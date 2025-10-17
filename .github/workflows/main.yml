@@ -135,5 +135,5 @@ jobs:
           context: ./telegram-bot
           file: ./telegram-bot/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}:1.0.0
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
