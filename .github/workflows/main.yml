@@ -104,15 +104,13 @@ jobs:
 
   deploy-bot:
     runs-on: ubuntu-latest
-    needs: build-bot
-    #    needs: test-bot
-    if: ${{ success() }}
-#    environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - name: Log in to GHCR
-        run: echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Push image
-        run: |
-          docker tag telegram-bot:latest ghcr.io/${{ github.repository_owner_id }}/telegram-bot:latest
-          docker push ghcr.io/${{ github.repository_owner_id }}/telegram-bot:latest
+      - uses: actions/checkout@v4
+      - name: Build and push to GHCR
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/telegram-bot:latest
