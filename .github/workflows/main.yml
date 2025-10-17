@@ -7,8 +7,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  SERVER_IMAGE_NAME: server
-  TELEGRAM_BOT_IMAGE_NAME: telegram-bot
+  SERVER_IMAGE_NAME: server:1.0.0
+  TELEGRAM_BOT_IMAGE_NAME: telegram-bot:1.0.0
 
 jobs:
 #  test-server:
