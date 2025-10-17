@@ -84,7 +84,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build Image
-        run: docker build -t telegram-bot:latest .
+        run: |
+          cd telegram-bot
+          docker build -t telegram-bot:latest .
 
 #  deploy-server:
 #    runs-on: ubuntu-latest
