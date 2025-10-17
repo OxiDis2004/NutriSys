@@ -7,8 +7,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  SERVER_IMAGE_NAME: server:1.0.0
-  TELEGRAM_BOT_IMAGE_NAME: telegram-bot:1.0.0
+  SERVER_IMAGE_NAME: server
+  TELEGRAM_BOT_IMAGE_NAME: telegram-bot
 
 jobs:
 #  test-server:
@@ -135,5 +135,5 @@ jobs:
           context: ./telegram-bot
           file: ./telegram-bot/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}:1.0.0
           labels: ${{ steps.meta.outputs.labels }}
