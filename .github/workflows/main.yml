@@ -104,7 +104,8 @@ jobs:
 
   deploy-bot:
     runs-on: ubuntu-latest
-#    needs: test-bot
+    needs: build-bot
+    #    needs: test-bot
     if: ${{ success() }}
 #    environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
     steps:
@@ -113,5 +114,5 @@ jobs:
 
       - name: Push image
         run: |
-          docker tag telegram-bot:latest ghcr.io/${{ github.repository_owner }}/telegram-bot:latest
-          docker push ghcr.io/${{ github.repository_owner }}/telegram-bot:latest
+          docker tag telegram-bot:latest ghcr.io/${{ github.ref }}/telegram-bot:latest
+          docker push ghcr.io/${{ github.ref }}/telegram-bot:latest
