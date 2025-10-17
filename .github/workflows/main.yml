@@ -127,7 +127,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.REGISTRY }}/${{ env.TELEGRAM_BOT_IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.TELEGRAM_BOT_IMAGE_NAME }}
 
       - name: Build and push Docker Image
         uses: docker/build-push-action@v5
