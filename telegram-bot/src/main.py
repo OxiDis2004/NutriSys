@@ -3,9 +3,10 @@ from aiogram.types import Message
 from aiogram.filters import Command
 import asyncio
 import logging
+import os
 
 logging.basicConfig(level=logging.INFO)
-API_TOKEN = "7761062074:AAHTyEAzkEu37lbzznlUWMbD1VsxebrDXRs"
+API_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
