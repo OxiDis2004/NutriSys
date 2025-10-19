@@ -2,6 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+images:
+  pullSecrets:
+    - name: ghcr-secret
+
 persistentVolumeClaim:
   name: mysql-pvc
   storageClassName: standard
@@ -11,6 +15,9 @@ secrets:
   mysql:
     name: mysql-secret
     key: root-password
+  telegramBot:
+    name: telegram-secret
+    key: token
 
 mysqlDeployment:
   image: mysql:9.0.1-oraclelinux9
@@ -35,7 +42,7 @@ serverDeployment:
 
 serverService:
   name: server-svc
-  type: ClusterIP
+  type: LoadBalancer
   port: 8000
 
 webDeployment:

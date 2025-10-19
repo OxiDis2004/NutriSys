@@ -187,3 +187,20 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+#  helm:
+#    name: Update helm
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Create GHCR secret in Kubernetes
+#        run: |
+#          kubectl create secret docker-registry ghcr-secret \
+#            --docker-server=${{ env.REGISTRY }} \
+#            --docker-username=${{ github.actor }} \
+#            --docker-password=${{ secrets.GHCR_PAT }} \
+#            -n nutri-sys-ns || \
+#          kubectl patch secret ghcr-secret -n nutri-sys-ns -p '{"type": "kubernetes.io/dockerconfigjson" }'
+#
+#      - name: Helm install
+#        run: |
+#          helm upgrade --install nutri-sys ./chart -n nutri-sys-ns --create-namespace

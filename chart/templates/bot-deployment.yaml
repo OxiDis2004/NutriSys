@@ -18,3 +18,11 @@ spec:
       containers:
         - name: {{ .Values.botDeployment.name }}
           image: {{ .Values.botDeployment.image }}
+          env:
+            - name: TELEGRAM_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.telegramBot.name }}
+                  key: {{ .Values.secrets.telegramBot.key }}
+      imagePullSecrets: {{ toYaml .Values.images.pullSecrets | nindent 8 }}
+

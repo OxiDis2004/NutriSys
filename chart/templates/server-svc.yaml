@@ -4,7 +4,7 @@ metadata:
   name: {{ .Values.serverService.name }}
 spec:
   selector:
-    app: {{ .Values.serverService.name }}
+    app: {{ .Values.serverDeployment.name }}
   ports:
     - protocol: TCP
       port: {{ .Values.serverService.port }}

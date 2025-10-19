@@ -21,4 +21,5 @@ spec:
           ports:
             - containerPort: {{ .Values.webDeployment.port }}
               protocol: TCP
+      imagePullSecrets: {{ toYaml .Values.images.pullSecrets | nindent 8 }}
       restartPolicy: {{ .Values.webDeployment.restartPolicy }}
