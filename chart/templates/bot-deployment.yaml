@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.botDeployment.name }}
+  labels:
+    app: {{ .Values.botDeployment.name }}
+spec:
+  replicas: {{ .Values.botDeployment.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.botDeployment.name }}
+  template:
+    metadata:
+      name: {{ .Values.botDeployment.name }}
+      labels:
+        app: {{ .Values.botDeployment.name }}
+    spec:
+      containers:
+        - name: {{ .Values.botDeployment.name }}
+          image: {{ .Values.botDeployment.image }}

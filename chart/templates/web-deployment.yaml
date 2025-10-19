@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.webDeployment.name }}
+  labels:
+    app: {{ .Values.webDeployment.name }}
+spec:
+  replicas: {{ .Values.webDeployment.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.webDeployment.name }}
+  template:
+    metadata:
+      name: {{ .Values.webDeployment.name }}
+      labels:
+        app: {{ .Values.webDeployment.name }}
+    spec:
+      containers:
+        - name: {{ .Values.webDeployment.name }}
+          image: {{ .Values.webDeployment.image }}
+          ports:
+            - containerPort: {{ .Values.webDeployment.port }}
+              protocol: TCP
+      restartPolicy: {{ .Values.webDeployment.restartPolicy }}
