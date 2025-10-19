@@ -9,6 +9,7 @@ env:
   REGISTRY: ghcr.io
   SERVER_IMAGE_NAME: server
   TELEGRAM_BOT_IMAGE_NAME: telegram-bot
+  WEB_IMAGE_NAME: web
 
 jobs:
 #  test-server:
@@ -152,6 +153,37 @@ jobs:
         with:
           context: ./telegram-bot
           file: ./telegram-bot/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy-web:
+    name: Build and Push Web Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login into ${{ env.REGISTRY }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.WEB_IMAGE_NAME }}
+
+      - name: Build and push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./web
+          file: ./web/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

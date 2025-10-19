@@ -6,7 +6,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
+  storageClassName: {{ .Values.persistentVolumeClaim.storageClassName }}
   resources:
     requests:
-      storage: {{ .Values.persistentVolumeClaim.storage }}
-    storageClassName: {{ .Values.persistentVolumeClaim.storageClassName }}
+      storage: {{ .Values.persistentVolumeClaim.size }}

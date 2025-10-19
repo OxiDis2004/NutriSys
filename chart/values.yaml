@@ -2,13 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
-replicaCount: 1
-
 persistentVolumeClaim:
   name: mysql-pvc
-  storageClassName: '""'
-  storage: 2Gi
+  storageClassName: standard
+  size: 2Gi
 
 secrets:
   mysql:
@@ -45,13 +42,17 @@ webDeployment:
   image: ghcr.io/oxidis2004/web:main
   name: web
   replicaCount: 1
-  port: 4173
+  port: 80
   restartPolicy: Always
 
 webService:
   name: web-svc
-  type: NodePort
+  type: ClusterIP
   port: 80
+
+webIngress:
+  name: web-ing
+  host: nutri-system.local
 
 autoscaling:
   enabled: true
