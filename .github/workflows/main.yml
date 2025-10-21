@@ -1,15 +1,27 @@
-name: Build and Deploy
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
       - '**'
+  workflow_dispatch:
+    inputs:
+      deploy_to_server:
+        description: "Deploy to server"
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "true"
+          - "false"
 
 env:
   REGISTRY: ghcr.io
+  GHCR_PASS: ${{ secrets.GHCR_TOKEN }}
   SERVER_IMAGE_NAME: server
-  TELEGRAM_BOT_IMAGE_NAME: telegram-bot
-  WEB_IMAGE_NAME: web
+  TELEGRAM_BOT_IMAGE_NAME: bot-frontend
+  WEB_IMAGE_NAME: web-frontend
+
 
 jobs:
 #  test-server:
@@ -43,16 +55,16 @@ jobs:
 #          cd server/
 #          pytest --maxfail=1 --disable-warnings -q
 
-  build-server:
-    name: Build Server Image
-    runs-on: ubuntu-latest
-#    needs: test-server
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build Image
-        run: |
-          cd server
-          docker build -t ${{ env.SERVER_IMAGE_NAME }}:latest .
+#  build-server:
+#    name: Build Server Image
+#    runs-on: ubuntu-latest
+##    needs: test-server
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Build Image
+#        run: |
+#          cd server
+#          docker build -t ${{ env.SERVER_IMAGE_NAME }}:latest .
 
 #  test-bot:
 #    name: Run Telegram Bot Tests
@@ -85,122 +97,242 @@ jobs:
 #          cd telegram-bot/
 #          pytest --maxfail=1 --disable-warnings -q
 
-  build-bot:
-    name: Build Telegram Bot Image
-    runs-on: ubuntu-latest
-#    needs: test-server
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build Image
-        run: |
-          cd telegram-bot
-          docker build -t ${{ env.TELEGRAM_BOT_IMAGE_NAME }}:latest .
-
-  deploy-server:
-    name: Build and Push Server Image
-    runs-on: ubuntu-latest
-#    needs: test-server
-#    if: ${{ success() }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Login into ${{ env.REGISTRY }}
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.SERVER_IMAGE_NAME }}
-
-      - name: Build and push Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./server
-          file: ./server/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-  deploy-telegram-bot:
-    name: Build and Push Telegram Bot Image
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Login into ${{ env.REGISTRY }}
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.TELEGRAM_BOT_IMAGE_NAME }}
-
-      - name: Build and push Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./telegram-bot
-          file: ./telegram-bot/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-  deploy-web:
-    name: Build and Push Web Image
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Login into ${{ env.REGISTRY }}
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.WEB_IMAGE_NAME }}
-
-      - name: Build and push Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./web
-          file: ./web/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-#  helm:
-#    name: Update helm
+#  build-bot:
+#    name: Build Telegram Bot Image
+#    runs-on: ubuntu-latest
+##    needs: test-server
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Build Image
+#        run: |
+#          cd telegram-bot
+#          docker build -t ${{ env.TELEGRAM_BOT_IMAGE_NAME }}:latest .
+#
+#  deploy-server:
+#    name: Build and Push Server Image
 #    runs-on: ubuntu-latest
 #    steps:
-#      - name: Create GHCR secret in Kubernetes
-#        run: |
-#          kubectl create secret docker-registry ghcr-secret \
-#            --docker-server=${{ env.REGISTRY }} \
-#            --docker-username=${{ github.actor }} \
-#            --docker-password=${{ secrets.GHCR_PAT }} \
-#            -n nutri-sys-ns || \
-#          kubectl patch secret ghcr-secret -n nutri-sys-ns -p '{"type": "kubernetes.io/dockerconfigjson" }'
+#      - uses: actions/checkout@v4
 #
-#      - name: Helm install
+#      - name: Login into ${{ env.REGISTRY }}
+#        uses: docker/login-action@v3
+#        with:
+#          registry: ${{ env.REGISTRY }}
+#          username: ${{ github.actor }}
+#          password: ${{ GHCR_PASS }}
+#
+#      - name: Extract Docker metadata
+#        id: meta
+#        uses: docker/metadata-action@v3
+#        with:
+#          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.SERVER_IMAGE_NAME }}
+#
+#      - name: Build and push Docker Image
+#        uses: docker/build-push-action@v5
+#        with:
+#          context: ./server
+#          file: ./server/Dockerfile
+#          push: true
+#          tags: ${{ steps.meta.outputs.tags }}
+#          labels: ${{ steps.meta.outputs.labels }}
+#
+#  deploy-bot-frontend:
+#    name: Build and Push Telegram Bot Image
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: read
+#      packages: write
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - name: Login into ${{ env.REGISTRY }}
+#        uses: docker/login-action@v3
+#        with:
+#          registry: ${{ env.REGISTRY }}
+#          username: ${{ github.actor }}
+#          password: ${{ GHCR_PASS }}
+#
+#      - name: Extract Docker metadata
+#        id: meta
+#        uses: docker/metadata-action@v3
+#        with:
+#          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.TELEGRAM_BOT_IMAGE_NAME }}
+#
+#      - name: Build and push Docker Image
+#        uses: docker/build-push-action@v5
+#        with:
+#          context: ./telegram-bot
+#          file: ./telegram-bot/Dockerfile
+#          push: true
+#          tags: ${{ steps.meta.outputs.tags }}
+#          labels: ${{ steps.meta.outputs.labels }}
+#
+#  deploy-web-frontend:
+#    name: Build and Push Web Image
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: read
+#      packages: write
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - name: Login into ${{ env.REGISTRY }}
+#        uses: docker/login-action@v3
+#        with:
+#          registry: ${{ env.REGISTRY }}
+#          username: ${{ github.actor }}
+#          password: ${{ GHCR_PASS }}
+#
+#      - name: Extract Docker metadata
+#        id: meta
+#        uses: docker/metadata-action@v3
+#        with:
+#          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.WEB_IMAGE_NAME }}
+#
+#      - name: Build and push Docker Image
+#        uses: docker/build-push-action@v5
+#        with:
+#          context: ./web
+#          file: ./web/Dockerfile
+#          push: true
+#          tags: ${{ steps.meta.outputs.tags }}
+#          labels: ${{ steps.meta.outputs.labels }}
+
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: ${{ env.SERVER_IMAGE_NAME }}
+            context: ./server
+            dockerfile: ./server/Dockerfile
+            image_name: ${{ env.SERVER_IMAGE_NAME }}
+          - name: ${{ env.TELEGRAM_BOT_IMAGE_NAME }}
+            context: ./telegram-bot
+            dockerfile: ./telegram-bot/Dockerfile
+            image_name: ${{ env.TELEGRAM_BOT_IMAGE_NAME }}
+          - name: ${{ env.WEB_IMAGE_NAME }}
+            context: ./web
+            dockerfile: ./web/Dockerfile
+            image_name: ${{ env.WEB_IMAGE_NAME }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+#      # --- Python tests (unit + integration) ---
+#      - name: Setup Python
+#        if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
+#        uses: actions/setup-python@v5
+#        with:
+#          python-version: '3.12'
+#
+#      - name: Run Python unit tests for ${{ matrix.name }}
+#        if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
 #        run: |
-#          helm upgrade --install nutri-sys ./chart -n nutri-sys-ns --create-namespace
+#          cd ${{ matrix.context }}
+#          pip install -r requirements.txt
+#          pytest -v tests/unit > ../../test-${{ matrix.name }}-unit.log 2>&1
+#        continue-on-error: true
+#
+#      - name: Run Python integration tests for ${{ matrix.name }}
+#        if: matrix.name == env.SERVER_IMAGE_NAME
+#        run: |
+#          cd ${{ matrix.context }}
+#          pytest -v tests/integration > ../../test-${{ matrix.name }}-integration.log 2>&1
+#        continue-on-error: true
+#
+#      # --- Web tests (Playwright) ---
+#      - name: Setup Node.js
+#        if: matrix.name == env.WEB_IMAGE_NAME
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: 20
+#
+#      - name: Install dependencies (web)
+#        if: matrix.test_type == 'web'
+#        run: |
+#          cd ${{ matrix.context }}
+#          npm ci
+#
+#      - name: Run Playwright tests
+#        if: matrix.test_type == 'web'
+#        run: |
+#          cd ${{ matrix.context }}
+#          npx playwright install --with-deps
+#          npx playwright test > ../../test-${{ matrix.name }}-playwright.log 2>&1
+#        continue-on-error: true
+#
+#      # --- Upload logs ---
+#      - name: Upload test logs for ${{ matrix.name }}
+#        if: always()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: test-logs-${{ matrix.name }}
+#          path: test-${{ matrix.name }}-*.log
+
+      # --- Build images and push into GitHub repository ---
+      - name: Login into ${{ env.REGISTRY }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ env.GHCR_PASS }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.image_name }}
+
+      - name: Build and push ${{ matrix.name }} image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy-to-server:
+    name: Deploy to kubectl
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.deploy_to_server == 'true' }}
+    needs: build-and-push
+    steps:
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
+
+      - name: Ensure namespace exists
+        run: |
+          kubectl get ns nutri-sys-ns >/dev/null 2>&1 || kubectl create ns nutri-sys-ns
+
+      - name: Create telegram secret in Kubernetes
+        run: |
+          kubectl delete secret telegram-secret -n nutri-sys-ns --ignore-not-found
+          kubectl create secret generic telegram-secret \
+            --from-literal=token=${{ secrets.TELEGRAM_TOKEN }} \
+            -n nutri-sys-ns
+
+      - name: Create GHCR secret in Kubernetes
+        run: |
+          kubectl delete secret ghcr-secret -n nutri-sys-ns --ignore-not-found
+          kubectl create secret docker-registry ghcr-secret \
+            --docker-server=${{ env.REGISTRY }} \
+            --docker-username=${{ github.actor }} \
+            --docker-password=${{ GHCR_PASS }} \
+            -n nutri-sys-ns
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install nutri-sys ./chart -n nutri-sys-ns

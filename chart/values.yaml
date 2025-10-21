@@ -29,8 +29,8 @@ mysqlDeployment:
     mountPath: /var/lib/mysql
 
 botDeployment:
-  image: ghcr.io/oxidis2004/telegram-bot:main
-  name: telegram-bot
+  image: ghcr.io/oxidis2004/bot-frontend:main
+  name: bot-frontend
   replicaCount: 1
 
 serverDeployment:
@@ -46,8 +46,8 @@ serverService:
   port: 8000
 
 webDeployment:
-  image: ghcr.io/oxidis2004/web:main
-  name: web
+  image: ghcr.io/oxidis2004/web-frontend:main
+  name: web-frontend
   replicaCount: 1
   port: 80
   restartPolicy: Always
