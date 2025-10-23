@@ -37,5 +37,5 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .Values.persistentVolumeClaim.name }}
         - name: init-db
-            configMap:
-              name: {{ .Values.mysql.name }}-initdb
+          configMap:
+            name: {{ .Values.mysql.name }}-initdb
