@@ -17,4 +17,5 @@ requests
 sqlalchemy
 #python-multipart
 pydantic
+pymysql
 #usda-api
