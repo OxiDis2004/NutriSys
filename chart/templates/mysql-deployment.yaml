@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.mysqlDeployment.name }}
+  name: {{ .Values.mysql.name }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ .Values.mysqlDeployment.name }}
+    app: {{ .Values.mysql.name }}
 spec:
-  replicas: {{ .Values.mysqlDeployment.replicaCount }}
+  replicas: {{ .Values.mysql.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Values.mysqlDeployment.name }}
+      app: {{ .Values.mysql.name }}
   template:
     metadata:
-      name: {{ .Values.mysqlDeployment.name }}
+      name: {{ .Values.mysql.name }}
       labels:
-        app: {{ .Values.mysqlDeployment.name }}
+        app: {{ .Values.mysql.name }}
     spec:
       containers:
-        - name: {{ .Values.mysqlDeployment.name }}
-          image: {{ .Values.mysqlDeployment.image }}
+        - name: {{ .Values.mysql.name }}
+          image: {{ .Values.mysql.image }}
           ports:
-            - containerPort: {{ .Values.mysqlDeployment.port }}
+            - containerPort: {{ .Values.mysql.port }}
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
@@ -28,9 +28,14 @@ spec:
                   name: {{ .Values.secrets.mysql.name }}
                   key: {{ .Values.secrets.mysql.key }}
           volumeMounts:
-            - name: {{ .Values.mysqlDeployment.volume.storageName }}
-              mountPath: {{ .Values.mysqlDeployment.volume.mountPath }}
+            - name: {{ .Values.mysql.volume.storageName }}
+              mountPath: {{ .Values.mysql.volume.mountPath }}
+            - name: init-db
+              mountPath: /docker-entrypoint-initdb.d
       volumes:
-        - name: {{ .Values.mysqlDeployment.volume.storageName }}
+        - name: {{ .Values.mysql.volume.storageName }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistentVolumeClaim.name }}
+        - name: init-db
+            configMap:
+              name: {{ .Values.mysql.name }}-initdb

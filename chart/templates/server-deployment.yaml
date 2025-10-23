@@ -21,5 +21,20 @@ spec:
           ports:
             - containerPort: {{ .Values.serverDeployment.port }}
               protocol: TCP
+          env:
+            - name: DB_HOST
+              value: "{{ .Values.mysql.service }}.{{ .Release.Namespace }}.svc.cluster.local"
+            - name: DB_PORT
+              value: "{{ .Values.mysql.port }}"
+            - name: DB_USER
+              value: "{{ .Values.mysql.user }}"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.mysql.name }}
+                  key: {{ .Values.secrets.mysql.key }}
+            - name: DB_DATABASE
+              value: "{{ .Values.mysql.database }}"
+
       imagePullSecrets: {{ toYaml .Values.images.pullSecrets | nindent 8 }}
       restartPolicy: {{ .Values.serverDeployment.restartPolicy }}

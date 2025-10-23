@@ -19,11 +19,14 @@ secrets:
     name: telegram-secret
     key: token
 
-mysqlDeployment:
+mysql:
   image: mysql:9.0.1-oraclelinux9
   name: mysql
+  service: mysql-svc
   replicaCount: 1
   port: 3306
+  user: "root"
+  database: "nutri-system"
   volume:
     storageName: mysql-storage
     mountPath: /var/lib/mysql
