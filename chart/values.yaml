@@ -36,6 +36,7 @@ botDeployment:
   name: bot-frontend
   replicaCount: 1
   restartPolicy: Always
+  imagePullPolicy: Always
 
 serverDeployment:
   image: ghcr.io/oxidis2004/server:main
@@ -43,6 +44,7 @@ serverDeployment:
   replicaCount: 1
   port: 8000
   restartPolicy: Always
+  imagePullPolicy: Always
 
 serverService:
   name: server-svc
@@ -55,6 +57,7 @@ webDeployment:
   replicaCount: 1
   port: 80
   restartPolicy: Always
+  imagePullPolicy: Always
 
 webService:
   name: web-svc

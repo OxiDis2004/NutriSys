@@ -18,6 +18,7 @@ spec:
       containers:
         - name: {{ .Values.botDeployment.name }}
           image: {{ .Values.botDeployment.image }}
+          imagePullPolicy: {{ .Values.botDeployment.imagePullPolicy }}
           env:
             - name: TELEGRAM_BOT_TOKEN
               valueFrom:

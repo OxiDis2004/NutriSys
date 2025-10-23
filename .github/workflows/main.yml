@@ -297,7 +297,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   deploy-to-server:
-    name: Deploy to kubectl
+    name: Deploy to server
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.deploy_to_server == 'true' }}
     needs: build-and-push
