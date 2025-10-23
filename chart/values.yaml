@@ -35,6 +35,7 @@ botDeployment:
   image: ghcr.io/oxidis2004/bot-frontend:main
   name: bot-frontend
   replicaCount: 1
+  restartPolicy: Always
 
 serverDeployment:
   image: ghcr.io/oxidis2004/server:main

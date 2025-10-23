@@ -35,6 +35,5 @@ spec:
                   key: {{ .Values.secrets.mysql.key }}
             - name: DB_DATABASE
               value: "{{ .Values.mysql.database }}"
-
       imagePullSecrets: {{ toYaml .Values.images.pullSecrets | nindent 8 }}
       restartPolicy: {{ .Values.serverDeployment.restartPolicy }}
