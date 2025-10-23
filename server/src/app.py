@@ -14,6 +14,10 @@ database = os.getenv('DB_DATABASE')
 db = DBAdapter(db_host, db_port, db_user, db_pwd, database)
 app = FastAPI()
 
+@app.get("/")
+async def index():
+    return { "message": f"{db.session}" }
+
 @app.get("/hello")
 async def hello():
     return { "message": "hello" }
