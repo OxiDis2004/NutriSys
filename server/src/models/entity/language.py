@@ -2,7 +2,7 @@ from typing import List
 from sqlalchemy import String
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
 
-from src.models.entity.user import User
+from user import User
 
 
 class Language(DeclarativeBase):

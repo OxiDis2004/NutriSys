@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlalchemy import String, ForeignKey, DATETIME
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
 
-from src.models.entity.language import Language
+from language import Language
 
 
 class User(DeclarativeBase):
