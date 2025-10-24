@@ -35,21 +35,17 @@ spec:
           readinessProbe:
             exec:
               command:
-                - mysql
-                - -uroot
-                - -p$(MYSQL_PASSWORD)
-                - -e
-                - "USE nutri_system;"
+                - sh
+                - -c
+                - mysql -uroot -p"$MYSQL_PASSWORD" -e "USE nutri_system;"
             initialDelaySeconds: 10
             periodSeconds: 5
           livenessProbe:
             exec:
               command:
-                - mysql
-                - -uroot
-                - -p$(MYSQL_PASSWORD)
-                - -e
-                - "USE nutri_system;"
+                - sh
+                - -c
+                - mysql -uroot -p"$MYSQL_PASSWORD" -e "USE nutri_system;"
             initialDelaySeconds: 10
             periodSeconds: 5
 

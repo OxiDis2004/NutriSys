@@ -1,6 +1,7 @@
 import os
 
 from fastapi import FastAPI
+from sqlalchemy import text
 
 from src.models.adapter.database_adapter import DBAdapter
 
@@ -20,3 +21,13 @@ async def index():
 @app.get("/hello")
 async def hello():
     return { "message": "hello" }
+
+@app.get("/health")
+async def health_check():
+    try:
+        # Попытка выполнить простой запрос к базе
+        with db.session() as session:
+            session.execute(text("SELECT 1"))
+        return {"status": "healthy"}
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}
