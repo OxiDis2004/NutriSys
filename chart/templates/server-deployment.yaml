@@ -24,7 +24,7 @@ spec:
               protocol: TCP
           env:
             - name: DB_HOST
-              value: "{{ .Values.mysql.service }}.{{ .Release.Namespace }}.svc.cluster.local"
+              value: "{{ .Values.mysql.service }}"
             - name: DB_PORT
               value: "{{ .Values.mysql.port }}"
             - name: DB_USER
@@ -36,23 +36,11 @@ spec:
                   key: {{ .Values.secrets.mysql.key }}
             - name: DB_DATABASE
               value: "{{ .Values.mysql.database }}"
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            initialDelaySeconds: 10
-            periodSeconds: 5
           livenessProbe:
             httpGet:
               path: /health
               port: 8000
             initialDelaySeconds: 20
             periodSeconds: 10
-          startupProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            failureThreshold: 30
-            periodSeconds: 5
       imagePullSecrets: {{ toYaml .Values.images.pullSecrets | nindent 8 }}
       restartPolicy: {{ .Values.serverDeployment.restartPolicy }}

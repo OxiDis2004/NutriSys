@@ -27,32 +27,12 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.secrets.mysql.name }}
                   key: {{ .Values.secrets.mysql.key }}
+            - name: MYSQL_DATABASE
+              value: {{ .Values.mysql.database }}
           volumeMounts:
             - name: {{ .Values.mysql.volume.storageName }}
               mountPath: {{ .Values.mysql.volume.mountPath }}
-            - name: init-db
-              mountPath: /docker-entrypoint-initdb.d
-          readinessProbe:
-            exec:
-              command:
-                - sh
-                - -c
-                - mysql -uroot -p"$MYSQL_PASSWORD" -e "USE nutri_system;"
-            initialDelaySeconds: 10
-            periodSeconds: 5
-          livenessProbe:
-            exec:
-              command:
-                - sh
-                - -c
-                - mysql -uroot -p"$MYSQL_PASSWORD" -e "USE nutri_system;"
-            initialDelaySeconds: 10
-            periodSeconds: 5
-
       volumes:
         - name: {{ .Values.mysql.volume.storageName }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistentVolumeClaim.name }}
-        - name: init-db
-          configMap:
-            name: {{ .Values.mysql.name }}-initdb
