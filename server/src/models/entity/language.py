@@ -1,18 +1,18 @@
 from typing import List
 from sqlalchemy import String
-from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 
-from user import User
+from src.models.entity.base import Base
 
 
-class Language(DeclarativeBase):
+class Language(Base):
     __tablename__ = 'language'
 
     id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
     iso: Mapped[str] = mapped_column(String(3), nullable=False)
 
     users: Mapped[List["User"]] = relationship(
-        back_populates="language", cascade="all, delete-orphan"
+        "User", back_populates="language", cascade="all, delete-orphan"
     )
 
     def __repr__(self) -> str:

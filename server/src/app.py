@@ -2,8 +2,7 @@ import os
 
 from fastapi import FastAPI
 
-from models.adapter.database_adapter import DBAdapter
-
+from src.models.adapter.database_adapter import DBAdapter
 
 db_host = os.getenv('DB_HOST')
 db_port = os.getenv('DB_PORT')

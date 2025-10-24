@@ -18,4 +18,5 @@ sqlalchemy
 #python-multipart
 pydantic
 pymysql
+cryptography
 #usda-api
