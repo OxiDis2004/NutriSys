@@ -22,7 +22,6 @@ secrets:
 mysql:
   image: mysql:9.0.1-oraclelinux9
   name: mysql
-  service: mysql-svc
   replicaCount: 1
   port: 3306
   user: "root"
@@ -30,6 +29,11 @@ mysql:
   volume:
     storageName: mysql-storage
     mountPath: /var/lib/mysql
+
+mysqlService:
+  name: mysql-svc
+  type: NodePort
+  port: 3306
 
 botDeployment:
   image: ghcr.io/oxidis2004/bot-frontend:main

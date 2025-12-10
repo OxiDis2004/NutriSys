@@ -24,9 +24,9 @@ spec:
               protocol: TCP
           env:
             - name: DB_HOST
-              value: "{{ .Values.mysql.service }}"
+              value: "{{ .Values.mysqlService.name }}"
             - name: DB_PORT
-              value: "{{ .Values.mysql.port }}"
+              value: "{{ .Values.mysqlService.port }}"
             - name: DB_USER
               value: "{{ .Values.mysql.user }}"
             - name: DB_PASSWORD
