@@ -1,5 +1,9 @@
 fastapi
 uvicorn[standard]
+pytest
+pytest-mock
+pytest-asyncio
+httpx[http2]
 #pillow
 #opencv-python
 
