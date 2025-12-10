@@ -8,7 +8,7 @@ from src.models.entity.base import Base
 class Food(Base):
     __tablename__ = 'food'
 
-    id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
+    id: Mapped[str] = mapped_column(String(40), primary_key=True, nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     calory: Mapped[int] = mapped_column(Integer, nullable=False)
     protein: Mapped[Decimal] = mapped_column(DECIMAL(5,2), nullable=False)

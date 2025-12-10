@@ -9,12 +9,18 @@ from src.models.entity.drunk_water import DrunkWater
 class User(Base):
     __tablename__ = "user"
 
-    id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
-    name: Mapped[str] = mapped_column(String(30), nullable=False)
+    id: Mapped[str] = mapped_column(String(40), primary_key=True, nullable=False)
+    telegram_id: Mapped[str] = mapped_column(String(50), nullable=False)
     language_id: Mapped[int] = mapped_column(ForeignKey("language.id"), nullable=False)
     last_activity: Mapped[datetime] = mapped_column(DATETIME, nullable=False)
 
-    language: Mapped["Language"] = relationship("Language", back_populates="users")
+    language: Mapped["Language"] = relationship(
+        "Language", back_populates="users"
+    )
+
+    info: Mapped["UserInfo"] = relationship(
+        "UserInfo", back_populates="user", cascade="all, delete-orphan"
+    )
 
     drunk_water: Mapped["DrunkWater"] = relationship(
         "DrunkWater", back_populates="user", cascade="all, delete-orphan"
@@ -27,6 +33,6 @@ class User(Base):
     def __repr__(self) -> str:
         lang = self.language.iso if self.language else 'uk'
         return (
-            f"User(id={self.id!r}, name={self.name!r}, "
+            f"User(id={self.id!r}, telegram_id={self.telegram_id!r}, "
             f"language={lang!r}, last_activity={self.last_activity!r})"
         )
