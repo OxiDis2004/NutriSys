@@ -59,14 +59,14 @@ jobs:
         run: |
           cd ${{ matrix.context }}
           pip install -r requirements.txt
-          pytest -v test/unit > ../../test-${{ matrix.name }}-unit.log 2>&1
+          pytest -v test/unit > ../test-${{ matrix.name }}-unit.log 2>&1
         continue-on-error: true
 
       - name: Run Python integration tests for ${{ matrix.name }}
         if: matrix.name == env.SERVER_IMAGE_NAME
         run: |
           cd ${{ matrix.context }}
-          pytest -v test/integration > ../../test-${{ matrix.name }}-integration.log 2>&1
+          pytest -v test/integration > ../test-${{ matrix.name }}-integration.log 2>&1
         continue-on-error: true
 
       # --- Web tests (Playwright) ---
@@ -87,7 +87,7 @@ jobs:
         run: |
           cd ${{ matrix.context }}
           npx playwright install --with-deps
-          npx playwright test > ../../test-${{ matrix.name }}-playwright.log 2>&1
+          npx playwright test > ../test-${{ matrix.name }}-playwright.log 2>&1
         continue-on-error: true
 
       # --- Upload logs ---
