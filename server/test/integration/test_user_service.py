@@ -40,7 +40,7 @@ class TestUserService:
 
     @pytest.fixture
     def initialize_language(self, setup_services):
-        self.db_service.add_language(language_ua[0], language_ua[1])
+        self.db_service._add_language(language_ua[0], language_ua[1])
 
     @pytest.fixture
     def initialize_user(self, setup_services):

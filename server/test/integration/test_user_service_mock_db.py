@@ -27,7 +27,7 @@ class TestUserServiceMockDB:
         self.user_service = None
 
     def test_login_success(self, setup_services):
-        self.db_service.add_language(1, "ua")
+        self.db_service._add_language(1, "ua")
         user = UserDTO(id=str(uuid.uuid4()), telegram_id="user123", language="ua")
         self.db_service.add_user(user, datetime.now())
 
