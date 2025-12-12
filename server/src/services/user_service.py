@@ -1,6 +1,8 @@
 import uuid
 from datetime import date, datetime
-from fastapi import HTTPException
+
+from fastapi import HTTPException, status
+from fastapi.responses import Response
 
 from src.services.db_service import DBService
 from src.models.dto.user_dto import UserDTO
@@ -11,19 +13,22 @@ from src.models.property.goal import Goal
 
 class UserService:
     def __init__(self, db_service: DBService):
-        self.db_service: DBService = db_service
+        self._db_service: DBService = db_service
 
     def login(self, user: UserDTO) -> UserDTO:
-        data = self.db_service.get_user(user.telegram_id)
+        data = self._db_service.get_user(user.telegram_id)
 
         if data is None or data.id is None:
             raise HTTPException(status_code=404, detail="User not found")
 
         user.id = data.id
         user.language = data.iso if user.language is None else user.language
-
-        self.db_service.update_user_activity(user.telegram_id)
-        return user
+        
+        try:
+            self._db_service.update_user_activity(user.telegram_id)
+            return user
+        except Exception as e:
+            raise HTTPException(status_code=400, detail="Caught " + str(e))
 
     def register(self, user: UserDTO) -> UserDTO:
         user.id = str(uuid.uuid4())
@@ -32,8 +37,13 @@ class UserService:
             raise HTTPException(status_code=400, detail="User cannot be created")
 
         user_last_activity = datetime.now()
-        self.db_service.add_user(user, user_last_activity)
-        data = self.db_service.get_user(user.telegram_id)
+
+        data = self._db_service.get_user(user.telegram_id)
+        if data is not None:
+            raise HTTPException(status_code=400, detail="User exists")
+
+        self._db_service.add_user(user, user_last_activity)
+        data = self._db_service.get_user(user.telegram_id)
 
         if data is None:
             raise HTTPException(status_code=404, detail="User couldn't create")
@@ -42,19 +52,26 @@ class UserService:
         return user
 
     def update_information(self, user_info: UserInfoDTO):
-        if user_info.id is None:
+        if user_info is None or user_info.id is None:
             raise HTTPException(status_code=400, detail="User id is undefined")
 
-        self.db_service.update_user_info(user_info)
+        try:
+            self._db_service.update_user_info(user_info)
+            return Response(status_code=status.HTTP_202_ACCEPTED)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail="Caught " + str(e))
 
-    def calculate_calorie(self, user_info: UserInfoDTO) -> int:
+    def calculate_calorie(self, user_info: UserInfoDTO) -> dict[str, int]:
         if user_info.weight is None or \
             user_info.height is None or \
             user_info.birthday is None or \
             user_info.sex is None:
-            return 0
+            return { "bmr": 0 }
 
         year = self.years_old(user_info.birthday)
+        if year:
+            return { "bmr": 0 }
+
         bmr = self.formula(user_info.weight, user_info.height, year, user_info.sex)
 
         if isinstance(user_info.count_of_sport_in_week, Activity):
@@ -63,7 +80,7 @@ class UserService:
         if isinstance(user_info.goal, Goal):
             bmr = self.set_bmr_by_goal(bmr, user_info.goal)
 
-        return round(bmr)
+        return { "bmr": round(bmr) }
 
     def years_old(self, birthday: date) -> int:
         today = self.get_today()

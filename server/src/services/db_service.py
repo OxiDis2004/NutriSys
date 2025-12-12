@@ -1,11 +1,11 @@
 from datetime import date, datetime
 import os
-import uuid
 
 from sqlalchemy import Engine, update, select, Row
 from sqlalchemy.dialects.mysql import insert
 
 from src.models.adapter.database_adapter import DBAdapter
+from src.models.dto.nutrient_food_dto import NutrientFoodDTO
 from src.models.dto.user_dto import UserDTO
 from src.models.dto.user_info_dto import UserInfoDTO
 from src.models.entity.drunk_water import DrunkWater
@@ -73,43 +73,42 @@ class DBService:
 
     def get_drunk_water(self, user_id: str, search_date: date):
         stmt = (
-            select(DrunkWater.date, DrunkWater.water)
+            select(DrunkWater.date.label("date"), DrunkWater.water.label("water"))
             .where(DrunkWater.user_id == user_id)
             .where(DrunkWater.date == search_date)
             .group_by(DrunkWater.date)
         )
 
-        return self.db.fetch(stmt)
+        return self.db.fetch_one(stmt)
 
     def get_drunk_water_interval(self, user_id: str, date_from: date, date_to: date):
         stmt = (
-            select(DrunkWater.date, DrunkWater.water)
+            select(DrunkWater.date.label("date"), DrunkWater.water.label("water"))
             .where(DrunkWater.user_id == user_id)
-            .where(DrunkWater.date > date_from)
-            .where(DrunkWater.date < date_to)
+            .where(DrunkWater.date >= date_from)
+            .where(DrunkWater.date <= date_to)
             .group_by(DrunkWater.date)
         )
 
         return self.db.fetch(stmt)
 
-    def insert_drunk_water(self, user_id: str, drunk_water: int):
-        date_now = date.today()
-
-        stmt = (
-            insert(DrunkWater).values([
-                {
-                    "user_id": user_id,
-                    "water": drunk_water,
-                    "date": date_now
-                }
-            ])
-        )
-
+    def add_drunk_water(self, user_id: str, drunk_water: int, now: date):
+        stmt = insert(DrunkWater).values(user_id=user_id, water=drunk_water, date=now)
         self.db.commit(stmt)
 
-    def get_sent_food(self, user_id: str, search_date: date):
+    def update_drunk_water(self, user_id: str, drunk_water: int, now: date):
         stmt = (
-            select(SentFood.date, SentFood.food_id, SentFood.image_id)
+            update(DrunkWater)
+            .where(DrunkWater.user_id == user_id)
+            .where(DrunkWater.date == now)
+            .values(water=drunk_water)
+        )
+        self.db.commit(stmt)
+
+    def get_sent_food(self, user_id: str, search_date: datetime):
+        stmt = (
+            select(SentFood.date.label("date"), SentFood.food_id.label("food"),
+                SentFood.image_id.label("image"))
             .where(SentFood.user_id == user_id)
             .where(SentFood.date == search_date)
             .group_by(SentFood.date)
@@ -119,7 +118,8 @@ class DBService:
 
     def get_sent_food_interval(self, user_id: str, date_from: date, date_to: date):
         stmt = (
-            select(SentFood.date, SentFood.food_id, SentFood.image_id)
+            select(SentFood.date.label("date"), SentFood.food_id.label("food"),
+                SentFood.image_id.label("image"))
             .where(SentFood.user_id == user_id)
             .where(SentFood.date > date_from)
             .where(SentFood.date < date_to)
@@ -128,7 +128,7 @@ class DBService:
 
         return self.db.fetch(stmt)
 
-    def insert_sent_food(self, user_id: str, food_id: str, image_id: str | None):
+    def add_sent_food(self, user_id: str, food_id: str, image_id: str | None):
         date_now = date.today()
 
         stmt = (
@@ -146,12 +146,45 @@ class DBService:
 
     def get_food(self, food_id: str):
         stmt = (
-            select(Food.id, Food.name, Food.calory,
-                      Food.protein, Food.carbon, Food.fat)
+            select(Food.calory.label("calory"), Food.protein.label("protein"),
+                Food.carbon.label("carbon"), Food.fat.label("fat"))
                 .where(Food.id == food_id)
         )
 
         return self.db.fetch(stmt)
+
+    def get_food_by_name(self, food_name: str):
+        stmt = (
+            select(Food.id.label("id"), Food.name.label("name"), Food.calory.label("calory"),
+                Food.protein.label("protein"), Food.carbon.label("carbon"), Food.fat.label("fat"))
+            .where(Food.name == food_name)
+        )
+
+        return self.db.fetch(stmt)
+
+    def add_food(self, food_id: str, food_dto: NutrientFoodDTO):
+        stmt = (
+            insert(Food).values([
+                {
+                    "id": food_id,
+                    "name": food_dto.name,
+                    "calory": food_dto.calorie,
+                    "protein": food_dto.protein,
+                    "fat": food_dto.fat,
+                    "carbon": food_dto.carbon
+                }
+            ])
+        )
+
+        self.db.commit(stmt)
+
+    #-------- FOR TESTS --------
+    def add_language(self, language_id: int, iso: str):
+        insert_stmt = insert(Language).values(id=language_id, iso=iso)
+        self.db.commit(insert_stmt)
+
+    def close_session(self):
+        self.db.close_session()
 
     @staticmethod
     def get_db_host():

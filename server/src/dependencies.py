@@ -1,15 +1,29 @@
 from sqlalchemy import create_engine
-
 from src.models.adapter.database_adapter import DBAdapter
 from src.services.db_service import DBService
+from src.services.user_service import UserService
 
-_db_service = None
-_user_service = None
+class ServiceContainer:
+    db_service: DBService | None = None
+    user_service: UserService | None = None
 
-def set_services(db_service, user_service):
-    global _db_service, _user_service
-    _db_service = db_service
-    _user_service = user_service
+services = ServiceContainer()
+
+def set_services(db_service: DBService, user_service: UserService):
+    services.db_service = db_service
+    services.user_service = user_service
+
+def get_db_service() -> DBService:
+    return services.db_service
+
+def get_user_service() -> UserService:
+    return services.user_service
+
+def initialize_db_service(engine):
+    return DBService(engine)
+
+def initialize_user_service(db_service: DBService):
+    return UserService(db_service)
 
 def create_db_engine():
     db_host = DBService.get_db_host()
@@ -20,9 +34,3 @@ def create_db_engine():
 
     url = DBAdapter.get_url(db_host, db_port, db_user, db_pwd, database)
     return create_engine(url, echo=True)
-
-def get_db_service():
-    return _db_service
-
-def get_user_service():
-    return _user_service
