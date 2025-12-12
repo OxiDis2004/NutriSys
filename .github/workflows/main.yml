@@ -55,34 +55,34 @@ jobs:
           python-version: '3.12'
 
       - name: Run Python unit tests for ${{ matrix.name }}
-        id: unit_tests_${{ matrix.name }}
+        id: unit_tests
         if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
         run: |
           cd ${{ matrix.context }}
           pip install -r requirements.txt
           pytest -v test/unit > ../test-${{ matrix.name }}-unit.log 2>&1
           TEST_EXIT_CODE=$?
-          echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          echo "test_exit_code_${{ matrix.name }}=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
         continue-on-error: true
 
       - name: Run Python integration tests for ${{ matrix.name }}
-        id: integration_tests_${{ matrix.name }}
+        id: integration_tests
         if: matrix.name == env.SERVER_IMAGE_NAME
         run: |
           cd ${{ matrix.context }}
           pytest -v test/integration > ../test-${{ matrix.name }}-integration.log 2>&1
           TEST_EXIT_CODE=$?
-          echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          echo "test_exit_code_${{ matrix.name }}=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
         continue-on-error: true
 
       - name: Run Python e2e tests for ${{ matrix.name }}
-        id: e2e_tests_${{ matrix.name }}
+        id: e2e_tests
         if: matrix.name == env.SERVER_IMAGE_NAME
         run: |
           cd ${{ matrix.context }}
           pytest test/e2e -vv --cucumber-json=report-e2e-${{ matrix.name }}.json
           TEST_EXIT_CODE=$?
-          echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          echo "test_exit_code_${{ matrix.name }}=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
         continue-on-error: true
 
       # --- Web tests (Playwright) ---
