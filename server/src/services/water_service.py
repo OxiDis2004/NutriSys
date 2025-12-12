@@ -1,21 +1,20 @@
+import calendar
 from collections import defaultdict
-from datetime import date
+from datetime import date, datetime
 
 from fastapi import HTTPException
 
 from src.models.dto.water_request_dto import WaterRequestDTO
 from src.models.dto.water_response_dto import WaterResponseDTO
 from src.models.dto.water_statistic_request_dto import WaterStatisticRequestDTO
+from src.models.property.period import Period
 from src.services.db_service import DBService
-
-
-
 
 class WaterService:
     def __init__(self, db_service: DBService):
         self._db_service = db_service
 
-    def add_drunk_water(self, water_request: WaterRequestDTO):
+    def add_drunk_water(self, water_request: WaterRequestDTO) -> WaterResponseDTO:
         if water_request is None or water_request.user_id is None:
             raise HTTPException(status_code=400, detail="User id is null")
 
@@ -32,86 +31,76 @@ class WaterService:
                 self._db_service.update_drunk_water(water_request.user_id,
                     drunk_water, today)
 
-            return WaterResponseDTO(drunk_water_day=drunk_water)
+            return WaterResponseDTO(day=today, drunk_water_day=drunk_water)
 
         except Exception as e:
             raise HTTPException(status_code=400, detail="Caught " + str(e))
 
-    def statistic(self, request: WaterStatisticRequestDTO):
+    def statistic(self, request: WaterStatisticRequestDTO) -> list[WaterResponseDTO]:
         if request.user_id is None:
             raise HTTPException(status_code=400, detail="User id is null")
 
         try:
             if request.day is not None:
-                row = self._db_service.get_drunk_water(
-                    request.user_id, request.day
-                )
-                drunk_water = { row.date.isoformat(): int(row.water) }
+                row = self._db_service.get_drunk_water(request.user_id, request.day)
+                drunk_water = [WaterResponseDTO(day=row.date, drunk_water_day=row.water)]
                 return drunk_water
             elif request.week is not None:
-                monday, sunday = self.get_week(request.week)
-                rows = self._db_service.get_drunk_water_interval(
-                    request.user_id, monday, sunday
-                )
+                rows = self.get_statistic_data(self.get_week, request.week, request.user_id)
             elif request.month is not None:
-                start_month, end_month = self.get_month(request.month)
-                rows = self._db_service.get_drunk_water_interval(
-                    request.user_id, start_month, end_month
-                )
+                rows = self.get_statistic_data(self.get_month, request.month, request.user_id)
             elif request.year is not None:
-                start_year = request.year.replace(request.year.year, 1, 1)
-                end_year = request.year.replace(request.year.year, 12, 31)
-                rows = self._db_service.get_drunk_water_interval(
-                    request.user_id, start_year, end_year
-                )
+                rows = self.get_statistic_data(self.get_year, request.year, request.user_id)
+                months = defaultdict(int)
+                for row in rows:
+                    key = f"{row.date.year}-{row.date.month}"
+                    months[key] += row
+                rows = months
             else:
                 raise Exception("Date wouldn't be send")
 
             if len(rows) == 0:
                 raise Exception("Nothing found")
 
-            drunk_water = defaultdict(int)
-            for row in rows:
-                drunk_water[row.date.isoformat()] += int(row.water)
+            drunk_water: list[WaterResponseDTO] = []
+            if isinstance(rows, defaultdict):
+                for key, data in rows:
+                    drunk_water.append(WaterResponseDTO(day=date.fromisoformat(key),
+                        drunk_water_day=data))
+            else:
+                for row in rows:
+                    drunk_water.append(WaterResponseDTO(day=row.date, drunk_water_day=row.water))
 
             return drunk_water
         except Exception as e:
             raise e
 
+    def get_statistic_data(self, get_period_func, current_date: date | datetime, user_id: str ):
+        period = get_period_func(current_date)
+        period.start_date.isoformat()
+        return self._db_service.get_drunk_water_interval(user_id, period)
 
+    @staticmethod
+    def get_week(week: date | datetime) -> Period:
+        week_nr = week.isocalendar().week
+        start = date.fromisocalendar(week.year, week_nr, 1)
+        end = date.fromisocalendar(week.year, week_nr, 7)
+        return Period(start, end)
 
-    def get_week(self, week: date):
-        global monday, sunday
-        day = week.day
-        day_of_week = week.weekday()
-
-        match day_of_week:
-            case 0: monday, sunday = day, day + 6
-            case 1: monday, sunday = day + 1, day + 5
-            case 2: monday, sunday = day + 2, day + 4
-            case 3: monday, sunday = day + 3, day + 3
-            case 4: monday, sunday = day + 4, day + 2
-            case 5: monday, sunday = day + 5, day + 1
-            case 6: monday, sunday = day + 6, day
-            case _: monday, sunday = 1, 7
-
-        return (week.replace(week.year, week.month, monday),
-                week.replace(week.year, week.month, sunday))
-
-    def get_month(self, month_date: date):
-        global start, end
+    @staticmethod
+    def get_month(month_date: date | datetime) -> Period:
         year, month = month_date.year, month_date.month
-        start = month_date.replace(year, month, 1)
+        week_day, days_in_month = calendar.monthrange(year, month)
+        start = month_date.replace(day=1)
+        end = month_date.replace(day=days_in_month)
+        return Period(start, end)
 
-        if month in [1, 3, 5, 7, 8, 10, 12]:
-            day = 31
-        elif month == 2:
-            day = 29 if (year % 4 == 0 or year % 100 == 0) and year % 400 == 0 else 28
-        else:
-            day = 30
+    @staticmethod
+    def get_year(year_date: date | datetime) -> Period:
+        start = year_date.replace(month=1, day=1)
+        end = year_date.replace(month=12, day=31)
+        return Period(start, end)
 
-        end = month_date.replace(year, month, day)
-        return start, end
 
 
 

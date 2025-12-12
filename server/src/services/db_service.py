@@ -1,7 +1,7 @@
 from datetime import date, datetime
 import os
 
-from sqlalchemy import Engine, update, select, Row
+from sqlalchemy import Engine, update, select, Row, delete
 from sqlalchemy.dialects.mysql import insert
 
 from src.models.adapter.database_adapter import DBAdapter
@@ -14,6 +14,7 @@ from src.models.entity.language import Language
 from src.models.entity.sent_food import SentFood
 from src.models.entity.user import User
 from src.models.entity.user_info import UserInfo
+from src.models.property.period import Period
 
 
 class DBService:
@@ -81,12 +82,12 @@ class DBService:
 
         return self.db.fetch_one(stmt)
 
-    def get_drunk_water_interval(self, user_id: str, date_from: date, date_to: date):
+    def get_drunk_water_interval(self, user_id: str, period: Period):
         stmt = (
             select(DrunkWater.date.label("date"), DrunkWater.water.label("water"))
             .where(DrunkWater.user_id == user_id)
-            .where(DrunkWater.date >= date_from)
-            .where(DrunkWater.date <= date_to)
+            .where(DrunkWater.date >= period.start_date)
+            .where(DrunkWater.date <= period.end_date)
             .group_by(DrunkWater.date)
         )
 
@@ -179,7 +180,19 @@ class DBService:
         self.db.commit(stmt)
 
     #-------- FOR TESTS --------
-    def add_language(self, language_id: int, iso: str):
+    def _delete_user(self, telegram_id: str):
+        stmt = delete(User).where(User.telegram_id == telegram_id)
+        self.db.commit(stmt)
+
+    def _delete_drunk_water(self, user_id: str):
+        stmt = delete(DrunkWater).where(DrunkWater.user_id == user_id)
+        self.db.commit(stmt)
+
+    def get_language(self, language_id: int):
+        stmt = select(Language.id).where(Language.id == language_id)
+        return self.db.fetch(stmt)
+
+    def _add_language(self, language_id: int, iso: str):
         insert_stmt = insert(Language).values(id=language_id, iso=iso)
         self.db.commit(insert_stmt)
 
