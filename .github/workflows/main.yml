@@ -80,7 +80,7 @@ jobs:
         if: matrix.name == env.SERVER_IMAGE_NAME
         run: |
           cd ${{ matrix.context }}
-          pytest -v test/e2e > ../test-${{ matrix.name }}-e2e.log 2>&1
+          pytest test/e2e -vv --cucumber-json=report-e2e-${{ matrix.name }}.json
           TEST_EXIT_CODE=$?
           echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
         continue-on-error: true
