@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import IntEnum
 
 
-class Goal(Enum):
+class Goal(IntEnum):
     LoseWeight = 0
     MaintainWeight = 1
     GainWeight = 2

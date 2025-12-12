@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import ForeignKey, DATETIME, String, DATE
+from sqlalchemy import ForeignKey, DATETIME, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.entity.base import Base

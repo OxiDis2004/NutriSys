@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import IntEnum
 
 
-class Activity(Enum):
+class Activity(IntEnum):
     NoActivity = 0
     LowActivity = 1
     MiddleActivity = 2
