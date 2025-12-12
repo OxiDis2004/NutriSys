@@ -47,7 +47,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # --- Python tests (unit + integration) ---
+      # --- Python tests ---
       - name: Setup Python
         if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
         uses: actions/setup-python@v5
@@ -55,18 +55,34 @@ jobs:
           python-version: '3.12'
 
       - name: Run Python unit tests for ${{ matrix.name }}
+        id: unit_tests_${{ matrix.name }}
         if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
         run: |
           cd ${{ matrix.context }}
           pip install -r requirements.txt
           pytest -v test/unit > ../test-${{ matrix.name }}-unit.log 2>&1
+          TEST_EXIT_CODE=$?
+          echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
         continue-on-error: true
 
       - name: Run Python integration tests for ${{ matrix.name }}
+        id: integration_tests_${{ matrix.name }}
         if: matrix.name == env.SERVER_IMAGE_NAME
         run: |
           cd ${{ matrix.context }}
           pytest -v test/integration > ../test-${{ matrix.name }}-integration.log 2>&1
+          TEST_EXIT_CODE=$?
+          echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Run Python e2e tests for ${{ matrix.name }}
+        id: e2e_tests_${{ matrix.name }}
+        if: matrix.name == env.SERVER_IMAGE_NAME
+        run: |
+          cd ${{ matrix.context }}
+          pytest -v test/e2e > ../test-${{ matrix.name }}-e2e.log 2>&1
+          TEST_EXIT_CODE=$?
+          echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
         continue-on-error: true
 
       # --- Web tests (Playwright) ---
@@ -83,11 +99,14 @@ jobs:
           npm ci
 
       - name: Run Playwright tests
+        id: web_e2e_tests
         if: matrix.test_type == 'web'
         run: |
           cd ${{ matrix.context }}
           npx playwright install --with-deps
           npx playwright test > ../test-${{ matrix.name }}-playwright.log 2>&1
+          TEST_EXIT_CODE=$?
+          echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
         continue-on-error: true
 
       # --- Upload logs ---
@@ -108,6 +127,7 @@ jobs:
 
       - name: Extract Docker metadata
         id: meta
+        # if: steps.integration_tests.outputs.test_exit_code == '0'
         uses: docker/metadata-action@v3
         with:
           images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.name }}
