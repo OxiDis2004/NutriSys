@@ -53,14 +53,31 @@ class TestUserService:
         received_user = mocker.Mock()
         received_user.id = str(uuid.uuid4())
         received_user.iso = 'ua'
-        self.db_service_mock.get_user.return_value = received_user
+        self.db_service_mock.get_user.side_effect = [None, received_user]
 
         user = self.user_service_mock.register(user)
 
         assert user.id == received_user.id
         assert user.telegram_id == telegram_id
         assert user.language == received_user.iso
-        self.db_service_mock.get_user.assert_called_once_with(telegram_id)
+        assert self.db_service_mock.get_user.call_count == 2
+
+    def test_register_user_exists(self, mocker):
+        telegram_id = "example_id"
+        user = UserDTO(telegram_id=telegram_id, language='ua')
+        received_user = mocker.Mock()
+        received_user.id = str(uuid.uuid4())
+        received_user.iso = 'ua'
+        self.db_service_mock.get_user.return_value = received_user
+
+        with pytest.raises(Exception) as e_info:
+            user = self.user_service_mock.register(user)
+
+        assert e_info.errisinstance(HTTPException) == True
+        code, detail = str(e_info.value).split(": ")
+        assert code == '400'
+        assert detail == "User exists"
+        assert self.db_service_mock.get_user.call_count == 1
 
     def test_register_user_null_failed(self, mocker):
         user = UserDTO(telegram_id=None, language=None)
@@ -122,9 +139,9 @@ class TestUserService:
         self.user_service_mock.set_bmr_by_activity = mocker.Mock(return_value=3000)
         self.user_service_mock.set_bmr_by_goal = mocker.Mock(return_value=2700)
 
-        bmr = self.user_service_mock.calculate_calorie(user_info)
+        response = self.user_service_mock.calculate_calorie(user_info)
 
-        assert bmr == 2700
+        assert response['bmr'] == 2700
         self.user_service_mock.years_old.assert_called_once_with(user_info.birthday)
         self.user_service_mock.formula.assert_called_once_with(
             user_info.weight,
@@ -148,9 +165,9 @@ class TestUserService:
             lastname='Ponomarenko',
         )
 
-        bmr = self.user_service_mock.calculate_calorie(user_info)
+        response = self.user_service_mock.calculate_calorie(user_info)
 
-        assert bmr == 0
+        assert response['bmr'] == 0
 
     def test_years_old_normal(self, mocker):
         today = datetime.date(2025, 5, 6)

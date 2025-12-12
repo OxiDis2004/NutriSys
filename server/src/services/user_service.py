@@ -69,7 +69,7 @@ class UserService:
             return { "bmr": 0 }
 
         year = self.years_old(user_info.birthday)
-        if year:
+        if year == -1:
             return { "bmr": 0 }
 
         bmr = self.formula(user_info.weight, user_info.height, year, user_info.sex)
