@@ -26,5 +26,4 @@ jobs:
       - name: Run Postman tests
         run: |
           newman run ./server/postman/collection.json \
-          --environment ./server/postman/environment.json \
            -r cli,htmlextra
