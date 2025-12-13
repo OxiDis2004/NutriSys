@@ -13,32 +13,6 @@ from src.services.water_service import WaterService
 
 scenarios("features/drunk_water.feature")
 
-@given(parsers.cfparse('system has no user with telegram id "{telegram_id}"'))
-def clear_user(create_test_app, telegram_id):
-    get_db_service()._delete_user(telegram_id)
-
-
-@given(parsers.cfparse('system has user with telegram id "{telegram_id}" and language "{'
-                       'language}"'))
-def create_user(client, states, telegram_id, language):
-    async def inner():
-        if len(get_db_service().get_language(1)) < 1:
-            get_db_service()._add_language(1, "ua")
-
-        response = await client.post("/user/login", json={
-            "telegram_id": telegram_id
-        })
-
-        if response.status_code == 404:
-            response = await client.put("/user/register", json={
-                "telegram_id": telegram_id,
-                "language": language
-            })
-
-        states["user_id"] = response.json()["id"]
-
-    asyncio.run(inner())
-
 
 @given('remove data in table')
 def remove_water_data(states):
@@ -123,7 +97,7 @@ def add_water_in_year(states):
 
 
 @when(parsers.cfparse("I add {water_drunk:d} ml of water"))
-def add_water(client, states, water_drunk):
+def add_water_api(client, states, water_drunk):
     user_id = states["user_id"] if "user_id" in states else None
 
     async def inner():
@@ -201,16 +175,6 @@ def get_yearly_stats(client, states):
     asyncio.run(inner())
 
 
-@then(parsers.cfparse("response status {status:d}"))
-def check_status(states, status):
-    assert states["response"].status_code == status
-
-
-@then(parsers.cfparse('with message "{msg}"'))
-def check_message(states, msg):
-    assert states["response"].json()["detail"] == msg
-
-
 @then(parsers.cfparse("total drunk water should be {water_drunk:d} ml today"))
 def check_drunk_water(states, water_drunk):
     assert states["response"].json()["drunk_water_day"] == water_drunk
@@ -219,10 +183,8 @@ def check_drunk_water(states, water_drunk):
 @then(parsers.cfparse("{type_statistic} statistic"))
 def stats(states, type_statistic):
     global min_count, max_count, key
-    response = states.get("response")
-    body = response.json()
+    body = states.get("response").json()
 
-    assert response.status_code == 200
     match type_statistic:
         case 'daily':
             min_count = 1

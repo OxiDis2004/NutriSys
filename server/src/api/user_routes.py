@@ -10,6 +10,10 @@ router = APIRouter(prefix="/user")
 async def login(user: UserDTO, service=Depends(get_user_service)):
     return service.login(user)
 
+@router.post("/change_language", response_model=UserDTO)
+async def change_language(user: UserDTO, service=Depends(get_user_service)):
+    return service.update_language(user)
+
 @router.put("/register", response_model=UserDTO)
 async def register(user: UserDTO, service=Depends(get_user_service)):
     return service.register(user)
@@ -18,6 +22,6 @@ async def register(user: UserDTO, service=Depends(get_user_service)):
 async def calculate_calorie(user: UserInfoDTO, service=Depends(get_user_service)):
     return service.calculate_calorie(user)
 
-@router.put("/update_info")
+@router.post("/update_info")
 async def update_info(user: UserInfoDTO, service=Depends(get_user_service)):
     return service.update_information(user)

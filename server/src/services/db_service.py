@@ -43,6 +43,20 @@ class DBService:
         stmt = insert(UserInfo).values([ { "user_id": user.id } ])
         self.db.commit(stmt)
 
+    def update_user_language(self, user_id: str, language: str):
+        stmt = (
+            update(User)
+            .where(User.id == user_id)
+            .values(
+                language_id=(
+                    select(Language.id)
+                    .where(Language.iso == language)
+                    .scalar_subquery()
+                )
+            )
+        )
+        self.db.commit(stmt)
+
     def update_user_activity(self, user_id: str):
         user_last_activity = datetime.now()
 
@@ -188,8 +202,8 @@ class DBService:
         stmt = delete(DrunkWater).where(DrunkWater.user_id == user_id)
         self.db.commit(stmt)
 
-    def get_language(self, language_id: int):
-        stmt = select(Language.id).where(Language.id == language_id)
+    def get_languages(self):
+        stmt = select(Language.iso.label("iso"))
         return self.db.fetch(stmt)
 
     def _add_language(self, language_id: int, iso: str):

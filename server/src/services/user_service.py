@@ -61,6 +61,17 @@ class UserService:
         except Exception as e:
             raise HTTPException(status_code=400, detail="Caught " + str(e))
 
+    def update_language(self, user: UserDTO):
+        if user is None or user.id is None:
+            raise HTTPException(status_code=400, detail="User is undefined")
+
+        try:
+            self._db_service.update_user_language(user.id, user.language)
+            self._db_service.update_user_activity(user.id)
+            return user
+        except Exception as e:
+            raise HTTPException(status_code=400, detail="Caught " + str(e))
+
     def calculate_calorie(self, user_info: UserInfoDTO) -> dict[str, int]:
         if user_info.weight is None or \
             user_info.height is None or \
