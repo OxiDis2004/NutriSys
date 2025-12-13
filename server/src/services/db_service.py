@@ -1,7 +1,7 @@
 from datetime import date, datetime
 import os
 
-from sqlalchemy import Engine, update, select, Row, delete
+from sqlalchemy import Engine, update, select, Row, delete, text
 from sqlalchemy.dialects.mysql import insert
 
 from src.models.adapter.database_adapter import DBAdapter
@@ -194,6 +194,10 @@ class DBService:
         self.db.commit(stmt)
 
     #-------- FOR TESTS --------
+    def check_health(self):
+        stmt = select(text("1"))
+        return len(self.db.fetch(stmt)) > 0
+
     def _delete_user(self, telegram_id: str):
         stmt = delete(User).where(User.telegram_id == telegram_id)
         self.db.commit(stmt)

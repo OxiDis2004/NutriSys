@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy import text
+from fastapi import APIRouter, Depends, Response
 
 from src.dependencies import get_db_service
 
@@ -7,13 +6,12 @@ router = APIRouter()
 
 @router.get("/")
 async def index():
-    return { "status": "ok", "message": "hello" }
+    return Response(content="Hello world", status_code=200)
 
 @router.get("/db_health")
-async def db_health_check(db=Depends(get_db_service)):
+async def db_health_check(service=Depends(get_db_service)):
     try:
-        with db.session() as session:
-            session.execute(text("SELECT 1"))
-        return { "status": "ok", "message": "Healthy" }
+        service.check_health()
+        return Response(content="Healthy", status_code=200)
     except Exception as e:
-        return { "status": "error", "message": f"Unhealthy - {str(e)}" }
+        return Response(content=f"Unhealthy - {str(e)}", status_code=403)
