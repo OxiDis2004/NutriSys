@@ -1,0 +1,30 @@
+name: API Tests with Newman
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  newman-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Newman
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Run Postman tests
+        run: |
+          newman run ./server/postman/collection.json \
+          --environment ./server/postman/environment.json \
+           -r cli,htmlextra

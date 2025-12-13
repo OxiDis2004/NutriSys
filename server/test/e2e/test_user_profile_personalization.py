@@ -28,7 +28,7 @@ def update_language(client, states, telegram_id, language):
     states["user_data"] = UserDTO(id=user_id, telegram_id=telegram_id, language=language)
 
     async def inner():
-        response = await client.post(
+        response = await client.put(
             "/user/change_language",
             json=states["user_data"].model_dump(mode="json")
         )
@@ -47,7 +47,7 @@ def check_update(states):
 
 
 @when("user update profile information")
-def step_impl(client, states):
+def update_information(client, states):
     user_id = states["user_id"] if "user_id" in states else None
     user_info: UserInfoDTO = UserInfoDTO(id=user_id, name="Denys", lastname="Ponomarenko",
         birthday=date(2005, 1, 6), weight=100, height=182, sex='m',
@@ -55,7 +55,7 @@ def step_impl(client, states):
     )
 
     async def inner():
-        response = await client.post(
+        response = await client.put(
             "/user/update_info",
             json=user_info.model_dump(mode="json")
         )

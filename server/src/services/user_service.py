@@ -16,6 +16,9 @@ class UserService:
         self._db_service: DBService = db_service
 
     def login(self, user: UserDTO) -> UserDTO:
+        if user is None or user.telegram_id is None:
+            raise HTTPException(status_code=422, detail="Unprocessable Entity")
+
         data = self._db_service.get_user(user.telegram_id)
 
         if data is None or data.id is None:
@@ -28,13 +31,13 @@ class UserService:
             self._db_service.update_user_activity(user.telegram_id)
             return user
         except Exception as e:
-            raise HTTPException(status_code=400, detail="Caught " + str(e))
+            raise HTTPException(status_code=400, detail="Caught: " + str(e))
 
     def register(self, user: UserDTO) -> UserDTO:
         user.id = str(uuid.uuid4())
 
         if user.id is None or user.telegram_id is None or user.language is None:
-            raise HTTPException(status_code=400, detail="User cannot be created")
+            raise HTTPException(status_code=422, detail="User cannot be created")
 
         user_last_activity = datetime.now()
 
@@ -46,7 +49,7 @@ class UserService:
         data = self._db_service.get_user(user.telegram_id)
 
         if data is None:
-            raise HTTPException(status_code=404, detail="User couldn't create")
+            raise HTTPException(status_code=400, detail="User couldn't create")
 
         user.id = data.id
         return user
@@ -59,29 +62,38 @@ class UserService:
             self._db_service.update_user_info(user_info)
             return Response(status_code=status.HTTP_202_ACCEPTED)
         except Exception as e:
-            raise HTTPException(status_code=400, detail="Caught " + str(e))
+            raise HTTPException(status_code=400, detail="Caught: " + str(e))
 
     def update_language(self, user: UserDTO):
-        if user is None or user.id is None:
-            raise HTTPException(status_code=400, detail="User is undefined")
+        if user is None or (user.id is None and user.telegram_id is None) or user.language is None:
+            raise HTTPException(status_code=422, detail="User details not found")
 
         try:
+            data = self._db_service.get_user(user.telegram_id)
+            if data is None:
+                raise Exception("User didn't registered")
+
+            user.id = data.id
             self._db_service.update_user_language(user.id, user.language)
             self._db_service.update_user_activity(user.id)
             return user
         except Exception as e:
-            raise HTTPException(status_code=400, detail="Caught " + str(e))
+            raise HTTPException(status_code=400, detail="Caught: " + str(e))
 
     def calculate_calorie(self, user_info: UserInfoDTO) -> dict[str, int]:
-        if user_info.weight is None or \
-            user_info.height is None or \
-            user_info.birthday is None or \
-            user_info.sex is None:
-            return { "bmr": 0 }
+        if (user_info.weight is None or
+            not isinstance(user_info.weight, int) or
+            user_info.height is None or
+            not isinstance(user_info.height, int) or
+            user_info.birthday is None or
+            not isinstance(user_info.birthday, date) or
+            user_info.sex is None or
+            not isinstance(user_info.sex, str)):
+            raise HTTPException(status_code=400, detail="Not all the necessary data has been entered.")
 
         year = self.years_old(user_info.birthday)
         if year == -1:
-            return { "bmr": 0 }
+            raise HTTPException(status_code=400, detail="The birthday must be smaller than today.")
 
         bmr = self.formula(user_info.weight, user_info.height, year, user_info.sex)
 
