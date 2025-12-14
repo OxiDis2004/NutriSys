@@ -1,0 +1,42 @@
+name: 42Crunch API Security Scan
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  scan-api:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Клонування репозиторію
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Встановлення 42Crunch CLI
+      - name: Install 42Crunch CLI
+        run: |
+          curl -sSL https://download.42crunch.com/cli/42crunch-cli-linux-x64.tar.gz | tar -xz -C /usr/local/bin
+          chmod +x /usr/local/bin/42crunch
+
+      # 3. Запуск сканування OpenAPI
+      - name: Run 42Crunch scan
+        env:
+          CRUNCH_TOKEN: ${{ secrets.CRUNCH_TOKEN }}  # Токен доступу
+        run: |
+          mkdir -p reports
+          42crunch scan \
+            --file ./openapi.json \
+            --token $CRUNCH_TOKEN \
+            --output-json ./reports/42crunch_report.json \
+            --output-html ./reports/42crunch_report.html \
+            --fail-on-score-below 50
+
+      # 4. Збереження звітів як артефактів
+      - name: Upload 42Crunch reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: 42crunch-reports
+          path: reports/
