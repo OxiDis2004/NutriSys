@@ -4,7 +4,7 @@ from src.dependencies import get_user_service
 from src.models.dto.user_dto import UserDTO
 from src.models.dto.user_info_dto import UserInfoDTO
 
-router = APIRouter(prefix="/user")
+router = APIRouter(prefix="/api/user")
 
 @router.post("/login", response_model=UserDTO)
 async def login(user: UserDTO, service=Depends(get_user_service)):

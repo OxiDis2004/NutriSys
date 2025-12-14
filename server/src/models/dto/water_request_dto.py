@@ -1,6 +1,8 @@
-from pydantic import BaseModel
+from uuid import UUID
+
+from pydantic import BaseModel, Field
 
 
 class WaterRequestDTO(BaseModel):
-    user_id: str | None = None
-    drunk_water: int = 0
+    id: UUID = Field(..., description="Unique user identifier")
+    drunk_water: int = Field(..., description="Users drunk water now")

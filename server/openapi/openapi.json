@@ -1,0 +1,676 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FastAPI",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/": {
+      "get": {
+        "summary": "Index",
+        "operationId": "index_api__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/db_health": {
+      "get": {
+        "summary": "Db Health Check",
+        "operationId": "db_health_check_api_db_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/login": {
+      "post": {
+        "summary": "Login",
+        "operationId": "login_api_user_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/change_language": {
+      "put": {
+        "summary": "Change Language",
+        "operationId": "change_language_api_user_change_language_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/register": {
+      "put": {
+        "summary": "Register",
+        "operationId": "register_api_user_register_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/calculate_calorie": {
+      "post": {
+        "summary": "Calculate Calorie",
+        "operationId": "calculate_calorie_api_user_calculate_calorie_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserInfoDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/update_info": {
+      "put": {
+        "summary": "Update Info",
+        "operationId": "update_info_api_user_update_info_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserInfoDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/water/add": {
+      "put": {
+        "summary": "Add Water",
+        "operationId": "add_water_api_water_add_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WaterRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaterResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/water/statistic/day": {
+      "post": {
+        "summary": "Statistic Week",
+        "operationId": "statistic_week_api_water_statistic_day_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WaterStatisticRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WaterResponseDTO"
+                  },
+                  "type": "array",
+                  "title": "Response Statistic Week Api Water Statistic Day Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/water/statistic/week": {
+      "post": {
+        "summary": "Statistic Week",
+        "operationId": "statistic_week_api_water_statistic_week_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WaterStatisticRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WaterResponseDTO"
+                  },
+                  "type": "array",
+                  "title": "Response Statistic Week Api Water Statistic Week Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/water/statistic/month": {
+      "post": {
+        "summary": "Statistic Week",
+        "operationId": "statistic_week_api_water_statistic_month_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WaterStatisticRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WaterResponseDTO"
+                  },
+                  "type": "array",
+                  "title": "Response Statistic Week Api Water Statistic Month Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/water/statistic/year": {
+      "post": {
+        "summary": "Statistic Week",
+        "operationId": "statistic_week_api_water_statistic_year_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WaterStatisticRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WaterResponseDTO"
+                  },
+                  "type": "array",
+                  "title": "Response Statistic Week Api Water Statistic Year Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Activity": {
+        "type": "integer",
+        "enum": [0, 1, 2, 3, 4],
+        "title": "Activity"
+      },
+      "Goal": {
+        "type": "integer",
+        "enum": [0, 1, 2],
+        "title": "Goal"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "UserDTO": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Unique user identifier"
+          },
+          "telegram_id": {
+            "type": "string",
+            "maxLength": 50,
+            "pattern": "^\\d+$",
+            "title": "Telegram Id",
+            "description": "Telegram ID as numeric string"
+          },
+          "language": {
+            "type": "string",
+            "maxLength": 10,
+            "pattern": "^[a-z]{2}$",
+            "title": "Language",
+            "description": "User language code (ISO 639-1)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "telegram_id",
+          "language"
+        ],
+        "title": "UserDTO"
+      },
+      "UserInfoDTO": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Unique user identifier"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 55,
+            "pattern": "^[a-zA-Z\\- ]+$",
+            "title": "Name",
+            "description": "First name"
+          },
+          "lastname": {
+            "type": "string",
+            "maxLength": 55,
+            "pattern": "^[a-zA-Z\\- ]+$",
+            "title": "Lastname",
+            "description": "Last name"
+          },
+          "birthday": {
+            "type": "string",
+            "format": "date",
+            "title": "Birthday",
+            "description": "Date of birth"
+          },
+          "weight": {
+            "type": "integer",
+            "maximum": 500,
+            "minimum": 0,
+            "title": "Weight",
+            "description": "Weight in kilograms"
+          },
+          "height": {
+            "type": "integer",
+            "maximum": 300,
+            "minimum": 0,
+            "title": "Height",
+            "description": "Height in centimeters"
+          },
+          "sex": {
+            "type": "string",
+            "maxLength": 10,
+            "pattern": "^(male|female|other)$",
+            "title": "Sex",
+            "description": "Sex"
+          },
+          "count_of_sport_in_week": {
+            "$ref": "#/components/schemas/Activity",
+            "description": "Level of weekly activity"
+          },
+          "goal": {
+            "$ref": "#/components/schemas/Goal",
+            "description": "User goal"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "UserInfoDTO"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "WaterRequestDTO": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Unique user identifier"
+          },
+          "drunk_water": {
+            "type": "integer",
+            "title": "Drunk Water",
+            "description": "Users drunk water now"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "drunk_water"
+        ],
+        "title": "WaterRequestDTO"
+      },
+      "WaterResponseDTO": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day",
+            "description": "Today"
+          },
+          "drunk_water_day": {
+            "type": "integer",
+            "title": "Drunk Water Day",
+            "description": "Users drunk water today"
+          }
+        },
+        "type": "object",
+        "required": [
+          "drunk_water_day"
+        ],
+        "title": "WaterResponseDTO"
+      },
+      "WaterStatisticRequestDTO": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id",
+            "description": "Unique user identifier"
+          },
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day",
+            "description": "Optional day statistic"
+          },
+          "week": {
+            "type": "string",
+            "format": "date",
+            "title": "Week",
+            "description": "Optional week statistic"
+          },
+          "month": {
+            "type": "string",
+            "format": "date",
+            "title": "Month",
+            "description": "Optional month statistic"
+          },
+          "year": {
+            "type": "string",
+            "format": "date",
+            "title": "Year",
+            "description": "Optional year statistic"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "title": "WaterStatisticRequestDTO"
+      }
+    }
+  }
+}

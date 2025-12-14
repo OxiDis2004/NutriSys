@@ -1,0 +1,3 @@
+apis:
+  server/openapi/openapi.json:
+    alias: "fastapi"

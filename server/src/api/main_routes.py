@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Response
 
 from src.dependencies import get_db_service
 
-router = APIRouter()
+router = APIRouter(prefix="/api")
 
 @router.get("/")
 async def index():

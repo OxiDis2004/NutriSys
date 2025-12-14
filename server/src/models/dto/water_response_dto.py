@@ -1,8 +1,8 @@
-import datetime
+from datetime import date
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class WaterResponseDTO(BaseModel):
-    day: datetime.date = None
-    drunk_water_day: int = 0
+    day: date = Field(None, description="Today")
+    drunk_water_day: int = Field(..., description="Users drunk water today")

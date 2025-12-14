@@ -1,0 +1,671 @@
+{
+    "version": "2.0.0",
+    "runtimeConfiguration": {
+        "environment": "default",
+        "laxTestingModeEnabled": false,
+        "apiConnectivityCheck": true,
+        "logLevel": "error",
+        "logDestination": "stdout+platform",
+        "logMaxFileSize": 2147483648,
+        "requestHeaderNameRequestId": "x-scan-request-id",
+        "requestHeaderNameScenarioId": "x-scan-scenario-id",
+        "requestHeaderNameRequestType": "x-scan-request-type",
+        "requestFlowrate": 100,
+        "requestTimeout": 30,
+        "requestTlsInsecureSkipVerify": true,
+        "responseFollowRedirection": false,
+        "responseMaxBodySizeScan": 10485760,
+        "happyPathOnly": false,
+        "maxRequestRetryAttempts": 5,
+        "maxScanDuration": 1800,
+        "memoryLimit": 2147483648,
+        "memoryTimeSpan": 10,
+        "reportMaxRequestSizeHappyPath": 8092,
+        "reportMaxRequestSizeTest": 8092,
+        "reportIncludeRequestBody": true,
+        "reportIncludeResponseBody": true,
+        "reportMaxHttpResponseSizeHappyPath": 8092,
+        "reportMaxBodySizeHappyPath": 8092,
+        "reportMaxHttpResponseSizeTest": 8092,
+        "reportMaxBodySizeTest": 8092,
+        "reportIssuesOnly": false,
+        "reportMaxIssues": 1000,
+        "reportMaxSize": 20971520,
+        "reportGenerateCurlCommand": true,
+        "normalizeServerUrls": true
+    },
+    "customizations": {
+        "happyPaths": {
+            "retry": 1,
+            "responsePolicy": {
+                "httpStatusExpected": true,
+                "mustBeConformant": true
+            },
+            "httpStatusExpected": []
+        },
+        "tests": {
+            "responsePolicy": {
+                "httpStatusExpected": true,
+                "mustBeConformant": true
+            }
+        }
+    },
+    "operations": {
+        "add_water_api_water_add_put": {
+            "operationId": "add_water_api_water_add_put",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/add_water_api_water_add_put/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "add_water_api_water_add_put",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/api/water/add",
+                        "method": "PUT",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "drunk_water": 9066122120618351151,
+                                "id": "grmmhsiileapmoynqaquzjxdivgyzhzs"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "422": {
+                        "expectations": {
+                            "httpStatus": 422
+                        }
+                    }
+                }
+            }
+        },
+        "calculate_calorie_api_user_calculate_calorie_post": {
+            "operationId": "calculate_calorie_api_user_calculate_calorie_post",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/calculate_calorie_api_user_calculate_calorie_post/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "calculate_calorie_api_user_calculate_calorie_post",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/api/user/calculate_calorie",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "birthday": "lijdorrihdmgmrspahzsspkunleuchgz",
+                                "count_of_sport_in_week": 2410348773941294959,
+                                "goal": 4839270525744407204,
+                                "height": 214,
+                                "id": "hbmtqcribclyhkyspswdgkdlendxndcw",
+                                "lastname": "uQCqEKrvfDssuDbGiBdtRburdMku",
+                                "name": "jwBTdZROubdAnPtZZBPAazUnhSo",
+                                "sex": "other",
+                                "weight": 436
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "422": {
+                        "expectations": {
+                            "httpStatus": 422
+                        }
+                    }
+                }
+            }
+        },
+        "change_language_api_user_change_language_put": {
+            "operationId": "change_language_api_user_change_language_put",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/change_language_api_user_change_language_put/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "change_language_api_user_change_language_put",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/api/user/change_language",
+                        "method": "PUT",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "id": "mdfzpkjnytccyypqkqintfompzxzhgqm",
+                                "language": "aa",
+                                "telegram_id": "02277265488759524"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "422": {
+                        "expectations": {
+                            "httpStatus": 422
+                        }
+                    }
+                }
+            }
+        },
+        "db_health_check_api_db_health_get": {
+            "operationId": "db_health_check_api_db_health_get",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/db_health_check_api_db_health_get/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "db_health_check_api_db_health_get",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/api/db_health",
+                        "method": "GET"
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    }
+                }
+            }
+        },
+        "index_api__get": {
+            "operationId": "index_api__get",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/index_api__get/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "index_api__get",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/api/",
+                        "method": "GET"
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    }
+                }
+            }
+        },
+        "login_api_user_login_post": {
+            "operationId": "login_api_user_login_post",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/login_api_user_login_post/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "login_api_user_login_post",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/api/user/login",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "id": "mdfzpkjnytccyypqkqintfompzxzhgqm",
+                                "language": "aa",
+                                "telegram_id": "02277265488759524"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "422": {
+                        "expectations": {
+                            "httpStatus": 422
+                        }
+                    }
+                }
+            }
+        },
+        "register_api_user_register_put": {
+            "operationId": "register_api_user_register_put",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/register_api_user_register_put/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "register_api_user_register_put",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/api/user/register",
+                        "method": "PUT",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "id": "mdfzpkjnytccyypqkqintfompzxzhgqm",
+                                "language": "aa",
+                                "telegram_id": "02277265488759524"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "422": {
+                        "expectations": {
+                            "httpStatus": 422
+                        }
+                    }
+                }
+            }
+        },
+        "statistic_week_api_water_statistic_day_post": {
+            "operationId": "statistic_week_api_water_statistic_day_post",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/statistic_week_api_water_statistic_day_post/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "statistic_week_api_water_statistic_day_post",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/api/water/statistic/day",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "day": "awejqwmamymyakmeuohqoeofelphirkb",
+                                "month": "ululkksvaizifvujuhmugtsyarcgnngq",
+                                "user_id": "ldhwbatorahxrphjxgepcgqnjlzofqog",
+                                "week": "tcviqsjckrraevwqypetypkivvylktow",
+                                "year": "sfflapoyfagdghsrnohcijlvgnwhtzmn"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "422": {
+                        "expectations": {
+                            "httpStatus": 422
+                        }
+                    }
+                }
+            }
+        },
+        "statistic_week_api_water_statistic_month_post": {
+            "operationId": "statistic_week_api_water_statistic_month_post",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/statistic_week_api_water_statistic_month_post/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "statistic_week_api_water_statistic_month_post",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/api/water/statistic/month",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "day": "awejqwmamymyakmeuohqoeofelphirkb",
+                                "month": "ululkksvaizifvujuhmugtsyarcgnngq",
+                                "user_id": "ldhwbatorahxrphjxgepcgqnjlzofqog",
+                                "week": "tcviqsjckrraevwqypetypkivvylktow",
+                                "year": "sfflapoyfagdghsrnohcijlvgnwhtzmn"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "422": {
+                        "expectations": {
+                            "httpStatus": 422
+                        }
+                    }
+                }
+            }
+        },
+        "statistic_week_api_water_statistic_week_post": {
+            "operationId": "statistic_week_api_water_statistic_week_post",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/statistic_week_api_water_statistic_week_post/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "statistic_week_api_water_statistic_week_post",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/api/water/statistic/week",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "day": "awejqwmamymyakmeuohqoeofelphirkb",
+                                "month": "ululkksvaizifvujuhmugtsyarcgnngq",
+                                "user_id": "ldhwbatorahxrphjxgepcgqnjlzofqog",
+                                "week": "tcviqsjckrraevwqypetypkivvylktow",
+                                "year": "sfflapoyfagdghsrnohcijlvgnwhtzmn"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "422": {
+                        "expectations": {
+                            "httpStatus": 422
+                        }
+                    }
+                }
+            }
+        },
+        "statistic_week_api_water_statistic_year_post": {
+            "operationId": "statistic_week_api_water_statistic_year_post",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/statistic_week_api_water_statistic_year_post/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "statistic_week_api_water_statistic_year_post",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/api/water/statistic/year",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "day": "awejqwmamymyakmeuohqoeofelphirkb",
+                                "month": "ululkksvaizifvujuhmugtsyarcgnngq",
+                                "user_id": "ldhwbatorahxrphjxgepcgqnjlzofqog",
+                                "week": "tcviqsjckrraevwqypetypkivvylktow",
+                                "year": "sfflapoyfagdghsrnohcijlvgnwhtzmn"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "422": {
+                        "expectations": {
+                            "httpStatus": 422
+                        }
+                    }
+                }
+            }
+        },
+        "update_info_api_user_update_info_put": {
+            "operationId": "update_info_api_user_update_info_put",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/update_info_api_user_update_info_put/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "update_info_api_user_update_info_put",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/api/user/update_info",
+                        "method": "PUT",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "birthday": "lijdorrihdmgmrspahzsspkunleuchgz",
+                                "count_of_sport_in_week": 2410348773941294959,
+                                "goal": 4839270525744407204,
+                                "height": 214,
+                                "id": "hbmtqcribclyhkyspswdgkdlendxndcw",
+                                "lastname": "uQCqEKrvfDssuDbGiBdtRburdMku",
+                                "name": "jwBTdZROubdAnPtZZBPAazUnhSo",
+                                "sex": "other",
+                                "weight": 436
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "422": {
+                        "expectations": {
+                            "httpStatus": 422
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "environments": {
+        "default": {
+            "variables": {
+                "host": {
+                    "from": "environment",
+                    "name": "SCAN42C_HOST",
+                    "required": true
+                }
+            }
+        }
+    }
+}
