@@ -1,3 +1,4 @@
+{{- if .Values.apps.botEnabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,6 +20,10 @@ spec:
         - name: {{ .Values.botDeployment.name }}
           image: {{ .Values.botDeployment.image }}
           imagePullPolicy: {{ .Values.botDeployment.imagePullPolicy }}
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
           env:
             - name: TELEGRAM_BOT_TOKEN
               valueFrom:
@@ -27,4 +32,4 @@ spec:
                   key: {{ .Values.secrets.telegramBot.key }}
       imagePullSecrets: {{ toYaml .Values.images.pullSecrets | nindent 8 }}
       restartPolicy: {{ .Values.botDeployment.restartPolicy }}
-
+{{ end }}

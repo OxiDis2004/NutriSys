@@ -1,3 +1,4 @@
+{{- if .Values.apps.webEnabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,8 +20,13 @@ spec:
         - name: {{ .Values.webDeployment.name }}
           image: {{ .Values.webDeployment.image }}
           imagePullPolicy: {{ .Values.webDeployment.imagePullPolicy }}
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
           ports:
             - containerPort: {{ .Values.webDeployment.port }}
               protocol: TCP
       imagePullSecrets: {{ toYaml .Values.images.pullSecrets | nindent 8 }}
       restartPolicy: {{ .Values.webDeployment.restartPolicy }}
+{{ end }}

@@ -1,3 +1,4 @@
+{{- if .Values.apps.mysqlEnabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,6 +20,10 @@ spec:
       containers:
         - name: {{ .Values.mysql.name }}
           image: {{ .Values.mysql.image }}
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
           ports:
             - containerPort: {{ .Values.mysql.port }}
           env:
@@ -36,3 +41,4 @@ spec:
         - name: {{ .Values.mysql.volume.storageName }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistentVolumeClaim.name }}
+{{ end }}

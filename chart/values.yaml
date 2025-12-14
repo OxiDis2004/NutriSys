@@ -6,6 +6,12 @@ images:
   pullSecrets:
     - name: ghcr-secret
 
+apps:
+  mysqlEnabled: true
+  serverEnabled: true
+  botEnabled: true
+  webEnabled: true
+
 persistentVolumeClaim:
   name: mysql-pvc
   storageClassName: standard
