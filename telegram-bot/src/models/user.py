@@ -10,6 +10,10 @@ class User:
         self._height = None
         self._sex = None
 
+    def __str__(self):
+        return (f"ID: {self._user_id}"
+                f"TelegramID: {self._telegram_id}")
+
     @property
     def user_id(self):
         return self._user_id

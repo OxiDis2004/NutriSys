@@ -4,7 +4,7 @@ from aiogram.types import CallbackQuery
 
 from src.builders.menu_builder import MenuBuilder
 from src.handlers import history_last
-from src.models.menus.base_menu import BaseMenu
+from src.menus.base_menu import BaseMenu
 from src.models.menu_button_titles import MenuButtonTitle
 
 router = Router()
@@ -13,7 +13,7 @@ router = Router()
 @router.callback_query(F.data == MenuButtonTitle.BACK.value)
 async def previous_callback(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
-    menu = await get_last_menu(state, callback.message.from_user.id)
+    menu = await get_last_menu(state, callback.from_user.id)
     await callback.message.edit_text(
         text=menu.title,
         reply_markup=menu.keyboard

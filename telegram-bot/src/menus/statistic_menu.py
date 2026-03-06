@@ -1,16 +1,16 @@
-from src.models.menus.base_menu import BaseMenu
+from src.models.menu_title import MenuTitle
+from src.menus.base_menu import BaseMenu
 from src.models.menu_button_titles import MenuButtonTitle
 from src.models.menu_buttons import MenuButton
 
 
-class PeriodMenu(BaseMenu):
+class StatisticMenu(BaseMenu):
     def __init__(self, telegram_id: int):
-        title = "Period menu:"
+        title = MenuTitle.STATISTIC_TITLE
         buttons = [
             [
-                MenuButton(MenuButtonTitle.LAST_WEEK, MenuButtonTitle.LAST_WEEK),
-                MenuButton(MenuButtonTitle.LAST_MONTH, MenuButtonTitle.LAST_MONTH),
-                MenuButton(MenuButtonTitle.LAST_YEAR, MenuButtonTitle.LAST_YEAR)
+                MenuButton(MenuButtonTitle.CALORIE, MenuButtonTitle.CALORIE),
+                MenuButton(MenuButtonTitle.DRUNK_WATER, MenuButtonTitle.DRUNK_WATER)
             ],
             [
                 MenuButton(MenuButtonTitle.BACK, MenuButtonTitle.BACK)

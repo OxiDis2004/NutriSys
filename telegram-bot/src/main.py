@@ -12,9 +12,7 @@ async def main():
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     bot = Bot(token=token)
     dp = Dispatcher()
-
     setup_routers(dp)
-
     await dp.start_polling(bot)
 
 if __name__ == "__main__":

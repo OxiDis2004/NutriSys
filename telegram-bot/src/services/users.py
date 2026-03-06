@@ -4,7 +4,7 @@ from src.models.user import User
 USERS = {}
 USER_WATER = {}
 
-def get_current_user(telegram_id: int) -> User | None:
+def get_current_user(telegram_id: int) -> User:
     user = USERS.get(telegram_id, None)
 
     if user is None:
@@ -17,7 +17,9 @@ def get_current_user(telegram_id: int) -> User | None:
 
 def get_current_user_language(telegram_id: int):
     user: User = get_current_user(telegram_id)
-    return user.language if user is not None and user.language is not None else Language.ENGLISH.value
+    if user.language is None:
+        set_current_user_language(telegram_id, Language.ENGLISH.value)
+    return user.language
 
 def set_current_user_language(telegram_id: int, language: str):
     user: User = get_current_user(telegram_id)

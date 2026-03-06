@@ -3,6 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
 from src.handlers import open_menu_edit
+from src.handlers.previous import previous_callback
 from src.models.language import Language
 from src.models.menu_type import MenuType
 from src.models.menu_button_titles import MenuButtonTitle
@@ -25,4 +26,4 @@ async def language_handler(callback: CallbackQuery, state: FSMContext):
 async def change_language(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     set_current_user_language(callback.from_user.id, callback.data)
-    await open_menu_edit(callback, state, MenuType.SETTINGS)
+    await previous_callback(callback, state)

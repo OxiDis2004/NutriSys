@@ -1,15 +1,15 @@
-from src.models.menus.base_menu import BaseMenu
+from src.models.menu_title import MenuTitle
+from src.menus.base_menu import BaseMenu
 from src.models.menu_button_titles import MenuButtonTitle
 from src.models.menu_buttons import MenuButton
 
 
-class StatisticMenu(BaseMenu):
+class SettingsMenu(BaseMenu):
     def __init__(self, telegram_id: int):
-        title = "Statistic menu:"
+        title = MenuTitle.SETTINGS_TITLE
         buttons = [
             [
-                MenuButton(MenuButtonTitle.CALORIE, MenuButtonTitle.CALORIE),
-                MenuButton(MenuButtonTitle.DRUNK_WATER, MenuButtonTitle.DRUNK_WATER)
+                MenuButton(MenuButtonTitle.LANGUAGE, MenuButtonTitle.LANGUAGE)
             ],
             [
                 MenuButton(MenuButtonTitle.BACK, MenuButtonTitle.BACK)

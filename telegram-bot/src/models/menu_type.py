@@ -9,3 +9,4 @@ class MenuType(Enum):
     PERIOD = "period_menu"
     SETTINGS = "settings_menu"
     LANGUAGE = "language_menu"
+    HELP = "help_menu"

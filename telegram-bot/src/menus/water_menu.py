@@ -1,11 +1,12 @@
-from src.models.menus.base_menu import BaseMenu
+from src.models.menu_title import MenuTitle
+from src.menus.base_menu import BaseMenu
 from src.models.menu_button_titles import MenuButtonTitle
 from src.models.menu_buttons import MenuButton
 
 
 class WaterMenu(BaseMenu):
     def __init__(self, telegram_id: int):
-        title = "Water menu:"
+        title = MenuTitle.WATER_TITLE
         buttons = [
             [
                 MenuButton(MenuButtonTitle.ADD_250_ML, MenuButtonTitle.ADD_250_ML),
