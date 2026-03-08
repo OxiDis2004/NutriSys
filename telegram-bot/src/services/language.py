@@ -1,6 +1,7 @@
 from src.models.language import Language
 from src.models.menu_buttons import MenuButton
 from src.models.menu_title import MenuTitle
+from src.models.statistic_type import StatisticType
 from src.models.unit import Unit
 
 from src.services.users import get_current_user_language
@@ -8,7 +9,7 @@ from src.static import ua, en, de
 
 CURRENT_LANGUAGE = None
 
-def translate(telegram_id: int, text: MenuButton | MenuTitle | Unit | str):
+def translate(telegram_id: int, text: MenuButton | MenuTitle | StatisticType | Unit):
     global CURRENT_LANGUAGE
 
     language = get_current_user_language(telegram_id)

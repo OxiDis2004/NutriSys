@@ -7,6 +7,7 @@ class MenuType(Enum):
     FOOD = "food_menu"
     STATISTIC = "statistic_menu"
     PERIOD = "period_menu"
+    STATISTIC_PERIOD = "statistic_period"
     SETTINGS = "settings_menu"
     LANGUAGE = "language_menu"
     HELP = "help_menu"

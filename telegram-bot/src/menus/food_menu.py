@@ -9,6 +9,7 @@ class FoodMenu(BaseMenu):
         title = MenuTitle.FOOD_TITLE
         buttons = [
             [
+                MenuButton(MenuButtonTitle.ADD_FOOD, MenuButtonTitle.ADD_FOOD),
                 MenuButton(MenuButtonTitle.BACK, MenuButtonTitle.BACK)
             ]
         ]

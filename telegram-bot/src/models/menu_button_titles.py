@@ -22,6 +22,8 @@ class MenuButtonTitle(Enum):
     ADD_500_ML = "500ml"
     ADD_1_L = "1l"
     ADD_1_5_L = "1.5l"
+    #   --- Food menu ---
+    ADD_FOOD = "add_food"
     #   --- Settings menu ---
     LANGUAGE = "language"
     #   --- Language menu ---

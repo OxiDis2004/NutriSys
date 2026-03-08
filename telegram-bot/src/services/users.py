@@ -1,8 +1,10 @@
+from datetime import date
 from src.models.language import Language
 from src.models.user import User
 
 USERS = {}
-USER_WATER = {}
+USERS_WATER = {}
+USERS_CALORIE = {}
 
 def get_current_user(telegram_id: int) -> User:
     user = USERS.get(telegram_id, None)
@@ -27,11 +29,28 @@ def set_current_user_language(telegram_id: int, language: str):
         user.language = language
         USERS.update({ telegram_id: user })
 
-def add_water(telegram_id: int, water: int) -> int:
-    user: User | None = get_current_user(telegram_id)
-    add_water_to_user(user, water)
-    return USER_WATER[user.telegram_id]
+def get_current_day():
+    return date.today().strftime("%Y-%m-%d")
 
-def add_water_to_user(user: User, water: int):
-    total_water = USER_WATER.get(user.telegram_id, 0)
-    USER_WATER.update({user.telegram_id: total_water + water})
+def add_water(telegram_id: int, water: int):
+    add_water_to_user(telegram_id, water)
+
+def add_water_to_user(telegram_id: int, water: int):
+    curr_day = get_current_day()
+    user_water = USERS_WATER.get(telegram_id, {})
+    total_water = user_water.get(curr_day, 0)
+    user_water.update({ curr_day: total_water + water })
+    USERS_WATER.update({ telegram_id: user_water })
+
+def get_user_water(telegram_id: int, curr_day: str = get_current_day()):
+    return USERS_WATER.get(telegram_id, {}).get(curr_day, 0)
+
+def set_user_calorie(telegram_id: int, calorie: int):
+    curr_day = get_current_day()
+    user_calorie = USERS_CALORIE.get(telegram_id, {})
+    total_calorie = user_calorie.get(curr_day, 0)
+    user_calorie.update({ curr_day: total_calorie + calorie})
+    USERS_CALORIE.update({ telegram_id: user_calorie })
+
+def get_user_calorie(telegram_id: int, curr_day: str = get_current_day()):
+    return USERS_CALORIE.get(telegram_id, {}).get(curr_day, 0)
