@@ -9,6 +9,7 @@ class MenuButtonTitle(Enum):
     FOOD = "eat"
     STATISTIC = "stat"
     SETTINGS = "settings"
+    LINK_WEBSITE = "link_website"
     HELP = "help"
     #   --- Statistic menu ---
     CALORIE = "calorie"

@@ -2,6 +2,7 @@ from src.models.menu_title import MenuTitle
 from src.menus.base_menu import BaseMenu
 from src.models.menu_button_titles import MenuButtonTitle
 from src.models.menu_buttons import MenuButton
+from src.services.users import get_website_url
 
 
 class StartMenu(BaseMenu):
@@ -16,6 +17,7 @@ class StartMenu(BaseMenu):
                 MenuButton(MenuButtonTitle.STATISTIC, MenuButtonTitle.STATISTIC),
                 MenuButton(MenuButtonTitle.SETTINGS, MenuButtonTitle.SETTINGS),
             ],
+            [MenuButton(MenuButtonTitle.LINK_WEBSITE, url=get_website_url(telegram_id))],
             [MenuButton(MenuButtonTitle.HELP, MenuButtonTitle.HELP)]
         ]
         super().__init__(telegram_id, title, buttons)

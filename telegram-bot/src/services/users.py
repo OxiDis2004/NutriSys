@@ -54,3 +54,6 @@ def set_user_calorie(telegram_id: int, calorie: int):
 
 def get_user_calorie(telegram_id: int, curr_day: str = get_current_day()):
     return USERS_CALORIE.get(telegram_id, {}).get(curr_day, 0)
+
+def get_website_url(telegram_id):
+    return "https://google.com"

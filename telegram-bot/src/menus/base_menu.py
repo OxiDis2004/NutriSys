@@ -1,11 +1,10 @@
 from abc import ABC
 
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from src.models.menu_buttons import MenuButton
 from src.models.menu_title import MenuTitle
 from src.services.language import translate
-from src.services.users import get_current_user_language
 
 
 class BaseMenu(ABC):
@@ -20,7 +19,8 @@ class BaseMenu(ABC):
             [
                 InlineKeyboardButton(
                     text=translate(self._telegram_id, button.title),
-                    callback_data=button.callback
+                    callback_data=button.callback,
+                    web_app=WebAppInfo(url=button.url) if button.url is not None else None
                 )
                 for button in button_row
             ] for button_row in self._buttons
