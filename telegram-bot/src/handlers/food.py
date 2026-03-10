@@ -3,8 +3,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
 from src.handlers import open_menu_edit
-from src.models.menu_type import MenuType
-from src.models.menu_button_titles import MenuButtonTitle
+from src.models.menu_parts.menu_type import MenuType
+from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.services.users import set_user_calorie, get_user_calorie
 
 router = Router()

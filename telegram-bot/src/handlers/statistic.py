@@ -4,8 +4,8 @@ from aiogram.types import CallbackQuery, FSInputFile
 
 from src.handlers import open_menu_edit
 from src.handlers.previous import previous_callback
-from src.models.menu_type import MenuType
-from src.models.menu_button_titles import MenuButtonTitle
+from src.models.menu_parts.menu_type import MenuType
+from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.services.statistic import set_statistic_type, get_statistic_for_period
 
 router = Router()

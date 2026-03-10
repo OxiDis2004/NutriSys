@@ -2,11 +2,12 @@ from aiogram import Bot, Dispatcher
 import asyncio
 import logging
 import os
-import my_setenv
 from src.routers import setup_routers
+from src.services import get_hostname
 
 logging.basicConfig(level=logging.INFO)
-my_setenv.get_key()
+# my_setenv.get_key()
+get_hostname()
 
 async def main():
     token = os.getenv("TELEGRAM_BOT_TOKEN")

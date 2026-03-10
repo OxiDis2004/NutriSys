@@ -5,8 +5,8 @@ from aiogram.types import CallbackQuery
 from src.handlers import open_menu_edit
 from src.handlers.previous import previous_callback
 from src.models.language import Language
-from src.models.menu_type import MenuType
-from src.models.menu_button_titles import MenuButtonTitle
+from src.models.menu_parts.menu_type import MenuType
+from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.services.users import set_current_user_language
 
 router = Router()

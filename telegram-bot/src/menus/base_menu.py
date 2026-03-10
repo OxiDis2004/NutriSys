@@ -2,8 +2,8 @@ from abc import ABC
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
-from src.models.menu_buttons import MenuButton
-from src.models.menu_title import MenuTitle
+from src.models.menu_parts.menu_buttons import MenuButton
+from src.models.menu_parts.menu_title import MenuTitle
 from src.services.language import translate
 
 

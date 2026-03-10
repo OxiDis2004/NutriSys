@@ -1,4 +1,4 @@
-from src.models.menu_type import MenuType
+from src.models.menu_parts.menu_type import MenuType
 from src.menus.base_menu import BaseMenu
 from src.menus.food_menu import FoodMenu
 from src.menus.language_menu import LanguageMenu

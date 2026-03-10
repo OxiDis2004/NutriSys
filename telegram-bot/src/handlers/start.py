@@ -5,7 +5,7 @@ from aiogram.types import Message
 
 from src.builders.menu_builder import MenuBuilder
 from src.handlers import history_append
-from src.models.menu_type import MenuType
+from src.models.menu_parts.menu_type import MenuType
 
 router = Router()
 

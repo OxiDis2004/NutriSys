@@ -3,12 +3,12 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
 from src.handlers import open_menu_edit
-from src.models.menu_title import MenuTitle
-from src.models.menu_type import MenuType
-from src.models.menu_button_titles import MenuButtonTitle
+from src.models.menu_parts.menu_title import MenuTitle
+from src.models.menu_parts.menu_type import MenuType
+from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.models.unit import Unit
 from src.services.language import translate
-from src.services.users import add_water, get_user_water
+from src.services.users import add_drunk_water, get_user_water
 
 router = Router()
 
@@ -30,7 +30,7 @@ def format_answer(telegram_id: int, water: int) -> str:
 
 async def add_n_ml(callback: CallbackQuery, state: FSMContext, water: int):
     await callback.answer()
-    add_water(callback.from_user.id, water)
+    await add_drunk_water(callback.from_user.id, water)
     total_water = get_user_water(callback.from_user.id)
     text = format_answer(callback.from_user.id, total_water)
     await open_menu_edit(callback, state, MenuType.WATER, text)

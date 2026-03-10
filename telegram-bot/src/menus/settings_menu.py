@@ -1,7 +1,7 @@
-from src.models.menu_title import MenuTitle
+from src.models.menu_parts.menu_title import MenuTitle
 from src.menus.base_menu import BaseMenu
-from src.models.menu_button_titles import MenuButtonTitle
-from src.models.menu_buttons import MenuButton
+from src.models.menu_parts.menu_button_titles import MenuButtonTitle
+from src.models.menu_parts.menu_buttons import MenuButton
 
 
 class SettingsMenu(BaseMenu):

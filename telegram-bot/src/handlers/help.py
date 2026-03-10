@@ -3,8 +3,8 @@ from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
 
 from src.builders.menu_builder import MenuBuilder
-from src.models.menu_button_titles import MenuButtonTitle
-from src.models.menu_type import MenuType
+from src.models.menu_parts.menu_button_titles import MenuButtonTitle
+from src.models.menu_parts.menu_type import MenuType
 
 router = Router()
 

@@ -1,6 +1,9 @@
+from uuid import UUID, uuid4
+
+
 class User:
     def __init__(self):
-        self._user_id = None
+        self._user_id: UUID = uuid4()
         self._telegram_id = None
         self._language = None
         self._name = None
@@ -21,10 +24,6 @@ class User:
     @property
     def telegram_id(self):
         return self._telegram_id
-
-    @user_id.setter
-    def user_id(self, value):
-        self._user_id = value
 
     @telegram_id.setter
     def telegram_id(self, value):

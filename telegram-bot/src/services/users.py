@@ -1,6 +1,7 @@
 from datetime import date
 from src.models.language import Language
 from src.models.user import User
+from src.services.water import water_add_request
 
 USERS = {}
 USERS_WATER = {}
@@ -11,7 +12,6 @@ def get_current_user(telegram_id: int) -> User:
 
     if user is None:
         user = User()
-        user.user_id = 1
         user.telegram_id = telegram_id
         USERS.update({ telegram_id: user })
 
@@ -32,10 +32,11 @@ def set_current_user_language(telegram_id: int, language: str):
 def get_current_day():
     return date.today().strftime("%Y-%m-%d")
 
-def add_water(telegram_id: int, water: int):
-    add_water_to_user(telegram_id, water)
+async def add_drunk_water(telegram_id: int, water: int):
+    user: User = get_current_user(telegram_id)
+    return await water_add_request(user.user_id, water)
 
-def add_water_to_user(telegram_id: int, water: int):
+async def add_water_to_user(telegram_id: int, water: int):
     curr_day = get_current_day()
     user_water = USERS_WATER.get(telegram_id, {})
     total_water = user_water.get(curr_day, 0)

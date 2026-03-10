@@ -1,5 +1,5 @@
-from src.models.menu_button_titles import MenuButtonTitle
-from src.models.menu_title import MenuTitle
+from src.models.menu_parts.menu_button_titles import MenuButtonTitle
+from src.models.menu_parts.menu_title import MenuTitle
 from src.models.unit import Unit
 
 DE_VOCABULARY = {

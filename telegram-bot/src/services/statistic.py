@@ -1,12 +1,14 @@
 from aiogram.fsm.context import FSMContext
 import matplotlib.pyplot as plt
-from datetime import date, timedelta
+from datetime import date
 
-from src.models.menu_button_titles import MenuButtonTitle
+from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.models.statistic_type import StatisticType
 from src.models.unit import Unit
+from src.models.user import User
 from src.services.language import translate
-from src.services.users import get_user_water, get_user_calorie
+from src.services.users import get_user_calorie, get_current_user
+from src.services.water import water_statistic
 
 
 async def set_statistic_type(state: FSMContext, _type: MenuButtonTitle):
@@ -39,16 +41,23 @@ def get_period_type(tmp_period_type: MenuButtonTitle) -> StatisticType | None:
 
 async def get_statistic(telegram_id: int, stat_type: StatisticType, period_type: StatisticType) -> dict:
     curr_day = date.today()
+    user: User = get_current_user(telegram_id)
 
-    from_statistic = get_user_water if stat_type is StatisticType.WATER else get_user_calorie
+    match stat_type:
+        case StatisticType.CALORIE:
+            result = get_user_calorie(telegram_id, curr_day.strftime("%Y-%m-%d"))
+            return food_data(result, curr_day)
+        case StatisticType.WATER:
+            result = await water_statistic(user.user_id, period_type, curr_day)
+            return water_data(result)
 
-    data = {}
-    for i in range(7):
-        next_day = (curr_day - timedelta(days=i)).strftime("%Y-%m-%d")
-        value = from_statistic(telegram_id, next_day)
-        data.update({ next_day: value })
+    return {}
 
-    return data
+def food_data(result, curr_day) -> dict:
+    return { curr_day : result }
+
+def water_data(result) -> dict:
+    return { item.day.strftime("%Y-%m-%d") : item.drunk_water for item in result }
 
 async def generate_chart(
         telegram_id: int,

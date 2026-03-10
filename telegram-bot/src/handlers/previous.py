@@ -5,7 +5,7 @@ from aiogram.types import CallbackQuery
 from src.builders.menu_builder import MenuBuilder
 from src.handlers import history_last
 from src.menus.base_menu import BaseMenu
-from src.models.menu_button_titles import MenuButtonTitle
+from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 
 router = Router()
 

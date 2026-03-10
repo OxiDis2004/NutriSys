@@ -1,4 +1,4 @@
-from src.models.menu_button_titles import MenuButtonTitle
+from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 
 
 class MenuButton:

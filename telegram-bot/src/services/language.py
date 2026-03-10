@@ -1,6 +1,6 @@
 from src.models.language import Language
-from src.models.menu_buttons import MenuButton
-from src.models.menu_title import MenuTitle
+from src.models.menu_parts.menu_buttons import MenuButton
+from src.models.menu_parts.menu_title import MenuTitle
 from src.models.statistic_type import StatisticType
 from src.models.unit import Unit
 

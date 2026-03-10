@@ -2,7 +2,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
 from src.builders.menu_builder import MenuBuilder
-from src.models.menu_type import MenuType
+from src.models.menu_parts.menu_type import MenuType
 
 
 async def history_append(state: FSMContext, menu_type: MenuType):
