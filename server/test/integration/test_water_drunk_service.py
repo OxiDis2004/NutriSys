@@ -38,20 +38,20 @@ class TestWaterDrunkService:
 
     def test_add_water(self):
         drunk = self.water_service.add_drunk_water(WaterRequestDTO(user_id=self.user_id, drunk_water=250))
-        assert drunk.drunk_water_day == 250
+        assert drunk.drunk_water == 250
 
     def test_add_water_3_times(self):
         request_1 = WaterRequestDTO(user_id=self.user_id, drunk_water=500)
         drunk = self.water_service.add_drunk_water(request_1)
-        assert drunk.drunk_water_day == request_1.drunk_water
+        assert drunk.drunk_water == request_1.drunk_water
 
         request_2 = WaterRequestDTO(user_id=self.user_id, drunk_water=250)
         drunk = self.water_service.add_drunk_water(request_2)
-        assert drunk.drunk_water_day == request_1.drunk_water + request_2.drunk_water
+        assert drunk.drunk_water == request_1.drunk_water + request_2.drunk_water
 
         request_3 = WaterRequestDTO(user_id=self.user_id, drunk_water=1000)
         drunk = self.water_service.add_drunk_water(request_3)
-        assert (drunk.drunk_water_day == request_1.drunk_water + request_2.drunk_water +
+        assert (drunk.drunk_water == request_1.drunk_water + request_2.drunk_water +
                 request_3.drunk_water)
 
     @pytest.fixture

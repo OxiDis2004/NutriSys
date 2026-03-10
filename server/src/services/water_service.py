@@ -1,13 +1,14 @@
 import calendar
 from collections import defaultdict
-from datetime import date, datetime
+from datetime import date
+from uuid import UUID
 
 from fastapi import HTTPException
 
 from src.models.dto.water_request_dto import WaterRequestDTO
 from src.models.dto.water_response_dto import WaterResponseDTO
 from src.models.dto.water_statistic_request_dto import WaterStatisticRequestDTO
-from src.models.property.period import Period
+from src.models.property.period import Period, PeriodType
 from src.services.db_service import DBService
 
 class WaterService:
@@ -20,89 +21,96 @@ class WaterService:
 
         try:
             today = date.today()
-            rows = self._db_service.get_drunk_water(water_request.user_id, today)
-
+            result = self.get_statistic_day(
+                WaterStatisticRequestDTO(user_id=water_request.user_id, statistic_date=today)
+            )
             drunk_water = water_request.drunk_water
-            if rows is None or rows.date is None:
-                self._db_service.add_drunk_water(water_request.user_id, water_request.drunk_water,
-                today)
-            else:
-                drunk_water += rows.water
-                self._db_service.update_drunk_water(water_request.user_id,
-                    drunk_water, today)
 
-            return WaterResponseDTO(day=today, drunk_water_day=drunk_water)
+            if len(result) == 0:
+                self._db_service.add_drunk_water(
+                    str(water_request.user_id),
+                    water_request.drunk_water,
+                    today
+                )
+            else:
+                drunk_water += result[0].drunk_water
+                self._db_service.update_drunk_water(
+                    str(water_request.user_id),
+                    drunk_water,
+                    today
+                )
+
+            return WaterResponseDTO(day=today, drunk_water=drunk_water)
 
         except Exception as e:
-            raise HTTPException(status_code=400, detail="Caught " + str(e))
+            raise HTTPException(status_code=500, detail="Caught " + str(e))
 
-    def statistic(self, request: WaterStatisticRequestDTO) -> list[WaterResponseDTO]:
+    def statistic(self, request: WaterStatisticRequestDTO, period_type_str: str) \
+            -> list[WaterResponseDTO]:
         if request.user_id is None:
             raise HTTPException(status_code=400, detail="User id is null")
 
         try:
-            if request.day is not None:
-                row = self._db_service.get_drunk_water(request.user_id, request.day)
-                drunk_water = [WaterResponseDTO(day=row.date, drunk_water_day=row.water)]
-                return drunk_water
-            elif request.week is not None:
-                rows = self.get_statistic_data(self.get_week, request.week, request.user_id)
-            elif request.month is not None:
-                rows = self.get_statistic_data(self.get_month, request.month, request.user_id)
-            elif request.year is not None:
-                rows = self.get_statistic_data(self.get_year, request.year, request.user_id)
-                months = defaultdict(int)
-                for row in rows:
-                    key = f"{row.date.year}-{row.date.month}"
-                    months[key] += row
-                rows = months
-            else:
-                raise Exception("Date wouldn't be send")
+            period_type: PeriodType = PeriodType(period_type_str)
+            match period_type:
+                case PeriodType.DAY: return self.get_statistic_day(request)
+                case PeriodType.WEEK: return self.get_statistic_week(request)
+                case PeriodType.MONTH: return self.get_statistic_month(request)
+                case PeriodType.YEAR: return self.get_statistic_year(request)
 
-            if len(rows) == 0:
-                raise Exception("Nothing found")
-
-            drunk_water: list[WaterResponseDTO] = []
-            if isinstance(rows, defaultdict):
-                for key, data in rows:
-                    drunk_water.append(WaterResponseDTO(day=date.fromisoformat(key),
-                        drunk_water_day=data))
-            else:
-                for row in rows:
-                    drunk_water.append(WaterResponseDTO(day=row.date, drunk_water_day=row.water))
-
-            return drunk_water
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail="Caught " + str(e))
 
-    def get_statistic_data(self, get_period_func, current_date: date | datetime, user_id: str ):
-        period = get_period_func(current_date)
-        period.start_date.isoformat()
-        return self._db_service.get_drunk_water_interval(user_id, period)
+    def get_statistic_day(self, request: WaterStatisticRequestDTO) -> list[WaterResponseDTO]:
+        return self.get_statistic_list(self.get_day, request)
+
+    def get_statistic_week(self, request: WaterStatisticRequestDTO) -> list[WaterResponseDTO]:
+        return self.get_statistic_list(self.get_week, request)
+
+    def get_statistic_month(self, request: WaterStatisticRequestDTO) -> list[WaterResponseDTO]:
+        return self.get_statistic_list(self.get_month, request)
+
+    def get_statistic_list(self, period_func, request: WaterStatisticRequestDTO) -> list[WaterResponseDTO]:
+        rows = self.get_statistic_data(period_func, request)
+        return [WaterResponseDTO(day=row.date, drunk_water=row.water) for row in rows]
+
+    def get_statistic_year(self, request: WaterStatisticRequestDTO) -> list[WaterResponseDTO]:
+        rows = self.get_statistic_data(self.get_year, request)
+        months = defaultdict(int)
+
+        for row in rows:
+            key = f"{row.date.year}-{row.date.month}"
+            months[key] += row
+
+        return [
+            WaterResponseDTO(day=date.fromisoformat(key), drunk_water=data) for key, data in months
+        ]
+
+    def get_statistic_data(self, period_func, request: WaterStatisticRequestDTO):
+        period = period_func(request.statistic_date)
+        return self._db_service.get_drunk_water_interval(request.user_id, period)
 
     @staticmethod
-    def get_week(week: date | datetime) -> Period:
-        week_nr = week.isocalendar().week
-        start = date.fromisocalendar(week.year, week_nr, 1)
-        end = date.fromisocalendar(week.year, week_nr, 7)
+    def get_day(statistic_date: date) -> Period:
+        return Period(statistic_date, statistic_date)
+
+    @staticmethod
+    def get_week(statistic_date: date) -> Period:
+        week_nr = statistic_date.isocalendar().week
+        start = date.fromisocalendar(statistic_date.year, week_nr, 1)
+        end = date.fromisocalendar(statistic_date.year, week_nr, 7)
         return Period(start, end)
 
     @staticmethod
-    def get_month(month_date: date | datetime) -> Period:
-        year, month = month_date.year, month_date.month
+    def get_month(statistic_date: date) -> Period:
+        year, month = statistic_date.year, statistic_date.month
         week_day, days_in_month = calendar.monthrange(year, month)
-        start = month_date.replace(day=1)
-        end = month_date.replace(day=days_in_month)
+        start = statistic_date.replace(day=1)
+        end = statistic_date.replace(day=days_in_month)
         return Period(start, end)
 
     @staticmethod
-    def get_year(year_date: date | datetime) -> Period:
-        start = year_date.replace(month=1, day=1)
-        end = year_date.replace(month=12, day=31)
+    def get_year(statistic_date: date) -> Period:
+        start = statistic_date.replace(month=1, day=1)
+        end = statistic_date.replace(month=12, day=31)
         return Period(start, end)
-
-
-
-
-
-
