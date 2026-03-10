@@ -1,7 +1,8 @@
 from datetime import date, datetime
 import os
+from uuid import UUID
 
-from sqlalchemy import Engine, update, select, Row, delete, text
+from sqlalchemy import Engine, update, select, Row, delete, text, func
 from sqlalchemy.dialects.mysql import insert
 
 from src.models.adapter.database_adapter import DBAdapter
@@ -86,19 +87,9 @@ class DBService:
 
         self.db.commit(stmt)
 
-    def get_drunk_water(self, user_id: str, search_date: date):
+    def get_drunk_water_interval(self, user_id: UUID, period: Period):
         stmt = (
-            select(DrunkWater.date.label("date"), DrunkWater.water.label("water"))
-            .where(DrunkWater.user_id == user_id)
-            .where(DrunkWater.date == search_date)
-            .group_by(DrunkWater.date)
-        )
-
-        return self.db.fetch_one(stmt)
-
-    def get_drunk_water_interval(self, user_id: str, period: Period):
-        stmt = (
-            select(DrunkWater.date.label("date"), DrunkWater.water.label("water"))
+            select(DrunkWater.date.label("date"), func.sum(DrunkWater.water).label("water"))
             .where(DrunkWater.user_id == user_id)
             .where(DrunkWater.date >= period.start_date)
             .where(DrunkWater.date <= period.end_date)

@@ -21,13 +21,13 @@ class TestUserService:
         telegram_id = "example_id"
         user = UserDTO(telegram_id=telegram_id)
         received_user = mocker.Mock()
-        received_user.id = str(uuid.uuid4())
+        received_user.user_id = str(uuid.uuid4())
         received_user.iso = 'ua'
         self.db_service_mock.get_user.return_value = received_user
 
         user = self.user_service_mock.login(user)
 
-        assert user.id == received_user.id
+        assert user.id == received_user.user_id
         assert user.telegram_id == telegram_id
         assert user.language == received_user.iso
         self.db_service_mock.get_user.assert_called_once_with(telegram_id)
@@ -51,13 +51,13 @@ class TestUserService:
         telegram_id = "example_id"
         user = UserDTO(telegram_id=telegram_id, language='ua')
         received_user = mocker.Mock()
-        received_user.id = str(uuid.uuid4())
+        received_user.user_id = str(uuid.uuid4())
         received_user.iso = 'ua'
         self.db_service_mock.get_user.side_effect = [None, received_user]
 
         user = self.user_service_mock.register(user)
 
-        assert user.id == received_user.id
+        assert user.id == received_user.user_id
         assert user.telegram_id == telegram_id
         assert user.language == received_user.iso
         assert self.db_service_mock.get_user.call_count == 2
@@ -66,7 +66,7 @@ class TestUserService:
         telegram_id = "example_id"
         user = UserDTO(telegram_id=telegram_id, language='ua')
         received_user = mocker.Mock()
-        received_user.id = str(uuid.uuid4())
+        received_user.user_id = str(uuid.uuid4())
         received_user.iso = 'ua'
         self.db_service_mock.get_user.return_value = received_user
 
