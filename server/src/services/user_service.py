@@ -28,13 +28,13 @@ class UserService:
         user.language = data.iso if user.language is None else user.language
         
         try:
-            self._db_service.update_user_activity(user.telegram_id)
+            self._db_service.update_user_activity(user.id)
             return user
         except Exception as e:
             raise HTTPException(status_code=400, detail="Caught: " + str(e))
 
     def register(self, user: UserDTO) -> UserDTO:
-        user.id = str(uuid.uuid4())
+        user.id = uuid.uuid4()
 
         if user.id is None or user.telegram_id is None or user.language is None:
             raise HTTPException(status_code=422, detail="User cannot be created")
@@ -43,7 +43,9 @@ class UserService:
 
         data = self._db_service.get_user(user.telegram_id)
         if data is not None:
-            raise HTTPException(status_code=400, detail="User exists")
+            user.id = data.id
+            user.language = data.iso
+            return user
 
         self._db_service.add_user(user, user_last_activity)
         data = self._db_service.get_user(user.telegram_id)
@@ -74,7 +76,7 @@ class UserService:
                 raise Exception("User didn't registered")
 
             user.id = data.id
-            self._db_service.update_user_language(user.id, user.language)
+            self._db_service.update_user_language(user)
             self._db_service.update_user_activity(user.id)
             return user
         except Exception as e:

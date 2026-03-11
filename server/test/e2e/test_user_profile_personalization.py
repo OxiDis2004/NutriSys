@@ -18,7 +18,7 @@ def step_impl(language):
         if row.iso == language:
             return
 
-    get_db_service()._add_language(2, language)
+    get_db_service()._add_language(language)
 
 @when(parsers.cfparse(
     'user with telegram id "{telegram_id}" updates profile language to "{language}"'

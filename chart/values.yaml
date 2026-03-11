@@ -10,7 +10,7 @@ apps:
   mysqlEnabled: true
   serverEnabled: true
   botEnabled: true
-  webEnabled: true
+  webEnabled: false
 
 persistentVolumeClaim:
   name: mysql-pvc

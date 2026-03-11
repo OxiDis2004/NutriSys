@@ -18,24 +18,25 @@ class TestUserService:
         self.user_service_mock = UserService(self.db_service_mock)
 
     def test_login_successful(self, mocker):
-        telegram_id = "example_id"
-        user = UserDTO(telegram_id=telegram_id)
+        telegram_id = 123
+        user = UserDTO(id=None, telegram_id=telegram_id, language='ua')
         received_user = mocker.Mock()
-        received_user.user_id = str(uuid.uuid4())
+        received_user.id = str(uuid.uuid4())
+        received_user.telegram_id = telegram_id
         received_user.iso = 'ua'
         self.db_service_mock.get_user.return_value = received_user
 
         user = self.user_service_mock.login(user)
 
-        assert user.id == received_user.user_id
-        assert user.telegram_id == telegram_id
+        assert user.id == received_user.id
+        assert user.telegram_id == received_user.telegram_id
         assert user.language == received_user.iso
         self.db_service_mock.get_user.assert_called_once_with(telegram_id)
-        self.db_service_mock.update_user_activity.assert_called_once_with(telegram_id)
+        self.db_service_mock.update_user_activity.assert_called_once_with(user.id)
 
     def test_login_failed(self, mocker):
-        telegram_id = "example_id"
-        user = UserDTO(telegram_id=telegram_id)
+        telegram_id = 123
+        user = UserDTO(id=None, telegram_id=telegram_id, language='ua')
         received_user = None
         self.db_service_mock.get_user.return_value = received_user
 
@@ -48,46 +49,46 @@ class TestUserService:
         assert detail == "User not found"
 
     def test_register_successful(self, mocker):
-        telegram_id = "example_id"
-        user = UserDTO(telegram_id=telegram_id, language='ua')
+        telegram_id = 123
+        user = UserDTO(id=None, telegram_id=telegram_id, language='ua')
         received_user = mocker.Mock()
-        received_user.user_id = str(uuid.uuid4())
+        received_user.id = str(uuid.uuid4())
+        received_user.telegram_id = telegram_id
         received_user.iso = 'ua'
         self.db_service_mock.get_user.side_effect = [None, received_user]
 
         user = self.user_service_mock.register(user)
 
-        assert user.id == received_user.user_id
-        assert user.telegram_id == telegram_id
+        assert user.id == received_user.id
+        assert user.telegram_id == received_user.telegram_id
         assert user.language == received_user.iso
         assert self.db_service_mock.get_user.call_count == 2
 
     def test_register_user_exists(self, mocker):
-        telegram_id = "example_id"
-        user = UserDTO(telegram_id=telegram_id, language='ua')
+        telegram_id = 123
+        user = UserDTO(id=None, telegram_id=telegram_id, language='ua')
         received_user = mocker.Mock()
         received_user.user_id = str(uuid.uuid4())
+        received_user.telegram_id = telegram_id
         received_user.iso = 'ua'
         self.db_service_mock.get_user.return_value = received_user
 
-        with pytest.raises(Exception) as e_info:
-            user = self.user_service_mock.register(user)
+        user = self.user_service_mock.register(user)
 
-        assert e_info.errisinstance(HTTPException) == True
-        code, detail = str(e_info.value).split(": ")
-        assert code == '400'
-        assert detail == "User exists"
+        assert user.id == received_user.id
+        assert user.telegram_id == received_user.telegram_id
+        assert user.language == received_user.iso
         assert self.db_service_mock.get_user.call_count == 1
 
     def test_register_user_null_failed(self, mocker):
-        user = UserDTO(telegram_id=None, language=None)
+        user = UserDTO(id=None, telegram_id=None, language=None)
 
         with pytest.raises(Exception) as e_info:
             self.user_service_mock.register(user)
 
         assert e_info.errisinstance(HTTPException) == True
         code, detail = str(e_info.value).split(": ")
-        assert code == '400'
+        assert code == '422'
         assert detail == "User cannot be created"
 
     def test_not_registered(self, mocker):

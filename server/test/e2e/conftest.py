@@ -41,7 +41,7 @@ def clear_user(create_test_app, telegram_id):
 def create_user(client, states, telegram_id, language):
     async def inner():
         if len(get_db_service().get_languages()) < 1:
-            get_db_service()._add_language(1, "ua")
+            get_db_service()._add_language("ua")
 
         response = await client.post("/user/login", json={
             "telegram_id": telegram_id
