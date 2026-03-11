@@ -2,6 +2,7 @@ from aiogram.fsm.context import FSMContext
 import matplotlib.pyplot as plt
 from datetime import date
 
+from src.models.dto.water_response import WaterResponseDTO
 from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.models.statistic_type import StatisticType
 from src.models.unit import Unit
@@ -49,15 +50,32 @@ async def get_statistic(telegram_id: int, stat_type: StatisticType, period_type:
             return food_data(result, curr_day)
         case StatisticType.WATER:
             result = await water_statistic(user.user_id, period_type, curr_day)
-            return water_data(result)
+            return water_data(period_type, result)
 
     return {}
 
 def food_data(result, curr_day) -> dict:
     return { curr_day : result }
 
-def water_data(result) -> dict:
-    return { item.day.strftime("%Y-%m-%d") : item.drunk_water for item in result }
+def water_data(period_type: StatisticType, result: list[WaterResponseDTO]) -> dict:
+    match period_type:
+        case StatisticType.WEEK:
+            return {
+                date.fromisoformat(item.day).strftime("%a") : item.drunk_water for item in result
+            }
+
+        case StatisticType.MONTH:
+            return {
+                item.day : item.drunk_water for item in result
+            }
+
+        case StatisticType.YEAR:
+            return {
+                date.fromisoformat(item.day).strftime("%b") : item.drunk_water for item in result
+            }
+
+        case _:
+            return { item.day : item.drunk_water for item in result }
 
 async def generate_chart(
         telegram_id: int,
@@ -75,7 +93,7 @@ async def generate_chart(
     plt.xlabel(translate(telegram_id, period_type))
     plt.ylabel(translate(telegram_id, Unit.L))
 
-    file = f"chart_{telegram_id}_{stat_type.value}_{period_type.value}.png"
+    file = f"chart_{telegram_id}_{stat_type.value}_{period_type.value.split('/')[1]}.png"
     plt.savefig(file)
     plt.close()
 

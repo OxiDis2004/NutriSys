@@ -1,6 +1,6 @@
-from datetime import date
+from dataclasses import dataclass
 
-
+@dataclass
 class WaterResponseDTO:
-    day: date = None
+    day: str = None
     drunk_water: int = None

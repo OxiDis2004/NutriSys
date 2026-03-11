@@ -1,20 +1,58 @@
 from datetime import date
+from uuid import uuid4
+
+import httpx
+
 from src.models.language import Language
 from src.models.user import User
+from src.services import server, request
 from src.services.water import water_add_request
 
 USERS = {}
 USERS_WATER = {}
 USERS_CALORIE = {}
 
-def get_current_user(telegram_id: int) -> User:
-    user = USERS.get(telegram_id, None)
+USER_API = f"{server()}/api/user"
+
+async def current_user(telegram_id: int, language: Language) -> User:
+    async with httpx.AsyncClient() as client:
+        body = {
+            "id": None,
+            "telegram_id": telegram_id,
+            "language": language.value
+        }
+        response = await request(client.post, f"{USER_API}/login", body, False)
+
+        if not response.ok:
+            response = await request(client.put, f"{USER_API}/register", body)
+
+        data = response.json()
+        user = User()
+        user.user_id = data.get('id', uuid4())
+        user.telegram_id = data.get('telegram_id', telegram_id)
+        user.language = data.get('language', Language.ENGLISH)
+        return user
+
+async def register_user(telegram_id: int, language: Language):
+    user = get_current_user(telegram_id)
 
     if user is None:
-        user = User()
-        user.telegram_id = telegram_id
-        USERS.update({ telegram_id: user })
+        async with httpx.AsyncClient() as client:
+            body = {
+                "id": None,
+                "telegram_id": telegram_id,
+                "language": language.value
+            }
+            response = await request(client.put, f"{USER_API}/register", body)
+            data = response.json()
+            user = User()
+            user.user_id = data.get('id', uuid4())
+            user.telegram_id = data.get('telegram_id', telegram_id)
+            user.language = data.get('language', Language.ENGLISH)
+            USERS.update({ telegram_id: user })
 
+def get_current_user(telegram_id: int) -> User | None:
+    user = USERS.get(telegram_id, None)
     return user
 
 def get_current_user_language(telegram_id: int):

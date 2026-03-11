@@ -1,5 +1,6 @@
 from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.models.menu_parts.menu_title import MenuTitle
+from src.models.statistic_type import StatisticType
 from src.models.unit import Unit
 
 EN_VOCABULARY = {
@@ -36,7 +37,14 @@ EN_VOCABULARY = {
     MenuTitle.EXISTS_COMMAND: "Available commands:",
 
     Unit.L: "l",
-    Unit.ML: "ml"
+    Unit.ML: "ml",
+
+    StatisticType.WATER: "Water statistic",
+    StatisticType.CALORIE: "Calorie statistic",
+
+    StatisticType.WEEK: "Weekday",
+    StatisticType.MONTH: "Day in month",
+    StatisticType.YEAR: "Month",
 }
 
 def vocabulary():

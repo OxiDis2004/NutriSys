@@ -28,10 +28,14 @@ async def open_menu_edit(
         callback: CallbackQuery,
         state: FSMContext,
         menu_type: MenuType,
-        text: str | None = None
+        text: str | None = None,
+        new_message: bool = False
 ):
     menu = MenuBuilder.build_menu(menu_type, callback.from_user.id)
-    await callback.message.edit_text(
+    action = callback.message.answer if new_message else callback.message.edit_text
+    if new_message:
+        await callback.message.delete_reply_markup()
+    await action(
         text=menu.title if text is None else text,
         reply_markup=menu.keyboard
     )
