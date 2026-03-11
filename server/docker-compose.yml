@@ -3,14 +3,14 @@ version: "3.1"
 services:
   mysql:
     image: mysql:9.0.1-oraclelinux9
-    container_name: mysql_db
     restart: unless-stopped
     ports:
-      - "3306:3306"
-    read_only: true
+      - "3307:3306"
     environment:
       MYSQL_ROOT_PASSWORD: my_pass
       MYSQL_DATABASE: nutri_system
+    volumes:
+      - mysql_data:/var/lib/mysql
     healthcheck:
       test: [ "CMD", "mysql", "-uroot", "-pmy_pass", "-e", "USE nutri_system;" ]
       interval: 7s
@@ -19,15 +19,18 @@ services:
 
   server:
     depends_on:
-      db:
+      mysql:
         condition: service_healthy
     build: .
     container_name: server-cont
     ports:
       - "8000:8000"
     environment:
-      DB_HOST: db
+      DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: root
       DB_PASSWORD: my_pass
       DB_DATABASE: nutri_system
+
+volumes:
+  mysql_data:

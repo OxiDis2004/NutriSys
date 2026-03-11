@@ -3,7 +3,7 @@ import os
 from uuid import UUID
 
 from sqlalchemy import Engine, update, select, Row, delete, text, func
-from sqlalchemy.dialects.mysql import insert
+from sqlalchemy.dialects.postgresql import insert
 
 from src.models.adapter.database_adapter import DBAdapter
 from src.models.dto.nutrient_food_dto import NutrientFoodDTO
@@ -23,7 +23,7 @@ class DBService:
         self.db = DBAdapter(engine)
         self.db.init_db()
 
-    def get_user(self, telegram_id: str) -> Row:
+    def get_user(self, telegram_id: int) -> Row:
         stmt = (select(User.id.label("id"), Language.iso.label("iso"))
                 .join(User.language)
                 .where(User.telegram_id == telegram_id))
@@ -32,7 +32,7 @@ class DBService:
     def add_user(self, user: UserDTO, activity: datetime):
         stmt = insert(User).values([
             {
-                "id": user.id,
+                "id": str(user.id),
                 "telegram_id": user.telegram_id,
                 "language_id": select(Language.id).where(Language.iso == user.language),
                 "last_activity": activity
@@ -41,29 +41,29 @@ class DBService:
 
         self.db.commit(stmt)
 
-        stmt = insert(UserInfo).values([ { "user_id": user.id } ])
+        stmt = insert(UserInfo).values([ { "user_id": str(user.id) } ])
         self.db.commit(stmt)
 
-    def update_user_language(self, user_id: str, language: str):
+    def update_user_language(self, user: UserDTO):
         stmt = (
             update(User)
-            .where(User.id == user_id)
+            .where(User.id == str(user.id))
             .values(
                 language_id=(
                     select(Language.id)
-                    .where(Language.iso == language)
+                    .where(Language.iso == user.language)
                     .scalar_subquery()
                 )
             )
         )
         self.db.commit(stmt)
 
-    def update_user_activity(self, user_id: str):
+    def update_user_activity(self, user_id: UUID):
         user_last_activity = datetime.now()
 
         stmt = (
             update(User)
-            .where(User.id == user_id)
+            .where(User.id == str(user_id))
             .values(last_activity=user_last_activity)
         )
 
@@ -72,7 +72,7 @@ class DBService:
     def update_user_info(self, user: UserInfoDTO):
         stmt = (
             update(UserInfo)
-            .where(UserInfo.user_id == user.id)
+            .where(UserInfo.user_id == str(user.id))
             .values(
                 name=user.name,
                 lastname=user.lastname,
@@ -90,7 +90,7 @@ class DBService:
     def get_drunk_water_interval(self, user_id: UUID, period: Period):
         stmt = (
             select(DrunkWater.date.label("date"), func.sum(DrunkWater.water).label("water"))
-            .where(DrunkWater.user_id == user_id)
+            .where(DrunkWater.user_id == str(user_id))
             .where(DrunkWater.date >= period.start_date)
             .where(DrunkWater.date <= period.end_date)
             .group_by(DrunkWater.date)
@@ -98,14 +98,14 @@ class DBService:
 
         return self.db.fetch(stmt)
 
-    def add_drunk_water(self, user_id: str, drunk_water: int, now: date):
-        stmt = insert(DrunkWater).values(user_id=user_id, water=drunk_water, date=now)
+    def add_drunk_water(self, user_id: UUID, drunk_water: int, now: date):
+        stmt = insert(DrunkWater).values(user_id=str(user_id), water=drunk_water, date=now)
         self.db.commit(stmt)
 
-    def update_drunk_water(self, user_id: str, drunk_water: int, now: date):
+    def update_drunk_water(self, user_id: UUID, drunk_water: int, now: date):
         stmt = (
             update(DrunkWater)
-            .where(DrunkWater.user_id == user_id)
+            .where(DrunkWater.user_id == str(user_id))
             .where(DrunkWater.date == now)
             .values(water=drunk_water)
         )
@@ -189,7 +189,7 @@ class DBService:
         stmt = select(text("1"))
         return len(self.db.fetch(stmt)) > 0
 
-    def _delete_user(self, telegram_id: str):
+    def _delete_user(self, telegram_id: int):
         stmt = delete(User).where(User.telegram_id == telegram_id)
         self.db.commit(stmt)
 
@@ -201,8 +201,8 @@ class DBService:
         stmt = select(Language.iso.label("iso"))
         return self.db.fetch(stmt)
 
-    def _add_language(self, language_id: int, iso: str):
-        insert_stmt = insert(Language).values(id=language_id, iso=iso)
+    def _add_language(self, iso: str):
+        insert_stmt = insert(Language).values(iso=iso)
         self.db.commit(insert_stmt)
 
     def close_session(self):

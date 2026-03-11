@@ -12,12 +12,12 @@ from src.models.dto.user_info_dto import UserInfoDTO
 from src.models.property.activity import Activity
 from src.models.property.goal import Goal
 
-language_ua = (1, "ua")
-user: UserDTO = UserDTO(id=str(uuid.uuid4()), telegram_id="example123", language=language_ua[1])
-user_info: UserInfoDTO = UserInfoDTO(id=user.id, name="Denys", lastname="Ponomarenko",
-    birthday=date(2005, 1, 6), weight=100, height=182, sex='m',
-    count_of_sport_in_week=Activity.HighActivity, goal=Goal.LoseWeight
-)
+language_en = (2, "en")
+user: UserDTO = UserDTO(id=uuid.uuid4(), telegram_id=759786972, language=language_en[1])
+# user_info: UserInfoDTO = UserInfoDTO(id=user.id, name="Denys", lastname="Ponomarenko",
+#     birthday=date(2005, 1, 6), weight=100, height=182, sex='m',
+#     count_of_sport_in_week=Activity.HighActivity, goal=Goal.LoseWeight
+# )
 
 @pytest.mark.asyncio
 class TestUserEndpoints:
@@ -57,7 +57,7 @@ class TestUserEndpoints:
 
     @pytest.fixture
     def initialize_language(self, setup_mocks):
-        get_db_service()._add_language(language_ua[0], language_ua[1])
+        get_db_service()._add_language(language_en[1])
 
     @pytest.fixture
     def initialize_user(self, setup_mocks):
@@ -89,8 +89,8 @@ class TestUserEndpoints:
             ) as client
         ):
             resp = await client.put(
-                "/user/register",
-                json={ "telegram_id": user.telegram_id, "language": user.language }
+                "/api/user/register",
+                json={ "id": None, "telegram_id": user.telegram_id, "language": user.language }
             )
 
         assert resp.status_code == 200

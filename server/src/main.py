@@ -10,7 +10,7 @@ from src.dependencies import (
     initialize_water_service,
     initialize_ai_service,
     initialize_food_service,
-    set_services,
+    set_services, initialize_languages,
 )
 from src.api import main_routes, user_routes, water_routes
 
@@ -27,6 +27,7 @@ def create_app() -> FastAPI:
 
     set_services(db_service, user_service, water_service, ai_service, food_service)
 
+    initialize_languages()
     app.add_middleware(LimitRequestSizeMiddleware, max_upload_size=65536)
 
     app_dependency = [Depends(rate_limiter)]

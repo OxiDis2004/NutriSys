@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 from src.models.adapter.database_adapter import DBAdapter
+from src.models.entity.language import LANGUAGE_ISO
 from src.services.ai_service import AIService
 from src.services.db_service import DBService
 from src.services.food_service import FoodService
@@ -68,3 +69,11 @@ def create_db_engine():
 
     url = DBAdapter.get_url(db_host, db_port, db_user, db_pwd, database)
     return create_engine(url, echo=True)
+
+def initialize_languages():
+    db = get_db_service()
+    isos = db.get_languages()
+
+    for iso in LANGUAGE_ISO:
+        if iso not in isos:
+            db._add_language(iso)

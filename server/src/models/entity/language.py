@@ -4,11 +4,13 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.models.entity.base import Base
 
+LANGUAGE_ISO = ["ua", "en", "de"]
+
 
 class Language(Base):
     __tablename__ = 'language'
 
-    id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, nullable=False)
     iso: Mapped[str] = mapped_column(String(3), nullable=False)
 
     users: Mapped[List["User"]] = relationship(
