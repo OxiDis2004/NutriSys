@@ -1,12 +1,10 @@
-import datetime
-import uuid
-
-import pytest
+import datetime, uuid, pytest
 from fastapi import HTTPException
 from sqlalchemy.engine.create import create_engine
 
 from src.models.dto.water_request_dto import WaterRequestDTO
 from src.models.dto.water_statistic_request_dto import WaterStatisticRequestDTO
+from src.models.property.period import PeriodType
 from src.services.db_service import DBService
 from src.services.water_service import WaterService
 
@@ -20,7 +18,7 @@ class TestWaterDrunkService:
         )
         self.db_service = DBService(self.engine_mock)
         self.water_service = WaterService(self.db_service)
-        self.user_id = str(uuid.uuid4())
+        self.user_id = uuid.uuid4()
 
         yield
 
@@ -64,9 +62,11 @@ class TestWaterDrunkService:
         water = self.water_service.statistic(
             WaterStatisticRequestDTO(
                 user_id=self.user_id,
-                day=datetime.date.today()
-            )
+                statistic_date=datetime.date.today()
+            ),
+            PeriodType.DAY
         )
 
         assert len(water) == 1
-        assert water[datetime.date.today().isoformat()] == 2000
+        assert water[0].day == datetime.date.today().isoformat()
+        assert water[0].drunk_water == 2000

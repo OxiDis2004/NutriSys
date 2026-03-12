@@ -16,7 +16,7 @@ class UserService:
         self._db_service: DBService = db_service
 
     def login(self, user: UserDTO) -> UserDTO:
-        if user is None or user.telegram_id is None:
+        if user.telegram_id is None:
             raise HTTPException(status_code=422, detail="Unprocessable Entity")
 
         data = self._db_service.get_user(user.telegram_id)
@@ -45,7 +45,7 @@ class UserService:
         if data is not None:
             user.id = data.id
             user.language = data.iso
-            return user
+            raise HTTPException(status_code=400, detail={ "message": "User already exists", "user": user.model_dump(mode="json") } )
 
         self._db_service.add_user(user, user_last_activity)
         data = self._db_service.get_user(user.telegram_id)
@@ -57,7 +57,7 @@ class UserService:
         return user
 
     def update_information(self, user_info: UserInfoDTO):
-        if user_info is None or user_info.id is None:
+        if user_info.id is None:
             raise HTTPException(status_code=400, detail="User id is undefined")
 
         try:
@@ -67,7 +67,7 @@ class UserService:
             raise HTTPException(status_code=400, detail="Caught: " + str(e))
 
     def update_language(self, user: UserDTO):
-        if user is None or (user.id is None and user.telegram_id is None) or user.language is None:
+        if user.telegram_id is None:
             raise HTTPException(status_code=422, detail="User details not found")
 
         try:
@@ -78,7 +78,7 @@ class UserService:
             user.id = data.id
             self._db_service.update_user_language(user)
             self._db_service.update_user_activity(user.id)
-            return user
+            return Response(status_code=status.HTTP_202_ACCEPTED)
         except Exception as e:
             raise HTTPException(status_code=400, detail="Caught: " + str(e))
 
@@ -91,7 +91,7 @@ class UserService:
             not isinstance(user_info.birthday, date) or
             user_info.sex is None or
             not isinstance(user_info.sex, str)):
-            raise HTTPException(status_code=400, detail="Not all the necessary data has been entered.")
+            raise HTTPException(status_code=422, detail="Not all the necessary data has been entered.")
 
         year = self.years_old(user_info.birthday)
         if year == -1:

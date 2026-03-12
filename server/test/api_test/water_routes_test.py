@@ -11,7 +11,7 @@ from src.dependencies import get_db_service
 from src.models.dto.user_dto import UserDTO
 
 language_en = (2, "en")
-user: UserDTO = UserDTO(id=uuid4(), telegram_id=759786972, language=language_en[1])
+user: UserDTO = UserDTO(id=uuid4(), telegram_id=123456789, language=language_en[1])
 
 @pytest.mark.asyncio
 class TestWaterEndpoints:
@@ -57,19 +57,17 @@ class TestWaterEndpoints:
         assert resp.status_code == 200
         return resp.json()
 
-    async def test_water_add(self, initialize_language, initialize_user):
-        data = await self._water_add_to_user(500)
+    async def water_test(self, add: int, expected: int):
+        data = await self._water_add_to_user(add)
         assert data["day"] == date.today().isoformat()
-        assert data["drunk_water"] == 500
+        assert data["drunk_water"] == expected
+
+    async def test_water_add(self, initialize_language, initialize_user):
+        await self.water_test(500, 500)
 
     async def test_water_add_2_times(self, initialize_language, initialize_user):
-        data = await self._water_add_to_user(1000)
-        assert data["day"] == date.today().isoformat()
-        assert data["drunk_water"] == 1000
-
-        data = await self._water_add_to_user(1000)
-        assert data["day"] == date.today().isoformat()
-        assert data["drunk_water"] == 2000
+        await self.water_test(1000, 1000)
+        await self.water_test(1000, 2000)
 
     @pytest.fixture
     def add_water_to_user(self, setup_mocks):
