@@ -72,7 +72,7 @@ def create_db_engine():
 
 def initialize_languages():
     db = get_db_service()
-    isos = db.get_languages()
+    isos = [row.iso for row in db.get_languages()]
 
     for iso in LANGUAGE_ISO:
         if iso not in isos:
