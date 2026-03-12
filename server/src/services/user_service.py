@@ -71,11 +71,12 @@ class UserService:
             raise HTTPException(status_code=422, detail="User details not found")
 
         try:
-            data = self._db_service.get_user(user.telegram_id)
-            if data is None:
-                raise Exception("User didn't registered")
+            if user.id is None:
+                data = self._db_service.get_user(user.telegram_id)
+                if data is None:
+                    raise Exception("User didn't registered")
+                user.id = data.id
 
-            user.id = data.id
             self._db_service.update_user_language(user)
             self._db_service.update_user_activity(user.id)
             return Response(status_code=status.HTTP_202_ACCEPTED)

@@ -25,5 +25,5 @@ async def language_handler(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data.in_([Language.UKRAINE.value, Language.ENGLISH.value, Language.GERMAN.value]))
 async def change_language(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
-    set_current_user_language(callback.from_user.id, callback.data)
+    await set_current_user_language(callback.from_user.id, callback.data)
     await previous_callback(callback, state)

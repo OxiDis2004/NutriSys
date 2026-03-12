@@ -5,7 +5,7 @@ import os
 
 from src import my_setenv
 from src.routers import setup_routers
-from src.services import get_hostname
+from src.services import get_hostname, initialize_client
 
 logging.basicConfig(level=logging.INFO)
 my_setenv.get_key()
@@ -15,6 +15,7 @@ async def main():
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     bot = Bot(token=token)
     dp = Dispatcher()
+    initialize_client()
     setup_routers(dp)
     await dp.start_polling(bot)
 

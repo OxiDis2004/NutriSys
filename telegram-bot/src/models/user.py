@@ -9,6 +9,8 @@ class User:
         self._weight = None
         self._height = None
         self._sex = None
+        self._activity = None
+        self._goal = None
 
     def __str__(self):
         return (f"ID: {self._user_id}"
@@ -86,4 +88,19 @@ class User:
     def sex(self, value):
         self._sex = value
 
+    @property
+    def activity(self):
+        return self._activity
+
+    @activity.setter
+    def activity(self, value):
+        self._activity = value
+
+    @property
+    def goal(self):
+        return self._goal
+
+    @goal.setter
+    def goal(self, value):
+        self._goal = value
 
