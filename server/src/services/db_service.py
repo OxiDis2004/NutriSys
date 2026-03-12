@@ -32,7 +32,7 @@ class DBService:
     def add_user(self, user: UserDTO, activity: datetime):
         stmt = insert(User).values([
             {
-                "id": str(user.id),
+                "id": user.user_id,
                 "telegram_id": user.telegram_id,
                 "language_id": select(Language.id).where(Language.iso == user.language),
                 "last_activity": activity
@@ -41,13 +41,13 @@ class DBService:
 
         self.db.commit(stmt)
 
-        stmt = insert(UserInfo).values([ { "user_id": str(user.id) } ])
+        stmt = insert(UserInfo).values([ { "user_id": user.user_id } ])
         self.db.commit(stmt)
 
     def update_user_language(self, user: UserDTO):
         stmt = (
             update(User)
-            .where(User.id == str(user.id))
+            .where(User.id == user.user_id)
             .values(
                 language_id=(
                     select(Language.id)
@@ -69,10 +69,34 @@ class DBService:
 
         self.db.commit(stmt)
 
+    def get_user_infos(self, user_ids: list[UUID]):
+        stmt = (select(
+            UserInfo.name.label("name"),
+            UserInfo.lastname.label("lastname"),
+            UserInfo.birthday.label("birthday"),
+            UserInfo.weight.label("weight"),
+            UserInfo.height.label("height"),
+            UserInfo.count_of_sport_in_week.label("activity"),
+            UserInfo.goal.label("goal")
+        ).where(UserInfo.user_id.in_([str(user_id) for user_id in user_ids])))
+        return self.db.fetch(stmt)
+
+    def get_user_info(self, user_id: UUID):
+        stmt = (select(
+            UserInfo.name.label("name"),
+            UserInfo.lastname.label("lastname"),
+            UserInfo.birthday.label("birthday"),
+            UserInfo.weight.label("weight"),
+            UserInfo.height.label("height"),
+            UserInfo.count_of_sport_in_week.label("activity"),
+            UserInfo.goal.label("goal")
+        ).where(UserInfo.user_id == str(user_id)))
+        return self.db.fetch_one(stmt)
+
     def update_user_info(self, user: UserInfoDTO):
         stmt = (
             update(UserInfo)
-            .where(UserInfo.user_id == str(user.id))
+            .where(UserInfo.user_id == user.user_id)
             .values(
                 name=user.name,
                 lastname=user.lastname,
@@ -98,35 +122,35 @@ class DBService:
 
         return self.db.fetch(stmt)
 
-    def add_drunk_water(self, user_id: UUID, drunk_water: int, now: date):
-        stmt = insert(DrunkWater).values(user_id=str(user_id), water=drunk_water, date=now)
+    def add_drunk_water(self, user_id: UUID, drunk_water: int, _date: date):
+        stmt = insert(DrunkWater).values(user_id=str(user_id), water=drunk_water, date=_date)
         self.db.commit(stmt)
 
-    def update_drunk_water(self, user_id: UUID, drunk_water: int, now: date):
+    def update_drunk_water(self, user_id: UUID, drunk_water: int, _date: date):
         stmt = (
             update(DrunkWater)
             .where(DrunkWater.user_id == str(user_id))
-            .where(DrunkWater.date == now)
+            .where(DrunkWater.date == _date)
             .values(water=drunk_water)
         )
         self.db.commit(stmt)
 
-    def get_sent_food(self, user_id: str, search_date: datetime):
+    def get_sent_food(self, user_id: UUID, search_date: datetime):
         stmt = (
             select(SentFood.date.label("date"), SentFood.food_id.label("food"),
                 SentFood.image_id.label("image"))
-            .where(SentFood.user_id == user_id)
+            .where(SentFood.user_id == str(user_id))
             .where(SentFood.date == search_date)
             .group_by(SentFood.date)
         )
 
         return self.db.fetch(stmt)
 
-    def get_sent_food_interval(self, user_id: str, date_from: date, date_to: date):
+    def get_sent_food_interval(self, user_id: UUID, date_from: date, date_to: date):
         stmt = (
             select(SentFood.date.label("date"), SentFood.food_id.label("food"),
                 SentFood.image_id.label("image"))
-            .where(SentFood.user_id == user_id)
+            .where(SentFood.user_id == str(user_id))
             .where(SentFood.date > date_from)
             .where(SentFood.date < date_to)
             .group_by(SentFood.date)
@@ -134,13 +158,13 @@ class DBService:
 
         return self.db.fetch(stmt)
 
-    def add_sent_food(self, user_id: str, food_id: str, image_id: str | None):
+    def add_sent_food(self, user_id: UUID, food_id: str, image_id: str | None):
         date_now = date.today()
 
         stmt = (
             insert(SentFood).values([
                 {
-                    "user_id": user_id,
+                    "user_id": str(user_id),
                     "food_id": food_id,
                     "image_id": image_id,
                     "date": date_now
@@ -193,8 +217,8 @@ class DBService:
         stmt = delete(User).where(User.telegram_id == telegram_id)
         self.db.commit(stmt)
 
-    def _delete_drunk_water(self, user_id: str):
-        stmt = delete(DrunkWater).where(DrunkWater.user_id == user_id)
+    def _delete_drunk_water(self, user_id: UUID):
+        stmt = delete(DrunkWater).where(DrunkWater.user_id == str(user_id))
         self.db.commit(stmt)
 
     def get_languages(self):

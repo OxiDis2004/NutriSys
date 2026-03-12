@@ -43,13 +43,12 @@ class WaterService:
         except Exception as e:
             raise HTTPException(status_code=500, detail="Caught " + str(e))
 
-    def statistic(self, request: WaterStatisticRequestDTO, period_type_str: str) \
+    def statistic(self, request: WaterStatisticRequestDTO, period_type: PeriodType) \
             -> list[WaterResponseDTO]:
         if request.user_id is None:
             raise HTTPException(status_code=400, detail="User id is null")
 
         try:
-            period_type: PeriodType = PeriodType(period_type_str)
             match period_type:
                 case PeriodType.DAY: return self.get_statistic_day(request)
                 case PeriodType.WEEK: return self.get_statistic_week(request)

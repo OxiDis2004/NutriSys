@@ -19,8 +19,8 @@ async def register(user: UserDTO, service=Depends(get_user_service)):
     return service.register(user)
 
 @router.post("/calculate_calorie")
-async def calculate_calorie(user: UserInfoDTO, service=Depends(get_user_service)):
-    return service.calculate_calorie(user)
+async def calculate_calorie(user_info: UserInfoDTO, service=Depends(get_user_service)):
+    return service.calculate_calorie(user_info)
 
 @router.put("/update_info")
 async def update_info(user: UserInfoDTO, service=Depends(get_user_service)):

@@ -14,3 +14,7 @@ class UserDTO(BaseModel):
         pattern=r"^[a-z]{2}$",
         description="User language code (ISO 639-1)"
     )
+
+    @property
+    def user_id(self) -> str:
+        return str(self.id)

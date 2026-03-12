@@ -41,11 +41,11 @@ def add_water_data(states):
         get_db_service().add_drunk_water(
             user_id=states["user_id"],
             drunk_water=water,
-            now=current_date
+            _date=current_date
         )
         states["water_data"].append(
             WaterResponseDTO(
-                day=current_date,
+                day=current_date.isoformat(),
                 drunk_water=water
             )
         )
@@ -58,11 +58,11 @@ def add_water_data(states):
 @given(parsers.cfparse("today user already drank {water_drunk:d} ml"))
 def add_water_today(states, water_drunk):
     day = datetime.date.today()
-    states["day_water"] = [WaterResponseDTO(day=day, drunk_water=water_drunk)]
+    states["day_water"] = [WaterResponseDTO(day=day.isoformat(), drunk_water=water_drunk)]
     get_db_service().add_drunk_water(
         user_id=states["user_id"],
         drunk_water=water_drunk,
-        now=day
+        _date=day
     )
 
 
@@ -167,7 +167,7 @@ def get_yearly_stats(client, states):
     async def inner():
         response = await client.post(
             "/water/statistic/year",
-            json=WaterStatisticRequestDTO(user_id=user_id, statistic_date_str=states["year"].strftime("%d_%m_%Y"))
+            json=WaterStatisticRequestDTO(user_id=user_id, statistic_date=states["year"])
             .model_dump(mode="json")
         )
         states["response"] = response
