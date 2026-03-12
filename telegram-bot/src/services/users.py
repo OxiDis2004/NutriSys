@@ -14,24 +14,21 @@ USERS_CALORIE = {}
 
 USER_API = f"{server()}/api/user"
 
-async def current_user(telegram_id: int, language: Language) -> User:
-    async with httpx.AsyncClient() as client:
-        body = {
-            "id": None,
-            "telegram_id": telegram_id,
-            "language": language.value
-        }
-        response = await request(client.post, f"{USER_API}/login", body, False)
-
-        if not response.ok:
-            response = await request(client.put, f"{USER_API}/register", body)
-
+async def get_all_users():
+    async with httpx.AsyncClient(
+        headers={"Authorization": f"Bearer"}
+    ) as client:
+        response = await request(client.get, f"{USER_API}/all_users", None)
         data = response.json()
-        user = User()
-        user.user_id = data.get('id', uuid4())
-        user.telegram_id = data.get('telegram_id', telegram_id)
-        user.language = data.get('language', Language.ENGLISH)
-        return user
+        for row in data:
+            telegram_id = row.get('telegram_id', None)
+            user = User(
+                row.get('id', uuid4()),
+                telegram_id,
+                row.get('language', Language.ENGLISH)
+            )
+            if telegram_id is not None:
+                USERS.update({ telegram_id: user })
 
 async def register_user(telegram_id: int, language: Language):
     user = get_current_user(telegram_id)
@@ -45,10 +42,11 @@ async def register_user(telegram_id: int, language: Language):
             }
             response = await request(client.put, f"{USER_API}/register", body)
             data = response.json()
-            user = User()
-            user.user_id = data.get('id', uuid4())
-            user.telegram_id = data.get('telegram_id', telegram_id)
-            user.language = data.get('language', Language.ENGLISH)
+            user = User(
+                data.get('id', uuid4()),
+                data.get('telegram_id', telegram_id),
+                data.get('language', Language.ENGLISH)
+            )
             USERS.update({ telegram_id: user })
 
 def get_current_user(telegram_id: int) -> User | None:

@@ -1,8 +1,8 @@
 class User:
-    def __init__(self):
-        self._user_id = None
-        self._telegram_id = None
-        self._language = None
+    def __init__(self, user_id, telegram_id, language):
+        self._user_id = user_id
+        self._telegram_id = telegram_id
+        self._language = language
         self._name = None
         self._lastname = None
         self._birthday = None
