@@ -11,7 +11,7 @@ from src.models.dto.user_dto import UserDTO
 from src.models.dto.user_info_dto import UserInfoDTO
 from src.models.entity.drunk_water import DrunkWater
 from src.models.entity.food import Food
-from src.models.entity.language import Language
+from src.models.entity.language import Language, LANGUAGE_ISO
 from src.models.entity.sent_food import SentFood
 from src.models.entity.user import User
 from src.models.entity.user_info import UserInfo
@@ -22,6 +22,13 @@ class DBService:
     def __init__(self, engine: Engine):
         self.db = DBAdapter(engine)
         self.db.init_db()
+
+    def get_users(self):
+        stmt = (
+            select(User.id.label("id"),  Language.iso.label("iso"))
+            .join(User.language)
+        )
+        return self.db.fetch(stmt)
 
     def get_user(self, telegram_id: int) -> Row:
         stmt = (select(User.id.label("id"), Language.iso.label("iso"))
@@ -43,6 +50,13 @@ class DBService:
 
         stmt = insert(UserInfo).values([ { "user_id": user.user_id } ])
         self.db.commit(stmt)
+
+    def initialize_languages(self):
+        isos = [row.iso for row in self.get_languages()]
+
+        for iso in LANGUAGE_ISO:
+            if iso not in isos:
+                self.add_language(iso)
 
     def update_user_language(self, user: UserDTO):
         stmt = (
@@ -70,27 +84,33 @@ class DBService:
         self.db.commit(stmt)
 
     def get_user_infos(self, user_ids: list[UUID]):
-        stmt = (select(
-            UserInfo.name.label("name"),
-            UserInfo.lastname.label("lastname"),
-            UserInfo.birthday.label("birthday"),
-            UserInfo.weight.label("weight"),
-            UserInfo.height.label("height"),
-            UserInfo.count_of_sport_in_week.label("activity"),
-            UserInfo.goal.label("goal")
-        ).where(UserInfo.user_id.in_([str(user_id) for user_id in user_ids])))
+        stmt = (
+            select(
+                UserInfo.name.label("name"),
+                UserInfo.lastname.label("lastname"),
+                UserInfo.birthday.label("birthday"),
+                UserInfo.weight.label("weight"),
+                UserInfo.height.label("height"),
+                UserInfo.count_of_sport_in_week.label("activity"),
+                UserInfo.goal.label("goal")
+            )
+            .where(UserInfo.user_id.in_([str(user_id) for user_id in user_ids]))
+        )
         return self.db.fetch(stmt)
 
     def get_user_info(self, user_id: UUID):
-        stmt = (select(
-            UserInfo.name.label("name"),
-            UserInfo.lastname.label("lastname"),
-            UserInfo.birthday.label("birthday"),
-            UserInfo.weight.label("weight"),
-            UserInfo.height.label("height"),
-            UserInfo.count_of_sport_in_week.label("activity"),
-            UserInfo.goal.label("goal")
-        ).where(UserInfo.user_id == str(user_id)))
+        stmt = (
+            select(
+                UserInfo.name.label("name"),
+                UserInfo.lastname.label("lastname"),
+                UserInfo.birthday.label("birthday"),
+                UserInfo.weight.label("weight"),
+                UserInfo.height.label("height"),
+                UserInfo.count_of_sport_in_week.label("activity"),
+                UserInfo.goal.label("goal")
+            )
+            .where(UserInfo.user_id == str(user_id))
+        )
         return self.db.fetch_one(stmt)
 
     def update_user_info(self, user: UserInfoDTO):
@@ -174,7 +194,7 @@ class DBService:
 
         self.db.commit(stmt)
 
-    def get_food(self, food_id: str):
+    def get_nutrient(self, food_id: str):
         stmt = (
             select(Food.calory.label("calory"), Food.protein.label("protein"),
                 Food.carbon.label("carbon"), Food.fat.label("fat"))
@@ -183,9 +203,10 @@ class DBService:
 
         return self.db.fetch(stmt)
 
-    def get_food_by_name(self, food_name: str):
+    def get_nutrient_by_name(self, food_name: str):
         stmt = (
-            select(Food.id.label("id"), Food.name.label("name"), Food.calory.label("calory"),
+            select(
+                Food.id.label("id"), Food.calory.label("calory"),
                 Food.protein.label("protein"), Food.carbon.label("carbon"), Food.fat.label("fat"))
             .where(Food.name == food_name)
         )
@@ -213,11 +234,11 @@ class DBService:
         stmt = select(text("1"))
         return len(self.db.fetch(stmt)) > 0
 
-    def _delete_user(self, telegram_id: int):
+    def delete_user(self, telegram_id: int):
         stmt = delete(User).where(User.telegram_id == telegram_id)
         self.db.commit(stmt)
 
-    def _delete_drunk_water(self, user_id: UUID):
+    def delete_drunk_water(self, user_id: UUID):
         stmt = delete(DrunkWater).where(DrunkWater.user_id == str(user_id))
         self.db.commit(stmt)
 
@@ -225,7 +246,7 @@ class DBService:
         stmt = select(Language.iso.label("iso"))
         return self.db.fetch(stmt)
 
-    def _add_language(self, iso: str):
+    def add_language(self, iso: str):
         insert_stmt = insert(Language).values(iso=iso)
         self.db.commit(insert_stmt)
 

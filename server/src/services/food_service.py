@@ -33,12 +33,12 @@ class FoodService:
         return nutrient
 
     def get_nutrient_by_name(self, food_name: str):
-        row = self._db_service.get_food(food_name)
+        row = self._db_service.get_nutrient_by_name(food_name)
 
         if row is None or row.user_id is None:
-            id = str(uuid.uuid4())
+            food_id = str(uuid.uuid4())
             nutrient = self.get_nutrient_from_api(food_name)
-            self._db_service.add_food(id, nutrient)
+            self._db_service.add_food(food_id, nutrient)
         else:
             nutrient = NutrientFoodDTO(
                 name=row.name,
