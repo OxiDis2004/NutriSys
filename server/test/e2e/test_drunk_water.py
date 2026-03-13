@@ -8,7 +8,7 @@ from pytest_bdd import given, when, then, parsers, scenarios
 from src.models.dto.water_request_dto import WaterRequestDTO
 from src.dependencies import get_services
 from src.models.dto.water_response_dto import WaterResponseDTO
-from src.models.dto.water_statistic_request_dto import WaterStatisticRequestDTO
+from src.models.dto.statistic_request_dto import StatisticRequestDTO
 from src.services.water_service import WaterService
 
 scenarios("features/drunk_water.feature")
@@ -117,8 +117,8 @@ def get_daily_stats(client, states):
     async def inner():
         response = await client.post(
             "/water/statistic/day",
-            json=WaterStatisticRequestDTO(user_id=user_id,
-                statistic_date_str=datetime.date.today().strftime("%d_%m_%Y"))
+            json=StatisticRequestDTO(user_id=user_id,
+                                     statistic_date_str=datetime.date.today().strftime("%d_%m_%Y"))
             .model_dump(mode="json")
         )
         states["response"] = response
@@ -134,7 +134,7 @@ def get_weekly_stats(client, states):
     async def inner():
         response = await client.post(
             "/water/statistic/week",
-            json=WaterStatisticRequestDTO(user_id=user_id, statistic_date_str=states["week"].strftime("%d_%m_%Y"))
+            json=StatisticRequestDTO(user_id=user_id, statistic_date_str=states["week"].strftime("%d_%m_%Y"))
             .model_dump(mode="json")
         )
         states["response"] = response
@@ -150,7 +150,7 @@ def get_monthly_stats(client, states):
     async def inner():
         response = await client.post(
             "/water/statistic/month",
-            json=WaterStatisticRequestDTO(user_id=user_id, statistic_date_str=states["month"].strftime("%d_%m_%Y"))
+            json=StatisticRequestDTO(user_id=user_id, statistic_date_str=states["month"].strftime("%d_%m_%Y"))
             .model_dump(mode="json")
         )
         states["response"] = response
@@ -166,7 +166,7 @@ def get_yearly_stats(client, states):
     async def inner():
         response = await client.post(
             "/water/statistic/year",
-            json=WaterStatisticRequestDTO(user_id=user_id, statistic_date=states["year"])
+            json=StatisticRequestDTO(user_id=user_id, statistic_date=states["year"])
             .model_dump(mode="json")
         )
         states["response"] = response

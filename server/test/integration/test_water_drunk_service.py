@@ -2,7 +2,7 @@ import datetime, pytest
 from fastapi import HTTPException
 
 from src.models.dto.water_request_dto import WaterRequestDTO
-from src.models.dto.water_statistic_request_dto import WaterStatisticRequestDTO
+from src.models.dto.statistic_request_dto import StatisticRequestDTO
 from src.models.property.period import PeriodType
 from src.services.water_service import WaterService
 from test import USER
@@ -52,7 +52,7 @@ class TestWaterDrunkService(BaseTestService):
 
     def test_get_drunk_water(self, initialize_2000):
         water = self.water_service.statistic(
-            WaterStatisticRequestDTO(
+            StatisticRequestDTO(
                 user_id=self.user_id,
                 statistic_date=datetime.date.today()
             ),
