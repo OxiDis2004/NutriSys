@@ -15,7 +15,7 @@ class UserInfoDTO(BaseModel):
     weight: int | None = Field(None, ge=0, le=500, description="Weight in kilograms")
     height: int | None = Field(None, ge=0, le=300, description="Height in centimeters")
     sex: str | None = Field(None, max_length=10, pattern=r"^(m|f)$", description="Sex")
-    count_of_sport_in_week: Activity | None = Field(None, description="Level of weekly activity")
+    activity: Activity | None = Field(None, description="Level of weekly activity")
     goal: Goal | None = Field(None, description="User goal")
 
     @property

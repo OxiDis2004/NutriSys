@@ -147,7 +147,7 @@ class TestUserService:
         )
         self.user_service_mock.set_bmr_by_activity.assert_called_once_with(
             2000,
-            user_info.count_of_sport_in_week
+            user_info.activity
         )
         self.user_service_mock.set_bmr_by_goal.assert_called_once_with(
             3000,

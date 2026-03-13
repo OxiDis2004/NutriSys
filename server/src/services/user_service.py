@@ -99,8 +99,8 @@ class UserService:
 
         bmr = self.formula(user_info.weight, user_info.height, year, user_info.sex)
 
-        if isinstance(user_info.count_of_sport_in_week, Activity):
-            bmr = self.set_bmr_by_activity(bmr, user_info.count_of_sport_in_week)
+        if isinstance(user_info.activity, Activity):
+            bmr = self.set_bmr_by_activity(bmr, user_info.activity)
 
         if isinstance(user_info.goal, Goal):
             bmr = self.set_bmr_by_goal(bmr, user_info.goal)

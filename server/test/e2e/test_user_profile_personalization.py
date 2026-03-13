@@ -50,9 +50,9 @@ def check_update(states):
 def update_information(client, states):
     user_id = states["user_id"] if "user_id" in states else None
     user_info: UserInfoDTO = UserInfoDTO(id=user_id, name="Denys", lastname="Ponomarenko",
-        birthday=date(2005, 1, 6), weight=100, height=182, sex='m',
-        count_of_sport_in_week=Activity.HighActivity, goal=Goal.LoseWeight
-    )
+                                         birthday=date(2005, 1, 6), weight=100, height=182, sex='m',
+                                         activity=Activity.HighActivity, goal=Goal.LoseWeight
+                                         )
 
     async def inner():
         response = await client.put(
