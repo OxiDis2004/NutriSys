@@ -1,40 +1,20 @@
-from datetime import datetime
-
 import pytest
 from fastapi import HTTPException
-from sqlalchemy import create_engine
 
 from src.models.dto.user_dto import UserDTO
 from src.models.dto.user_info_dto import UserInfoDTO
-from src.services.db_service import DBService
 from src.services.user_service import UserService
-from test import LANGUAGES, USER, USER_INFO
+from test import USER, USER_INFO
+from test.integration import BaseTestService
 
 
-class TestUserService:
+class TestUserService(BaseTestService):
 
     @pytest.fixture(scope="function", autouse=True)
-    def setup_services(self):
-        self.engine_mock = create_engine(
-            f"sqlite:///:memory:",
-            connect_args={"check_same_thread": False},
-        )
-        self.db_service = DBService(self.engine_mock)
+    def setup_service(self, setup_database):
         self.user_service = UserService(self.db_service)
-
         yield
-
-        self.engine_mock = None
-        self.db_service = None
         self.user_service = None
-
-    @pytest.fixture
-    def initialize_language(self, setup_services):
-        self.db_service._add_language(LANGUAGES[0])
-
-    @pytest.fixture
-    def initialize_user(self, setup_services):
-        self.db_service.add_user(USER, datetime.today())
 
     def test_login(self, initialize_language, initialize_user):
         received_user = self.user_service.login(

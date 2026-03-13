@@ -6,7 +6,7 @@ import random
 from pytest_bdd import given, when, then, parsers, scenarios
 
 from src.models.dto.water_request_dto import WaterRequestDTO
-from src.dependencies import get_db_service
+from src.dependencies import get_services
 from src.models.dto.water_response_dto import WaterResponseDTO
 from src.models.dto.water_statistic_request_dto import WaterStatisticRequestDTO
 from src.services.water_service import WaterService
@@ -17,7 +17,7 @@ scenarios("features/drunk_water.feature")
 @given('remove data in table')
 def remove_water_data(states):
     if "user_id" in states:
-        get_db_service()._delete_drunk_water(states["user_id"])
+        get_services().db_service.delete_drunk_water(states["user_id"])
         states["data_exists"] = "false"
 
 
@@ -29,7 +29,6 @@ def add_water_data(states):
     if states.get("data_exists") == "true":
         return
 
-    print("add data in table")
     current_date = datetime.date(2025, 1, 1)
     end_date = datetime.date(2025, 12, 31)
 
@@ -38,7 +37,7 @@ def add_water_data(states):
 
     while current_date <= end_date:
         water = random.choice(water_values)
-        get_db_service().add_drunk_water(
+        get_services().db_service.add_drunk_water(
             user_id=states["user_id"],
             drunk_water=water,
             _date=current_date
@@ -59,7 +58,7 @@ def add_water_data(states):
 def add_water_today(states, water_drunk):
     day = datetime.date.today()
     states["day_water"] = [WaterResponseDTO(day=day.isoformat(), drunk_water=water_drunk)]
-    get_db_service().add_drunk_water(
+    get_services().db_service.add_drunk_water(
         user_id=states["user_id"],
         drunk_water=water_drunk,
         _date=day

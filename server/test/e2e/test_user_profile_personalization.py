@@ -3,7 +3,7 @@ from datetime import date
 
 from pytest_bdd import when, parsers, then, scenarios, given
 
-from src.dependencies import get_db_service
+from src.dependencies import get_services
 from src.models.dto.user_dto import UserDTO
 from src.models.dto.user_info_dto import UserInfoDTO
 from src.models.property.activity import Activity
@@ -13,12 +13,12 @@ scenarios("features/user_profile_personalization.feature")
 
 @given(parsers.cfparse('system has language "{language}"'))
 def step_impl(language):
-    rows = get_db_service().get_languages()
+    rows = get_services().db_service.get_languages()
     for row in rows:
         if row.iso == language:
             return
 
-    get_db_service()._add_language(language)
+    get_services().db_service.add_language(language)
 
 @when(parsers.cfparse(
     'user with telegram id "{telegram_id}" updates profile language to "{language}"'
