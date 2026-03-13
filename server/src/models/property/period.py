@@ -1,6 +1,7 @@
 from collections import defaultdict
 from datetime import date, timedelta
 from enum import Enum
+from typing import Type
 
 
 class Period:
@@ -16,13 +17,13 @@ class Period:
     def end_date(self):
         return self._end_date.isoformat()
 
-    def period_dict(self, step_month: bool = False) -> dict[str, int]:
-        result = defaultdict(int)
+    def period_dict(self, default_value, step_month: bool = False) -> dict:
+        result = defaultdict(Type[default_value])
         current = self._start_date
 
         while current <= self._end_date:
             key = current.isoformat()
-            result[key] = 0
+            result[key] = default_value
 
             if step_month:
                 if current.month == 12:

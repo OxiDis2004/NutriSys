@@ -24,6 +24,14 @@ class StatisticService(ABC):
     def _get_data_from_db(self, user_id: UUID, period: Period) -> Sequence[Row[Any]]:
         pass
 
+    @abstractmethod
+    def _update_dict_value(self, dict_value: Any, new_value: Any) -> Any:
+        pass
+
+    @abstractmethod
+    def _default_dict_value(self):
+        pass
+
     def statistic[T](self, request: StatisticRequestDTO, period_type: PeriodType) -> list[T]:
         if request.user_id is None:
             raise HTTPException(status_code=400, detail="User id is null")
@@ -36,7 +44,6 @@ class StatisticService(ABC):
                 case PeriodType.WEEK: result = self.get_statistic_week(request)
                 case PeriodType.MONTH: result = self.get_statistic_month(request)
                 case PeriodType.YEAR: result = self.get_statistic_year(request)
-
             if result is None:
                 return []
 
@@ -59,14 +66,14 @@ class StatisticService(ABC):
 
     def get_statistic_data(self, period_func, request: StatisticRequestDTO,
                            step_month: bool = False) -> dict:
-        period = period_func(request.statistic_date)
+        period: Period = period_func(request.statistic_date)
         rows = self._get_data_from_db(request.user_id, period)
-        result = period.period_dict(step_month)
+        result = period.period_dict(self._default_dict_value(), step_month)
 
         for row in rows:
             key = row.date.isoformat() if not step_month \
                 else row.date.replace(day=1).isoformat()
-            result[key] += row.water
+            result[key] = self._update_dict_value(result[key], row)
 
         return result
 

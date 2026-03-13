@@ -46,6 +46,14 @@ class WaterService(StatisticService):
             raise HTTPException(status_code=500, detail="Caught " + str(e))
 
     @override
+    def _default_dict_value(self):
+        return 0
+
+    @override
+    def _update_dict_value(self, dict_value: Any, new_value: Any) -> Any:
+        return dict_value + new_value.water
+
+    @override
     def _get_data_from_db(self, user_id: UUID, period: Period) -> Sequence[Row[Any]]:
         return self._db_service.get_drunk_water_interval(user_id, period)
 
