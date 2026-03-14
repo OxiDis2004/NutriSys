@@ -39,6 +39,18 @@ class TestUserEndpoints(BaseTestEndpoint):
 
         return resp
 
+    async def test_get_users(self, initialize_user, initialize_user_2):
+        async with (
+            AsyncClient(
+                transport=ASGITransport(app=self.app),
+                base_url="http://test"
+            ) as client
+        ):
+            resp = await client.get("/api/user/all_users")
+
+        print(resp.json())
+
+
     async def test_login_not_found(self, setup_app):
         resp = await self.login()
         assert resp.status_code == 404
@@ -106,15 +118,9 @@ class TestUserEndpoints(BaseTestEndpoint):
                 base_url="http://test"
             ) as client
         ):
-            body = {
-                'id': '7761e28b-bf5f-422e-a5b8-10aff77226e9',
-                'name': None,
-                'lastname': None,
-                'birthday': None, 'weight': 100, 'height': None, 'sex': None, 'activity': None, 'goal': None}
             resp = await client.put(
                 "/api/user/update_info",
-                # json=USER_INFO.model_dump(mode="json")
-                json=body
+                json=USER_INFO.model_dump(mode="json")
             )
 
         assert resp.status_code == 202

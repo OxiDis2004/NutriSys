@@ -14,6 +14,12 @@ USER: UserDTO = UserDTO(
     language=LANGUAGES[0]
 )
 
+USER2: UserDTO = UserDTO(
+    id=uuid.uuid4(),
+    telegram_id=123454321,
+    language=LANGUAGES[1]
+)
+
 USER_INFO: UserInfoDTO = UserInfoDTO(
     id=USER.id,
     name="Denys",

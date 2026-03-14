@@ -5,7 +5,7 @@ import pytest
 from sqlalchemy import create_engine
 
 from src.dependencies import get_services
-from test import USER, USER_INFO
+from test import USER, USER_INFO, USER2
 
 
 @pytest.mark.asyncio
@@ -28,10 +28,13 @@ class BaseTestEndpoint:
         self.app = None
         get_services().db_service.close_session()
 
-
     @pytest.fixture
     def initialize_user(self, setup_app):
         get_services().db_service.add_user(USER, datetime.today())
+
+    @pytest.fixture
+    def initialize_user_2(self, setup_app):
+        get_services().db_service.add_user(USER2, datetime.today())
 
     @pytest.fixture
     def update_user_info(self, setup_app):

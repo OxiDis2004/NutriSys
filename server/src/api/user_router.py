@@ -6,6 +6,10 @@ from src.models.dto.user_info_dto import UserInfoDTO
 
 router = APIRouter(prefix="/api/user")
 
+@router.get("/all_users", response_model=list[UserDTO])
+async def get_users(services: ServiceContainer = Depends(get_services)):
+    return services.user_service.get_users()
+
 @router.post("/login", response_model=UserDTO)
 async def login(user: UserDTO, services: ServiceContainer = Depends(get_services)):
     return services.user_service.login(user)
