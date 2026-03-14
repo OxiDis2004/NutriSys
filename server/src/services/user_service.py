@@ -15,6 +15,15 @@ class UserService:
     def __init__(self, db_service: DBService):
         self._db_service: DBService = db_service
 
+    def get_users(self) -> list[UserDTO]:
+        data = self._db_service.get_users()
+        if data is None:
+            raise HTTPException(status_code=404, detail="Users not found")
+
+        return [
+            UserDTO(id=row.id, telegram_id=row.telegram_id, language=row.iso) for row in data
+        ]
+
     def login(self, user: UserDTO) -> UserDTO:
         if user.telegram_id is None:
             raise HTTPException(status_code=422, detail="Unprocessable Entity")

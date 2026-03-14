@@ -25,10 +25,11 @@ class DBService:
         self.db.init_db()
 
     def get_users(self):
-        stmt = (
-            select(User.id.label("id"),  Language.iso.label("iso"))
-            .join(User.language)
-        )
+        stmt = (select(
+                User.id.label("id"),
+                User.telegram_id.label("telegram_id"),
+                Language.iso.label("iso")
+            ).join(User.language))
         return self.db.fetch(stmt)
 
     def get_user(self, telegram_id: int) -> Row:
