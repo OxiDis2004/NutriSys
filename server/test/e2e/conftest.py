@@ -6,7 +6,7 @@ from httpx import ASGITransport, AsyncClient
 from pytest_bdd import given, parsers, then
 from sqlalchemy import create_engine
 
-from src.dependencies import get_db_service
+from src.dependencies import get_services
 
 states_dict = {}
 
@@ -33,15 +33,15 @@ def states():
 
 @given(parsers.cfparse('system has no user with telegram id "{telegram_id}"'))
 def clear_user(create_test_app, telegram_id):
-    get_db_service()._delete_user(telegram_id)
+    get_services().db_service.delete_user(telegram_id)
 
 
 @given(parsers.cfparse('system has user with telegram id "{telegram_id}" and language "{'
                        'language}"'))
 def create_user(client, states, telegram_id, language):
     async def inner():
-        if len(get_db_service().get_languages()) < 1:
-            get_db_service()._add_language("ua")
+        if len(get_services().db_service.get_languages()) < 1:
+            get_services().db_service.add_language("ua")
 
         response = await client.post("/user/login", json={
             "telegram_id": telegram_id
@@ -73,4 +73,4 @@ def check_message(states, msg):
 @pytest.fixture(scope="function")
 def after_all():
     yield
-    get_db_service().close_session()
+    get_services().db_service.close_session()

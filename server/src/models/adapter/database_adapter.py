@@ -24,20 +24,22 @@ class DBAdapter:
                 curr_session.commit()
             except:
                 curr_session.rollback()
-                raise
+                raise Exception("Error committing statement")
 
     def get_pk_constraint_of_table(self, tablename):
-        insp = inspect(self.engine)
-        return insp.get_pk_constraint(tablename)["name"]
+        _inspect = inspect(self.engine)
+        return _inspect.get_pk_constraint(tablename)["name"]
 
     def init_db(self):
         from src.models.entity.base import Base
-        import src.models.entity.language
-        import src.models.entity.user
-        import src.models.entity.user_info
-        import src.models.entity.food
-        import src.models.entity.drunk_water
-        import src.models.entity.sent_food
+        from src.models.entity import (
+            language,
+            user,
+            user_info,
+            food,
+            drunk_water,
+            sent_food,
+        )
         Base.metadata.create_all(self.engine)
 
     def close_session(self):

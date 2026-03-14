@@ -22,6 +22,6 @@ USER_INFO: UserInfoDTO = UserInfoDTO(
     weight=100,
     height=182,
     sex='m',
-    count_of_sport_in_week=Activity.HighActivity,
+    activity=Activity.HighActivity,
     goal=Goal.LoseWeight
 )

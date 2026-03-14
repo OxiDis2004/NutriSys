@@ -16,7 +16,7 @@ class UserInfo(Base):
     weight: Mapped[int] = mapped_column(Integer, nullable=True)
     height: Mapped[int] = mapped_column(Integer, nullable=True)
     sex: Mapped[str] = mapped_column(String(2), nullable=True)
-    count_of_sport_in_week: Mapped[int] = mapped_column(Integer, nullable=True)
+    activity_count: Mapped[int] = mapped_column(Integer, nullable=True)
     goal: Mapped[int] = mapped_column(Integer, nullable=True)
 
     user: Mapped["User"] = relationship("User", back_populates="info")
@@ -31,7 +31,7 @@ class UserInfo(Base):
             f"weight={self.weight!r}, "
             f"height={self.height!r}, "
             f"sex={self.sex!r}, "
-            f"count_of_sport_in_week={self.count_of_sport_in_week!r}, "
+            f"activity_count={self.activity_count!r}, "
             f"goal={self.goal!r}"
             f")"
         )
