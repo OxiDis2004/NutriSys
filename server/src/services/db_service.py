@@ -125,8 +125,8 @@ class DBService:
                 weight=user.weight,
                 height=user.height,
                 sex=user.sex,
-                activity_count=user.activity.value,
-                goal=user.goal.value
+                activity_count=user.activity,
+                goal=user.goal
             )
         )
 

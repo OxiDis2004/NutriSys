@@ -106,9 +106,15 @@ class TestUserEndpoints(BaseTestEndpoint):
                 base_url="http://test"
             ) as client
         ):
+            body = {
+                'id': '7761e28b-bf5f-422e-a5b8-10aff77226e9',
+                'name': None,
+                'lastname': None,
+                'birthday': None, 'weight': 100, 'height': None, 'sex': None, 'activity': None, 'goal': None}
             resp = await client.put(
                 "/api/user/update_info",
-                json=USER_INFO.model_dump(mode="json")
+                # json=USER_INFO.model_dump(mode="json")
+                json=body
             )
 
         assert resp.status_code == 202
