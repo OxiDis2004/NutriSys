@@ -1,51 +1,67 @@
 from collections import defaultdict
 from datetime import date
-from uuid import uuid4
 
 from src.models.language import Language
 from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.models.user import User
-from src.services import request_get, request_put
+from src.services import request_get, request_put, request_post
 from src.services.water import water_add_request
 
 USERS = defaultdict()
 USERS_CALORIE = {}
 
 async def get_all_users():
-    data = (await request_get("user/all_users")).json()
+    data = (await request_get("/user/all_users")).json()
     for row in data:
-        telegram_id = row.get('telegram_id', None)
-        user = User(
-            row.get('id', uuid4()),
-            telegram_id,
-            row.get('language', Language.ENGLISH)
-        )
-        if telegram_id is not None:
-            USERS[telegram_id] = user
+        add_user(row)
+
+def user_request_body(telegram_id: int, language: Language):
+    return {
+        "id": None,
+        "telegram_id": telegram_id,
+        "language": language.value
+    }
+
+def add_user(row):
+    telegram_id = row.get('telegram_id', None)
+    user = User(
+        row.get('id', None),
+        telegram_id,
+        row.get('language', None)
+    )
+    if telegram_id is not None:
+        USERS[telegram_id] = user
+
+async def login_user(telegram_id: int, language: Language):
+    user = get_current_user(telegram_id)
+
+    if user is None:
+        body = user_request_body(telegram_id, language)
+        response = await request_post(f"/user/login", body, False)
+        if response.status_code == 200:
+            data = response.json()
+            add_user(data)
+        else:
+            return False
+
+    return True
 
 async def register_user(telegram_id: int, language: Language):
     user = get_current_user(telegram_id)
 
     if user is None:
-        body = {
-            "id": None,
-            "telegram_id": telegram_id,
-            "language": language.value
-        }
+        body = user_request_body(telegram_id, language)
         response = await request_put(f"/user/register", body, False)
-        if response.status_code == 400:
-            data = exists_user(response.json())
-        else:
+        if response.status_code == 200:
             data = response.json()
-        user = User(
-            data.get('id', uuid4()),
-            data.get('telegram_id', telegram_id),
-            data.get('language', language.value)
-        )
-        USERS[telegram_id] = user
+            add_user(data)
+        else:
+            return False
 
-def exists_user(data):
-    return data["detail"]["user"]
+    return True
+
+async def is_user_exists(telegram_id: int):
+    return get_current_user(telegram_id) is not None
 
 def get_current_user(telegram_id: int) -> User | None:
     return USERS.get(telegram_id, None)
@@ -105,8 +121,6 @@ async def update_user_info(
     user.activity = activity
     user.goal = goal
 
-
-
     body = {
         "id": user.user_id,
         "name": None,
@@ -118,19 +132,10 @@ async def update_user_info(
         "activity": user.activity,
         "goal": user.goal,
     }
-    print(body)
     resp = await request_put(f"/user/update_info", body)
 
     if resp.status_code == 202:
         USERS[telegram_id] = user
-
-def parse_data(value, parse_func):
-    try:
-        return parse_func(value)
-    except (KeyError, ValueError):
-        return None
-
-
 
 def get_website_url(telegram_id: int):
     user = get_current_user(telegram_id)

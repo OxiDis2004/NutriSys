@@ -24,39 +24,18 @@ async def history_last(state: FSMContext):
     await state.update_data(menu_history=history)
     return last_menu
 
-async def open_menu_edit(
-        message: Message,
-        user_id: int,
-        state: FSMContext,
-        menu_type: MenuType,
-        text: str | None = None,
-        new_message: bool = False
-):
-    menu = MenuBuilder.build_menu(menu_type, user_id)
-    action = message.answer if new_message else message.edit_text
-    if new_message:
-        await message.delete_reply_markup()
-    await action(
-        text=menu.title if text is None else text,
-        reply_markup=menu.keyboard
-    )
-    await history_append(state, menu_type)
-
 async def open_menu_edit_message(
         message: Message,
         state: FSMContext,
         menu_type: MenuType,
         text: str | None = None,
-        new_message: bool = False
 ):
-    await open_menu_edit(
-        message,
-        message.from_user.id,
-        state,
-        menu_type,
-        text,
-        new_message
+    menu = MenuBuilder.build_menu(menu_type, message.from_user.id)
+    await message.answer(
+        text=menu.title if text is None else text,
+        reply_markup=menu.keyboard
     )
+    await history_append(state, menu_type)
 
 async def open_menu_edit_callback(
         callback: CallbackQuery,
@@ -65,11 +44,12 @@ async def open_menu_edit_callback(
         text: str | None = None,
         new_message: bool = False
 ):
-    await open_menu_edit(
-        callback.message,
-        callback.from_user.id,
-        state,
-        menu_type,
-        text,
-        new_message
+    menu = MenuBuilder.build_menu(menu_type, callback.from_user.id)
+    action = callback.message.answer if new_message else callback.message.edit_text
+    if new_message:
+        await callback.message.delete_reply_markup()
+    await action(
+        text=menu.title if text is None else text,
+        reply_markup=menu.keyboard
     )
+    await history_append(state, menu_type)

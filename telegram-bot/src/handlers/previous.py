@@ -18,4 +18,4 @@ async def previous_callback(callback: CallbackQuery, state: FSMContext, new_mess
 
 async def previous_callback_message(message: Message, state: FSMContext):
     menu = await history_last(state)
-    await open_menu_edit_message(message, state, menu, new_message=True)
+    await open_menu_edit_message(message, state, menu)

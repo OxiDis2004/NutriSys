@@ -7,10 +7,5 @@ from src.models.menu_parts.menu_title import MenuTitle
 class WeightMenu(BaseMenu):
     def __init__(self, telegram_id: int):
         title = MenuTitle.WEIGHT
-        buttons = [
-            [
-                MenuButton(MenuButtonTitle.BACK, MenuButtonTitle.BACK)
-            ]
-        ]
-
+        buttons = []
         super().__init__(telegram_id, title, buttons)

@@ -7,10 +7,5 @@ from src.models.menu_parts.menu_title import MenuTitle
 class HeightMenu(BaseMenu):
     def __init__(self, telegram_id: int):
         title = MenuTitle.HEIGHT
-        buttons = [
-            [
-                MenuButton(MenuButtonTitle.BACK, MenuButtonTitle.BACK)
-            ]
-        ]
-
+        buttons = []
         super().__init__(telegram_id, title, buttons)
