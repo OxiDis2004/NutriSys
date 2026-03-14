@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, FSInputFile
 
-from src.handlers import open_menu_edit
+from src.handlers import open_menu_edit_callback
 from src.handlers.previous import previous_callback
 from src.models.menu_parts.menu_type import MenuType
 from src.models.menu_parts.menu_button_titles import MenuButtonTitle
@@ -14,12 +14,12 @@ router = Router()
 
 @router.callback_query(F.data == MenuButtonTitle.STATISTIC.value)
 async def statistic_callback(callback: CallbackQuery, state: FSMContext):
-    await open_menu_edit(callback, state, MenuType.STATISTIC)
+    await open_menu_edit_callback(callback, state, MenuType.STATISTIC)
     await callback.answer()
 
 async def statistic_type_handler(callback: CallbackQuery, state: FSMContext, _type: MenuButtonTitle):
     await set_statistic_type(state, _type)
-    await open_menu_edit(callback, state, MenuType.PERIOD)
+    await open_menu_edit_callback(callback, state, MenuType.PERIOD)
     await callback.answer()
 
 @router.callback_query(F.data == MenuButtonTitle.DRUNK_WATER.value)

@@ -7,7 +7,7 @@ from src.services.users import get_website_url
 
 class StartMenu(BaseMenu):
     def __init__(self, telegram_id: int):
-        title = MenuTitle.START_TITLE
+        title = MenuTitle.START
         buttons = [
             [
                 MenuButton(MenuButtonTitle.WATER, MenuButtonTitle.WATER),

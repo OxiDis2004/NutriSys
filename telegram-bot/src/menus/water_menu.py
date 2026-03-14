@@ -6,7 +6,7 @@ from src.models.menu_parts.menu_buttons import MenuButton
 
 class WaterMenu(BaseMenu):
     def __init__(self, telegram_id: int):
-        title = MenuTitle.WATER_TITLE
+        title = MenuTitle.WATER
         buttons = [
             [
                 MenuButton(MenuButtonTitle.ADD_250_ML, MenuButtonTitle.ADD_250_ML),

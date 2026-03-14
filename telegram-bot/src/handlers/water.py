@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from src.handlers import open_menu_edit
+from src.handlers import open_menu_edit_callback
 from src.models.menu_parts.menu_title import MenuTitle
 from src.models.menu_parts.menu_type import MenuType
 from src.models.menu_parts.menu_button_titles import MenuButtonTitle
@@ -16,10 +16,10 @@ router = Router()
 @router.callback_query(F.data == MenuButtonTitle.WATER.value)
 async def water_callback(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
-    await open_menu_edit(callback, state, MenuType.WATER)
+    await open_menu_edit_callback(callback, state, MenuType.WATER)
 
 def format_answer(telegram_id: int, water: int) -> str:
-    translated_text = translate(telegram_id, MenuTitle.DRUNK_TITLE)
+    translated_text = translate(telegram_id, MenuTitle.DRUNK)
     if water >= 1000:
         water = f"{water/1000:.2f}".rstrip("0").rstrip(".")
         translated_unit = translate(telegram_id, Unit.L)
@@ -32,7 +32,7 @@ async def add_n_ml(callback: CallbackQuery, state: FSMContext, water: int):
     await callback.answer()
     total_water = await add_drunk_water(callback.from_user.id, water)
     text = format_answer(callback.from_user.id, total_water.drunk_water)
-    await open_menu_edit(callback, state, MenuType.WATER, text)
+    await open_menu_edit_callback(callback, state, MenuType.WATER, text)
 
 @router.callback_query(F.data == MenuButtonTitle.ADD_250_ML.value)
 async def add_250ml(callback: CallbackQuery, state: FSMContext):

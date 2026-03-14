@@ -1,5 +1,5 @@
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message
 
 from src.builders.menu_builder import MenuBuilder
 from src.models.menu_parts.menu_type import MenuType
@@ -25,18 +25,51 @@ async def history_last(state: FSMContext):
     return last_menu
 
 async def open_menu_edit(
+        message: Message,
+        user_id: int,
+        state: FSMContext,
+        menu_type: MenuType,
+        text: str | None = None,
+        new_message: bool = False
+):
+    menu = MenuBuilder.build_menu(menu_type, user_id)
+    action = message.answer if new_message else message.edit_text
+    if new_message:
+        await message.delete_reply_markup()
+    await action(
+        text=menu.title if text is None else text,
+        reply_markup=menu.keyboard
+    )
+    await history_append(state, menu_type)
+
+async def open_menu_edit_message(
+        message: Message,
+        state: FSMContext,
+        menu_type: MenuType,
+        text: str | None = None,
+        new_message: bool = False
+):
+    await open_menu_edit(
+        message,
+        message.from_user.id,
+        state,
+        menu_type,
+        text,
+        new_message
+    )
+
+async def open_menu_edit_callback(
         callback: CallbackQuery,
         state: FSMContext,
         menu_type: MenuType,
         text: str | None = None,
         new_message: bool = False
 ):
-    menu = MenuBuilder.build_menu(menu_type, callback.from_user.id)
-    action = callback.message.answer if new_message else callback.message.edit_text
-    if new_message:
-        await callback.message.delete_reply_markup()
-    await action(
-        text=menu.title if text is None else text,
-        reply_markup=menu.keyboard
+    await open_menu_edit(
+        callback.message,
+        callback.from_user.id,
+        state,
+        menu_type,
+        text,
+        new_message
     )
-    await history_append(state, menu_type)

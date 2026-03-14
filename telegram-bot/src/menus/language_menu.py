@@ -8,7 +8,7 @@ from src.services.users import get_current_user_language
 
 class LanguageMenu(BaseMenu):
     def __init__(self, telegram_id: int):
-        title = MenuTitle.LANGUAGE_TITLE
+        title = MenuTitle.LANGUAGE
         buttons = [
             [
                 MenuButton(self._format(telegram_id, MenuButtonTitle.UKRAINE, Language.UKRAINE),

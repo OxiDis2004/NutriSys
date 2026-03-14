@@ -6,7 +6,7 @@ from src.models.menu_parts.menu_buttons import MenuButton
 
 class PeriodMenu(BaseMenu):
     def __init__(self, telegram_id: int):
-        title = MenuTitle.PERIOD_TITLE
+        title = MenuTitle.PERIOD
         buttons = [
             [
                 MenuButton(MenuButtonTitle.LAST_WEEK, MenuButtonTitle.LAST_WEEK),

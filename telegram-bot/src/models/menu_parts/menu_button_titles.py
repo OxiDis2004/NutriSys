@@ -26,7 +26,30 @@ class MenuButtonTitle(Enum):
     #   --- Food menu ---
     ADD_FOOD = "add_food"
     #   --- Settings menu ---
+    USER_INFO = "user_info"
     LANGUAGE = "language"
+    #   --- User info ---
+    WEIGHT = "weight"
+    HEIGHT = "height"
+    BIRTHDAY = "birthday"
+    SEX = "sex"
+    ACTIVITY = "activity"
+    GOAL = "goal"
+    #   --- Calendar ---
+    OPEN_CALENDAR = "open_calendar"
+    #   --- Sex ---
+    MALE = "male_choice"
+    FEMALE = "female_choice"
+    #   --- Activity ---
+    ACTIVITY_VERY_LOW = "activity_very_low"
+    ACTIVITY_LOW = "activity_low"
+    ACTIVITY_MIDDLE = "activity_middle"
+    ACTIVITY_HIGH = "activity_high"
+    ACTIVITY_VERY_HIGH = "activity_very_high"
+    #   --- Goal ---
+    LOSE_WEIGHT = "lose_weight"
+    KEEP_WEIGHT = "keep_weight"
+    GAIN_WEIGHT = "gain_weight"
     #   --- Language menu ---
     UKRAINE = "🇺🇦 Українська"
     ENGLISH = "🇬🇧 English"

@@ -1,3 +1,8 @@
+from src.models.activity import Activity
+from src.models.goal import Goal
+from src.models.sex import Sex
+
+
 class User:
     def __init__(self, user_id, telegram_id, language):
         self._user_id = user_id
@@ -70,7 +75,7 @@ class User:
 
     @weight.setter
     def weight(self, value):
-        self._weight = value
+        self._weight = self.parse_data(value, int)
 
     @property
     def height(self):
@@ -78,7 +83,7 @@ class User:
 
     @height.setter
     def height(self, value):
-        self._height = value
+        self._height = self.parse_data(value, int)
 
     @property
     def sex(self):
@@ -86,7 +91,7 @@ class User:
 
     @sex.setter
     def sex(self, value):
-        self._sex = value
+        self._sex = self.parse_data(value, Sex)
 
     @property
     def activity(self):
@@ -94,7 +99,7 @@ class User:
 
     @activity.setter
     def activity(self, value):
-        self._activity = value
+        self._activity = self.parse_data(value, Activity)
 
     @property
     def goal(self):
@@ -102,5 +107,11 @@ class User:
 
     @goal.setter
     def goal(self, value):
-        self._goal = value
+        self._goal = self.parse_data(value, Goal)
 
+    @staticmethod
+    def parse_data(value, parse_func):
+        try:
+            return parse_func(value) if value is not None else None
+        except (KeyError, ValueError):
+            return None

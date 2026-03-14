@@ -3,11 +3,12 @@ from datetime import date
 from uuid import uuid4
 
 from src.models.language import Language
+from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.models.user import User
 from src.services import request_get, request_put
 from src.services.water import water_add_request
 
-USERS = defaultdict(None)
+USERS = defaultdict()
 USERS_CALORIE = {}
 
 async def get_all_users():
@@ -62,9 +63,7 @@ async def set_current_user_language(telegram_id: int, language: str):
             "telegram_id": user.telegram_id,
             "language": user.language
         }
-        resp = await request_put(f"/user/change_language", body, False)
-        if resp.is_error:
-            print(resp.json())
+        resp = await request_put(f"/user/change_language", body)
 
         if resp.status_code == 202:
             USERS[telegram_id] = user
@@ -85,6 +84,53 @@ def set_user_calorie(telegram_id: int, calorie: int):
 
 def get_user_calorie(telegram_id: int, curr_day: str = get_current_day()):
     return USERS_CALORIE.get(telegram_id, {}).get(curr_day, 0)
+
+async def update_user_info(
+        telegram_id: int,
+        weight: str = None,
+        height: str = None,
+        birthday: date = None,
+        sex: MenuButtonTitle = None,
+        activity: MenuButtonTitle = None,
+        goal: MenuButtonTitle = None
+):
+    user: User = get_current_user(telegram_id)
+    if user is None:
+        return
+
+    user.birthday = birthday
+    user.weight = weight
+    user.height = height
+    user.sex = sex
+    user.activity = activity
+    user.goal = goal
+
+
+
+    body = {
+        "id": user.user_id,
+        "name": None,
+        "lastname": None,
+        "birthday": user.birthday,
+        "weight": user.weight,
+        "height": user.height,
+        "sex": user.sex,
+        "activity": user.activity,
+        "goal": user.goal,
+    }
+    print(body)
+    resp = await request_put(f"/user/update_info", body)
+
+    if resp.status_code == 202:
+        USERS[telegram_id] = user
+
+def parse_data(value, parse_func):
+    try:
+        return parse_func(value)
+    except (KeyError, ValueError):
+        return None
+
+
 
 def get_website_url(telegram_id: int):
     user = get_current_user(telegram_id)

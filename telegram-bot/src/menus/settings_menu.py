@@ -6,8 +6,11 @@ from src.models.menu_parts.menu_buttons import MenuButton
 
 class SettingsMenu(BaseMenu):
     def __init__(self, telegram_id: int):
-        title = MenuTitle.SETTINGS_TITLE
+        title = MenuTitle.SETTINGS
         buttons = [
+            [
+                MenuButton(MenuButtonTitle.USER_INFO, MenuButtonTitle.USER_INFO)
+            ],
             [
                 MenuButton(MenuButtonTitle.LANGUAGE, MenuButtonTitle.LANGUAGE)
             ],
