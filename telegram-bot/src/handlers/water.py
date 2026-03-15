@@ -8,7 +8,7 @@ from src.models.menu_parts.menu_type import MenuType
 from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.models.unit import Unit
 from src.services.language import translate
-from src.services.users import add_drunk_water
+from src.services.water import water_add_request
 
 router = Router()
 
@@ -30,7 +30,7 @@ def format_answer(telegram_id: int, water: int) -> str:
 
 async def add_n_ml(callback: CallbackQuery, state: FSMContext, water: int):
     await callback.answer()
-    total_water = await add_drunk_water(callback.from_user.id, water)
+    total_water = await water_add_request(callback.from_user.id, water)
     text = format_answer(callback.from_user.id, total_water.drunk_water)
     await open_menu_edit_callback(callback, state, MenuType.WATER, text)
 

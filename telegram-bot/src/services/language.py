@@ -4,7 +4,7 @@ from src.models.menu_parts.menu_title import MenuTitle
 from src.models.statistic_type import StatisticType
 from src.models.unit import Unit
 
-from src.services.users import get_current_user_language
+from src.services.settings import get_current_user_language
 from src.static import ua, en, de
 
 def translate(telegram_id: int, text: MenuButton | MenuTitle | StatisticType | Unit):

@@ -3,7 +3,7 @@ from src.menus.base_menu import BaseMenu
 from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.models.menu_parts.menu_buttons import MenuButton
 from src.models.language import Language
-from src.services.users import get_current_user_language
+from src.services.settings import get_current_user_language
 
 
 class LanguageMenu(BaseMenu):

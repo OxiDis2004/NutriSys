@@ -8,7 +8,7 @@ from src.handlers.previous import previous_callback, previous_callback_message
 from src.models.language import Language
 from src.models.menu_parts.menu_type import MenuType
 from src.models.menu_parts.menu_button_titles import MenuButtonTitle
-from src.services.users import set_current_user_language, update_user_info
+from src.services.settings import set_current_user_language, update_user_info
 
 router = Router()
 
