@@ -24,18 +24,16 @@ class DBService:
         self.db = DBAdapter(engine)
         self.db.init_db()
 
-    def get_users(self):
-        stmt = (select(
-                User.id.label("id"),
-                User.telegram_id.label("telegram_id"),
-                Language.iso.label("iso")
-            ).join(User.language))
-        return self.db.fetch(stmt)
-
     def get_user(self, telegram_id: int) -> Row:
         stmt = (select(User.id.label("id"), Language.iso.label("iso"))
                 .join(User.language)
                 .where(User.telegram_id == telegram_id))
+        return self.db.fetch_one(stmt)
+
+    def get_user_by_id(self, user_id: UUID) -> Row:
+        stmt = (select(User.id.label("id"), Language.iso.label("iso"))
+                .join(User.language)
+                .where(User.id == str(user_id)))
         return self.db.fetch_one(stmt)
 
     def add_user(self, user: UserDTO, activity: datetime):
@@ -93,7 +91,7 @@ class DBService:
                 UserInfo.birthday.label("birthday"),
                 UserInfo.weight.label("weight"),
                 UserInfo.height.label("height"),
-                UserInfo.activity_count.label("activity"),
+                UserInfo.activity.label("activity"),
                 UserInfo.goal.label("goal")
             )
             .where(UserInfo.user_id.in_([str(user_id) for user_id in user_ids]))
@@ -103,12 +101,14 @@ class DBService:
     def get_user_info(self, user_id: UUID):
         stmt = (
             select(
+                UserInfo.user_id.label("id"),
                 UserInfo.name.label("name"),
                 UserInfo.lastname.label("lastname"),
                 UserInfo.birthday.label("birthday"),
                 UserInfo.weight.label("weight"),
                 UserInfo.height.label("height"),
-                UserInfo.activity_count.label("activity"),
+                UserInfo.sex.label("sex"),
+                UserInfo.activity.label("activity"),
                 UserInfo.goal.label("goal")
             )
             .where(UserInfo.user_id == str(user_id))
@@ -126,11 +126,10 @@ class DBService:
                 weight=user.weight,
                 height=user.height,
                 sex=user.sex,
-                activity_count=user.activity,
+                activity=user.activity,
                 goal=user.goal
             )
         )
-
         self.db.commit(stmt)
 
     def get_drunk_water_interval(self, user_id: UUID, period: Period):
@@ -207,12 +206,12 @@ class DBService:
     def get_food(self, condition):
         stmt = (
             select(
-                Food.id.label("id"),
-                Food.name.label("name"),
-                Food.calorie.label("calorie"),
-                Food.protein.label("protein"),
-                Food.carbon.label("carbon"),
-                Food.fat.label("fat")
+                Food.id.label("_id"),
+                Food.name.label("_name"),
+                Food.calorie.label("_calorie"),
+                Food.protein.label("_protein"),
+                Food.carbon.label("_carbon"),
+                Food.fat.label("_fat")
             )
             .where(condition)
         )
