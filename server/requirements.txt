@@ -10,8 +10,8 @@ sqlalchemy
 pydantic
 pymysql
 cryptography
+pillow
 
-#pillow
 #opencv-python
 #torchvision
 #torchaudio

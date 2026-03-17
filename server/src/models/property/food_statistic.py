@@ -24,6 +24,19 @@ class FoodStatistic:
         self._carbon=row.carbon,
         self._fat=row.fat
 
+    def calculate(self, mass: int):
+        self._calorie = self._calculate_value(self._calorie, mass)
+        self._protein = self._calculate_value(self._protein, mass)
+        self._carbon = self._calculate_value(self._carbon, mass)
+        self._fat = self._calculate_value(self._fat, mass)
+
+    @staticmethod
+    def _calculate_value(value: int | Decimal, mass: int):
+        if isinstance(value, int):
+            return value * (mass / 100)
+        else:
+            return (Decimal(value) * (mass / 100)).quantize(6, 2)
+
     @property
     def name(self):
         return self._name if self._name is not None else ''
