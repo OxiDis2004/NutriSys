@@ -1,14 +1,19 @@
+from aiogram.fsm.context import FSMContext
+
 from src.models.language import Language
 from src.models.menu_parts.menu_buttons import MenuButton
 from src.models.menu_parts.menu_title import MenuTitle
-from src.models.statistic_type import StatisticType
+from src.models.statistic_type import StatisticType, PeriodType
 from src.models.unit import Unit
-
-from src.services.settings import get_current_user_language
+from src.services.users import get_current_language
 from src.static import ua, en, de
 
-def translate(telegram_id: int, text: MenuButton | MenuTitle | StatisticType | Unit):
-    language = get_current_user_language(telegram_id)
+
+async def translate(
+        state: FSMContext,
+        text: MenuButton | MenuTitle | StatisticType | PeriodType | Unit
+):
+    language = await get_current_language(state)
     vocabulary = {}
 
     match language:

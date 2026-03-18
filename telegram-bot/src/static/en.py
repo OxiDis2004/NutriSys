@@ -1,6 +1,6 @@
 from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.models.menu_parts.menu_title import MenuTitle
-from src.models.statistic_type import StatisticType
+from src.models.statistic_type import StatisticType, PeriodType
 from src.models.unit import Unit
 
 EN_VOCABULARY = {
@@ -72,9 +72,9 @@ EN_VOCABULARY = {
     StatisticType.WATER: "Water statistic",
     StatisticType.CALORIE: "Calorie statistic",
 
-    StatisticType.WEEK: "Weekday",
-    StatisticType.MONTH: "Day in month",
-    StatisticType.YEAR: "Month",
+    PeriodType.WEEK: "Weekday",
+    PeriodType.MONTH: "Day in month",
+    PeriodType.YEAR: "Month",
 }
 
 def vocabulary():

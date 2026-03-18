@@ -1,3 +1,5 @@
+from aiogram.fsm.context import FSMContext
+
 from src.menus.base_menu import BaseMenu
 from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.models.menu_parts.menu_buttons import MenuButton
@@ -5,9 +7,14 @@ from src.models.menu_parts.menu_title import MenuTitle
 
 
 class ActivityMenu(BaseMenu):
-    def __init__(self, telegram_id: int):
-        title = MenuTitle.ACTIVITY
-        buttons = [
+
+    @classmethod
+    def get_title(cls) -> MenuTitle:
+        return MenuTitle.ACTIVITY
+
+    @classmethod
+    async def get_buttons(cls, state: FSMContext) -> list[list[MenuButton]]:
+        return [
             [
                 MenuButton(MenuButtonTitle.ACTIVITY_VERY_LOW, MenuButtonTitle.ACTIVITY_VERY_LOW),
                 MenuButton(MenuButtonTitle.ACTIVITY_LOW, MenuButtonTitle.ACTIVITY_LOW)
@@ -23,5 +30,3 @@ class ActivityMenu(BaseMenu):
                 MenuButton(MenuButtonTitle.BACK, MenuButtonTitle.BACK)
             ]
         ]
-
-        super().__init__(telegram_id, title, buttons)

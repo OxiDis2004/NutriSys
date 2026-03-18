@@ -1,15 +1,16 @@
 from aiogram import Router, F
 from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from src.builders.menu_builder import MenuBuilder
+from src.builders.menu_builder import MenuFactory
 from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.models.menu_parts.menu_type import MenuType
 
 router = Router()
 
-async def open_help(message: Message, telegram_id: int):
-    menu = MenuBuilder.build_menu(MenuType.HELP, telegram_id)
+async def open_help(message: Message, state: FSMContext):
+    menu = await MenuFactory.build_menu(MenuType.HELP, state)
 
     await message.answer(
         text=menu.title,
@@ -17,10 +18,10 @@ async def open_help(message: Message, telegram_id: int):
     )
 
 @router.message(Command("help"))
-async def help_message(message: Message):
-    await open_help(message, message.from_user.id)
+async def help_message(message: Message, state: FSMContext):
+    await open_help(message, state)
 
 @router.callback_query(F.data == MenuButtonTitle.HELP.value)
-async def help_callback(callback: CallbackQuery):
+async def help_callback(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
-    await open_help(callback.message, callback.from_user.id)
+    await open_help(callback.message, state)

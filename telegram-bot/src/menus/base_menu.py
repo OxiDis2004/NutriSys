@@ -1,5 +1,6 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
+from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from src.models.menu_parts.menu_buttons import MenuButton
@@ -8,29 +9,45 @@ from src.services.language import translate
 
 
 class BaseMenu(ABC):
-    def __init__(self, telegram_id: int, title: MenuTitle, buttons: list[list[MenuButton]]):
-        self._telegram_id = telegram_id
-        self._title: MenuTitle = title
-        self._buttons = buttons
-        self._keyboard: list[list[InlineKeyboardButton]] = []
+    def __init__(self, state: FSMContext, title: str, keyboard: list[list[InlineKeyboardButton]]):
+        self._state: FSMContext = state
+        self._title: str = title
+        self._keyboard: list[list[InlineKeyboardButton]] = keyboard
 
-    def _build(self):
-        self._keyboard = [
+    @classmethod
+    @abstractmethod
+    def get_title(cls) -> MenuTitle:
+        pass
+
+    @classmethod
+    @abstractmethod
+    async def get_buttons(cls, state: FSMContext) -> list[list[MenuButton]]:
+        pass
+
+    @classmethod
+    async def create(cls, state: FSMContext):
+        translated_title = await translate(state, cls.get_title())
+        keyboard = await cls.build(state, await cls.get_buttons(state))
+        return cls(state, translated_title, keyboard)
+
+    @staticmethod
+    async def build(state: FSMContext, buttons: list[list[MenuButton]]) \
+            -> list[list[InlineKeyboardButton]]:
+        return [
             [
                 InlineKeyboardButton(
-                    text=translate(self._telegram_id, button.title),
+                    text=(await translate(state, button.title)),
                     callback_data=button.callback,
                     web_app=WebAppInfo(url=button.url) if button.url is not None else None
                 )
                 for button in button_row
-            ] for button_row in self._buttons
+            ] for button_row in buttons
         ]
 
     @property
     def title(self):
-        return translate(self._telegram_id, self._title)
+        return self._title
 
     @property
     def keyboard(self):
-        self._build()
         return InlineKeyboardMarkup(inline_keyboard=self._keyboard)

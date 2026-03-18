@@ -3,53 +3,33 @@ import matplotlib.pyplot as plt
 from datetime import date
 
 from src.models.dto.water_response import WaterResponseDTO
-from src.models.menu_parts.menu_button_titles import MenuButtonTitle
-from src.models.statistic_type import StatisticType
+from src.models.statistic_type import StatisticType, PeriodType
 from src.models.unit import Unit
-from src.models.user import User
 from src.services.language import translate
-from src.services.users import get_user_calorie, get_current_user
+from src.services.users import get_user_calorie, get_user_id
 from src.services.water import water_statistic
 
 
-async def set_statistic_type(state: FSMContext, _type: MenuButtonTitle):
-    stat_type = ''
+STATISTIC_KEY = 'statistic_type'
 
-    match _type:
-        case MenuButtonTitle.DRUNK_WATER: stat_type = StatisticType.WATER
-        case MenuButtonTitle.CALORIE: stat_type = StatisticType.CALORIE
-        case _: raise Exception("Wrong statistic type")
-
-    await state.update_data(statistic_type=stat_type.value)
+async def set_statistic_type(state: FSMContext, stat_type: StatisticType):
+    await state.update_data(**{STATISTIC_KEY:stat_type})
 
 async def get_statistic_type(state: FSMContext) -> StatisticType | None:
-    _type: StatisticType | None = await state.get_value('statistic_type', None)
+    stat_type: StatisticType | None = await state.get_value(STATISTIC_KEY, None)
+    return StatisticType(stat_type) if stat_type is not None else None
 
-    if _type is None:
-        return None
-
-    return StatisticType(_type)
-
-def get_period_type(tmp_period_type: MenuButtonTitle) -> StatisticType | None:
-    period_type = None
-
-    match tmp_period_type:
-        case MenuButtonTitle.LAST_WEEK: period_type = StatisticType.WEEK
-        case MenuButtonTitle.LAST_MONTH: period_type = StatisticType.MONTH
-        case MenuButtonTitle.LAST_YEAR: period_type = StatisticType.YEAR
-
-    return period_type
-
-async def get_statistic(telegram_id: int, stat_type: StatisticType, period_type: StatisticType) -> dict:
+async def get_statistic(state: FSMContext, period_type: PeriodType) -> dict:
     curr_day = date.today()
-    user: User = get_current_user(telegram_id)
+    stat_type = await get_statistic_type(state)
+    user_id = await get_user_id(state)
 
     match stat_type:
         case StatisticType.CALORIE:
-            result = get_user_calorie(telegram_id, curr_day.strftime("%Y-%m-%d"))
+            result = get_user_calorie(state)
             return food_data(result, curr_day)
         case StatisticType.WATER:
-            result = await water_statistic(user.user_id, period_type, curr_day)
+            result = await water_statistic(user_id, period_type, curr_day)
             return water_data(period_type, result)
 
     return {}
@@ -57,19 +37,19 @@ async def get_statistic(telegram_id: int, stat_type: StatisticType, period_type:
 def food_data(result, curr_day) -> dict:
     return { curr_day : result }
 
-def water_data(period_type: StatisticType, result: list[WaterResponseDTO]) -> dict:
+def water_data(period_type: PeriodType, result: list[WaterResponseDTO]) -> dict:
     match period_type:
-        case StatisticType.WEEK:
+        case PeriodType.WEEK:
             return {
                 date.fromisoformat(item.day).strftime("%a") : item.drunk_water for item in result
             }
 
-        case StatisticType.MONTH:
+        case PeriodType.MONTH:
             return {
                 item.day : item.drunk_water for item in result
             }
 
-        case StatisticType.YEAR:
+        case PeriodType.YEAR:
             return {
                 date.fromisoformat(item.day).strftime("%b") : item.drunk_water for item in result
             }
@@ -78,9 +58,9 @@ def water_data(period_type: StatisticType, result: list[WaterResponseDTO]) -> di
             return { item.day : item.drunk_water for item in result }
 
 async def generate_chart(
-        telegram_id: int,
+        state: FSMContext,
         stat_type: StatisticType,
-        period_type: StatisticType,
+        period_type: PeriodType,
         data: dict
 ):
     x = [k for k in data.keys()]
@@ -89,25 +69,21 @@ async def generate_chart(
     plt.figure()
     plt.bar(x, y)
 
-    plt.title(translate(telegram_id, stat_type))
-    plt.xlabel(translate(telegram_id, period_type))
-    plt.ylabel(translate(telegram_id, Unit.L))
+    user_id = await get_user_id(state)
+    plt.title(await translate(state, stat_type))
+    plt.xlabel(await translate(state, period_type))
+    plt.ylabel(await translate(state, Unit.ML))
 
-    file = f"chart_{telegram_id}_{stat_type.value}_{period_type.value.split('/')[1]}.png"
+    file = f"chart_{user_id}_{stat_type.value}_{period_type.value.split('/')[1]}.png"
     plt.savefig(file)
     plt.close()
 
     return file
 
 async def get_statistic_for_period(
-        telegram_id: int,
         state: FSMContext,
-        period_type: MenuButtonTitle
+        period_type: PeriodType
 ):
     stat_type = await get_statistic_type(state)
-    period_type = get_period_type(period_type)
-
-    data = await get_statistic(telegram_id, stat_type, period_type)
-    filename = await generate_chart(telegram_id, stat_type, period_type, data)
-
-    return filename
+    data = await get_statistic(state, period_type)
+    return await generate_chart(state, stat_type, period_type, data)

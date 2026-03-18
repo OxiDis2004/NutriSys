@@ -1,3 +1,5 @@
+from aiogram.fsm.context import FSMContext
+
 from src.menus.user_info_menu import UserInfoMenu
 from src.menus.user_info_parts.activity_menu import ActivityMenu
 from src.menus.user_info_parts.birthday_menu import BirthdayMenu
@@ -16,25 +18,25 @@ from src.menus.statistic_menu import StatisticMenu
 from src.menus.water_menu import WaterMenu
 
 
-class MenuBuilder:
-    @staticmethod
-    def build_menu(menu_type: MenuType, telegram_id: int) -> BaseMenu:
-        menu = None
-        match menu_type:
-            case MenuType.START: menu = StartMenu(telegram_id)
-            case MenuType.WATER: menu = WaterMenu(telegram_id)
-            case MenuType.FOOD: menu = FoodMenu(telegram_id)
-            case MenuType.STATISTIC: menu = StatisticMenu(telegram_id)
-            case MenuType.PERIOD: menu = PeriodMenu(telegram_id)
-            case MenuType.SETTINGS: menu = SettingsMenu(telegram_id)
-            case MenuType.USER_INFO: menu = UserInfoMenu(telegram_id)
-            case MenuType.WEIGHT: menu = WeightMenu(telegram_id)
-            case MenuType.HEIGHT: menu = HeightMenu(telegram_id)
-            case MenuType.BIRTHDAY: menu = BirthdayMenu(telegram_id)
-            case MenuType.SEX: menu = SexMenu(telegram_id)
-            case MenuType.ACTIVITY: menu = ActivityMenu(telegram_id)
-            case MenuType.GOAL: menu = GoalMenu(telegram_id)
-            case MenuType.LANGUAGE: menu = LanguageMenu(telegram_id)
-            case _: menu = StartMenu(telegram_id)
+class MenuFactory:
+    _menus: dict[MenuType, type[BaseMenu]] = {
+        MenuType.START: StartMenu,
+        MenuType.WATER: WaterMenu,
+        MenuType.FOOD: FoodMenu,
+        MenuType.STATISTIC: StatisticMenu,
+        MenuType.PERIOD: PeriodMenu,
+        MenuType.SETTINGS: SettingsMenu,
+        MenuType.USER_INFO: UserInfoMenu,
+        MenuType.WEIGHT: WeightMenu,
+        MenuType.HEIGHT: HeightMenu,
+        MenuType.BIRTHDAY: BirthdayMenu,
+        MenuType.SEX: SexMenu,
+        MenuType.ACTIVITY: ActivityMenu,
+        MenuType.GOAL: GoalMenu,
+        MenuType.LANGUAGE: LanguageMenu,
+    }
 
-        return menu
+    @staticmethod
+    async def build_menu(menu_type: MenuType, state: FSMContext) -> BaseMenu:
+        menu_cls = MenuFactory._menus.get(menu_type, StartMenu)
+        return await menu_cls.create(state)

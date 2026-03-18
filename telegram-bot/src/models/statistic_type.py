@@ -4,6 +4,8 @@ from enum import Enum
 class StatisticType(Enum):
     WATER = "water_statistic"
     CALORIE = "calorie_statistic"
+
+class PeriodType(Enum):
     DAY = "statistic/day"
     WEEK = "statistic/week"
     MONTH = "statistic/month"

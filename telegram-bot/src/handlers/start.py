@@ -3,21 +3,21 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from src.builders.menu_builder import MenuBuilder
+from src.builders.menu_builder import MenuFactory
 from src.handlers import history_append
 from src.models.menu_parts.menu_type import MenuType
-from src.services.users import register_user, is_user_exists, login_user
+from src.services.users import register_user, login_user, is_exists_user
 
 router = Router()
 
 
 @router.message(CommandStart())
 async def start_handler(message: Message, state: FSMContext):
-    menu = MenuBuilder.build_menu(MenuType.START, message.from_user.id)
-    if not await is_user_exists(message.from_user.id):
-        success = await login_user(message.from_user.id)
+    if not await is_exists_user(state):
+        success = await login_user(state, message.from_user.id)
         if not success:
-            await register_user(message.from_user.id)
+            await register_user(state, message.from_user.id)
+    menu = await MenuFactory.build_menu(MenuType.START, state)
     await message.answer(
         text=menu.title,
         reply_markup=menu.keyboard

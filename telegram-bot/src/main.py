@@ -6,7 +6,6 @@ import os
 from src import my_setenv
 from src.routers import setup_routers
 from src.services import get_hostname, initialize_client
-from src.services.users import get_all_users
 
 logging.basicConfig(level=logging.INFO)
 my_setenv.get_key()
@@ -17,7 +16,6 @@ async def main():
     bot = Bot(token=token)
     dp = Dispatcher()
     initialize_client()
-    await get_all_users()
     setup_routers(dp)
     await dp.start_polling(bot)
 

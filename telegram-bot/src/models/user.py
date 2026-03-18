@@ -120,6 +120,32 @@ class User:
         }
 
     @staticmethod
+    def static_base_info(id: str = None, telegram_id: int = None, language: str = None):
+        return {
+            "id": id,
+            "telegram_id": telegram_id,
+            "language": language
+        }
+
+    @staticmethod
+    def static_extension_info(
+            id: str, birthday: date = None, weight: int = None, height: int = None,
+            sex: Sex = None, activity: Activity = None, goal: Goal = None
+    ):
+        return {
+            "id": id,
+            "name": None,
+            "lastname": None,
+            "birthday": birthday.isoformat() if birthday is not None else None,
+            "weight": User.parse_data(weight, int),
+            "height": User.parse_data(height, int),
+            "sex": User.parse_data(sex, Sex),
+            "activity": User.parse_data(activity, Activity),
+            "goal": User.parse_data(goal, Goal),
+        }
+
+
+    @staticmethod
     def parse_data(value, parse_func, default = None):
         try:
             return parse_func(value) if value is not None else default

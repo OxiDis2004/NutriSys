@@ -18,20 +18,20 @@ async def water_callback(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await open_menu_edit_callback(callback, state, MenuType.WATER)
 
-def format_answer(telegram_id: int, water: int) -> str:
-    translated_text = translate(telegram_id, MenuTitle.DRUNK)
+async def format_answer(state: FSMContext, water: int) -> str:
     if water >= 1000:
         water = f"{water/1000:.2f}".rstrip("0").rstrip(".")
-        translated_unit = translate(telegram_id, Unit.L)
+        translated_unit = await translate(state, Unit.L)
     else:
-        translated_unit = translate(telegram_id, Unit.ML)
+        translated_unit = await translate(state, Unit.ML)
 
+    translated_text = await translate(state, MenuTitle.DRUNK)
     return translated_text.format(water=water, unit=translated_unit)
 
 async def add_n_ml(callback: CallbackQuery, state: FSMContext, water: int):
     await callback.answer()
-    total_water = await water_add_request(callback.from_user.id, water)
-    text = format_answer(callback.from_user.id, total_water.drunk_water)
+    total_water = await water_add_request(state, water)
+    text = await format_answer(state, total_water.drunk_water)
     await open_menu_edit_callback(callback, state, MenuType.WATER, text)
 
 @router.callback_query(F.data == MenuButtonTitle.ADD_250_ML.value)

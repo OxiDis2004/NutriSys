@@ -1,6 +1,6 @@
 from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.models.menu_parts.menu_title import MenuTitle
-from src.models.statistic_type import StatisticType
+from src.models.statistic_type import StatisticType, PeriodType
 from src.models.unit import Unit
 
 UA_VOCABULARY = {
@@ -72,9 +72,9 @@ UA_VOCABULARY = {
     StatisticType.WATER: "Статистика випитої води",
     StatisticType.CALORIE: "Статистика калорії",
 
-    StatisticType.WEEK: "День неділі",
-    StatisticType.MONTH: "День місяця",
-    StatisticType.YEAR: "Місяць",
+    PeriodType.WEEK: "День неділі",
+    PeriodType.MONTH: "День місяця",
+    PeriodType.YEAR: "Місяць",
 }
 
 def vocabulary():

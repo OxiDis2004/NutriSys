@@ -1,9 +1,12 @@
+from typing import Union
+
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from src.builders.menu_builder import MenuBuilder
+from src.builders.menu_builder import MenuFactory
 from src.models.menu_parts.menu_type import MenuType
 
+Event = Union[Message, CallbackQuery]
 
 async def history_append(state: FSMContext, menu_type: MenuType):
     history: list = await state.get_value("menu_history", [])
@@ -30,7 +33,7 @@ async def open_menu_edit_message(
         menu_type: MenuType,
         text: str | None = None,
 ):
-    menu = MenuBuilder.build_menu(menu_type, message.from_user.id)
+    menu = await MenuFactory.build_menu(menu_type, state)
     await message.answer(
         text=menu.title if text is None else text,
         reply_markup=menu.keyboard
@@ -44,7 +47,7 @@ async def open_menu_edit_callback(
         text: str | None = None,
         new_message: bool = False
 ):
-    menu = MenuBuilder.build_menu(menu_type, callback.from_user.id)
+    menu = await MenuFactory.build_menu(menu_type, state)
     action = callback.message.answer if new_message else callback.message.edit_text
     if new_message:
         await callback.message.delete_reply_markup()

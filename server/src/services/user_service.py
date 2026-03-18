@@ -67,7 +67,7 @@ class UserService:
 
     def update_information(self, user_info: UserInfoDTO):
         if user_info.id is None:
-            raise HTTPException(status_code=400, detail="User id is undefined")
+            raise HTTPException(status_code=422, detail="User id is undefined")
 
         try:
             self._db_service.update_user_info(user_info)
@@ -76,16 +76,10 @@ class UserService:
             raise HTTPException(status_code=500, detail="Caught: " + str(e))
 
     def update_language(self, user: UserDTO):
-        if user.telegram_id is None:
+        if user.user_id is None:
             raise HTTPException(status_code=422, detail="User details not found")
 
         try:
-            if user.id is None:
-                data = self._db_service.get_user(user.telegram_id)
-                if data is None:
-                    raise Exception("User didn't registered")
-                user.id = data.id
-
             self._db_service.update_user_language(user)
             self._db_service.update_user_activity(user.id)
             return Response(status_code=status.HTTP_202_ACCEPTED)
