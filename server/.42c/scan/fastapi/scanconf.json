@@ -121,7 +121,7 @@
                 "request": {
                     "type": "42c",
                     "details": {
-                        "url": "{{host}}/api/user/calculate_calorie",
+                        "url": "{{host}}/api/user/calculate_bmr",
                         "method": "POST",
                         "headers": [
                             {

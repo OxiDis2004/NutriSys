@@ -6,10 +6,6 @@ from src.models.dto.user_info_dto import UserInfoDTO
 
 router = APIRouter(prefix="/api/user")
 
-@router.get("/all_users", response_model=list[UserDTO])
-async def get_users(services: ServiceContainer = Depends(get_services)):
-    return services.user_service.get_users()
-
 @router.post("/login", response_model=UserDTO)
 async def login(user: UserDTO, services: ServiceContainer = Depends(get_services)):
     return services.user_service.login(user)
@@ -22,9 +18,13 @@ async def change_language(user: UserDTO, services: ServiceContainer = Depends(ge
 async def register(user: UserDTO, services: ServiceContainer = Depends(get_services)):
     return services.user_service.register(user)
 
-@router.post("/calculate_calorie")
-async def calculate_calorie(user_info: UserInfoDTO, services: ServiceContainer = Depends(get_services)):
-    return services.user_service.calculate_calorie(user_info)
+@router.post("/calculate_bmr")
+async def calculate_bmr(user: UserDTO, services: ServiceContainer = Depends(get_services)):
+    return services.user_service.calculate_bmr(user)
+
+@router.post("/get_info", response_model=UserInfoDTO)
+async def get_info(user: UserDTO, services: ServiceContainer = Depends(get_services)):
+    return services.user_service.get_information(user)
 
 @router.put("/update_info")
 async def update_info(user: UserInfoDTO, services: ServiceContainer = Depends(get_services)):

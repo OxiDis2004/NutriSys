@@ -15,15 +15,6 @@ class UserService:
     def __init__(self, db_service: DBService):
         self._db_service: DBService = db_service
 
-    def get_users(self) -> list[UserDTO]:
-        data = self._db_service.get_users()
-        if data is None:
-            raise HTTPException(status_code=404, detail="Users not found")
-
-        return [
-            UserDTO(id=row.id, telegram_id=row.telegram_id, language=row.iso) for row in data
-        ]
-
     def login(self, user: UserDTO) -> UserDTO:
         if user.telegram_id is None:
             raise HTTPException(status_code=422, detail="Unprocessable Entity")
@@ -52,24 +43,37 @@ class UserService:
 
         data = self._db_service.get_user(user.telegram_id)
         if data is not None:
-            user.id = data.id
-            user.language = data.iso
-            raise HTTPException(status_code=400, detail={ "message": "User already exists", "user": user.model_dump(mode="json") } )
+            raise HTTPException(status_code=400, detail={ "message": "User already exists" } )
 
         self._db_service.add_user(user, user_last_activity)
         data = self._db_service.get_user(user.telegram_id)
 
         if data is None:
-            raise HTTPException(status_code=400, detail="User couldn't create")
+            raise HTTPException(status_code=500, detail="User couldn't create")
 
         user.id = data.id
         return user
+
+    def get_information(self, user: UserDTO) -> UserInfoDTO:
+        if user.id is None:
+            raise HTTPException(status_code=422, detail="User id is undefined")
+
+        data = self._db_service.get_user_info(user.id)
+        if data is None:
+            raise HTTPException(status_code=404, detail="User information not found")
+
+        user_info = UserInfoDTO(**data._mapping)
+        return user_info
 
     def update_information(self, user_info: UserInfoDTO):
         if user_info.id is None:
             raise HTTPException(status_code=422, detail="User id is undefined")
 
         try:
+            user = self._db_service.get_user_info(user_info.id)
+            if user is None:
+                raise Exception("User couldn't update")
+
             self._db_service.update_user_info(user_info)
             return Response(status_code=status.HTTP_202_ACCEPTED)
         except Exception as e:
@@ -86,7 +90,9 @@ class UserService:
         except Exception as e:
             raise HTTPException(status_code=400, detail="Caught: " + str(e))
 
-    def calculate_calorie(self, user_info: UserInfoDTO) -> dict[str, int]:
+    def calculate_bmr(self, user: UserDTO) -> dict[str, int]:
+        user_info = self.get_information(user)
+
         if (user_info.weight is None or
             not isinstance(user_info.weight, int) or
             user_info.height is None or

@@ -691,13 +691,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/user/calculate_calorie",
+					"raw": "{{base_url}}/user/calculate_bmr",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"user",
-						"calculate_calorie"
+						"calculate_bmr"
 					],
 					"query": [
 						{
@@ -724,13 +724,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/user/calculate_calorie",
+							"raw": "{{base_url}}/user/calculate_bmr",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"user",
-								"calculate_calorie"
+								"calculate_bmr"
 							],
 							"query": [
 								{
@@ -801,13 +801,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/user/calculate_calorie",
+					"raw": "{{base_url}}/user/calculate_bmr",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"user",
-						"calculate_calorie"
+						"calculate_bmr"
 					],
 					"query": [
 						{
@@ -834,13 +834,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/user/calculate_calorie",
+							"raw": "{{base_url}}/user/calculate_bmr",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"user",
-								"calculate_calorie"
+								"calculate_bmr"
 							],
 							"query": [
 								{

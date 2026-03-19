@@ -155,7 +155,7 @@
         }
       }
     },
-    "/api/user/calculate_calorie": {
+    "/api/user/calculate_bmr": {
       "post": {
         "summary": "Calculate Calorie",
         "operationId": "calculate_calorie_api_user_calculate_calorie_post",

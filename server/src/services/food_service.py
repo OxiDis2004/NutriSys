@@ -1,13 +1,16 @@
-import os.path
+import io
 import uuid
 from typing import override, Any
 from uuid import UUID
+from PIL import Image
 
 from fastapi import HTTPException
 from sqlalchemy import Sequence, Row
+from starlette.datastructures import UploadFile
 
 from src.models.dto.sent_food_response_dto import SentFoodResponseDTO
 from src.models.dto.sent_food_request_dto import SentFoodRequestDTO
+from src.models.property.detected_food import DetectedFood
 from src.models.property.food_statistic import FoodStatistic
 from src.models.property.period import Period
 from src.services import StatisticService
@@ -20,36 +23,33 @@ class FoodService(StatisticService):
         super().__init__(db_service)
         self._ai_service = ai_service
 
-    def sent_food(self, sent_food: SentFoodRequestDTO) -> SentFoodResponseDTO:
-        if sent_food.image_path is None:
-            raise HTTPException(status_code=400, detail="Image path is null")
+    async def sent_food(self, sent_food: SentFoodRequestDTO) -> SentFoodResponseDTO:
+        if sent_food.image is None:
+            raise HTTPException(status_code=422, detail="Image is null")
 
-        image = self.get_image(sent_food.image_path)
-        if sent_food.image_path is None:
+        image = await self.get_image(sent_food.image)
+        if image is None:
             raise HTTPException(status_code=400, detail="Image couldn't be find")
 
-        food_names = self._ai_service.scan_image(image)
-        if sent_food.image_path is None:
-            raise HTTPException(status_code=400, detail="Image couldn't be scan or interpreter")
-
-        nutrient = self.get_nutrient_by_name(food_names)
-
-        return nutrient
+        detected_foods = await self._ai_service.scan_image(image)
+        nutrients = self.get_nutrient_by_name([food.label for food in detected_foods])
+        nutrients_by_mass = self.get_food_nutrient_by_mass(detected_foods, nutrients)
+        return nutrients_by_mass
 
     def get_nutrient_by_name(self, food_names: list[str]):
-        nutrients = []
+        nutrients = dict[str, FoodStatistic]
 
         for food_name in food_names:
             row = self._db_service.get_food_by_name(food_name)
 
-            if row is None or row.user_id is None:
+            if row is None or row.id is None:
                 food_id = str(uuid.uuid4())
                 nutrient = self.get_nutrient_from_api(food_name)
                 self._db_service.add_food(food_id, nutrient)
             else:
-                nutrient = FoodStatistic().from_row(row)
+                nutrient = FoodStatistic(**row._mapping)
 
-            nutrients.append(nutrient)
+            nutrients.update({food_name: nutrient})
 
         return nutrients
 
@@ -75,6 +75,19 @@ class FoodService(StatisticService):
         ]
 
     @staticmethod
-    def get_image(image_path: str):
-        return os.path.abspath(image_path)
+    async def get_image(image: UploadFile):
+        content = await image.read()
+        return Image.open(io.BytesIO(content))
 
+    @staticmethod
+    def get_food_nutrient_by_mass(detected_foods: list[DetectedFood], nutrients: dict[str, FoodStatistic]):
+        for food_name in nutrients.keys():
+            mass = 0
+            for detected_food in detected_foods:
+                if food_name == detected_food.label:
+                    mass = detected_food.mass
+                    break
+
+            nutrients.get(food_name).calculate(mass)
+
+        return nutrients

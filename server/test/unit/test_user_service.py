@@ -135,7 +135,7 @@ class TestUserService:
         self.user_service_mock.set_bmr_by_activity = mocker.Mock(return_value=3000)
         self.user_service_mock.set_bmr_by_goal = mocker.Mock(return_value=2700)
 
-        response = self.user_service_mock.calculate_calorie(user_info)
+        response = self.user_service_mock.calculate_bmr(user_info)
 
         assert response['bmr'] == 2700
         self.user_service_mock.years_old.assert_called_once_with(user_info.birthday)
@@ -162,7 +162,7 @@ class TestUserService:
         )
 
         with pytest.raises(Exception) as e_info:
-            self.user_service_mock.calculate_calorie(user_info)
+            self.user_service_mock.calculate_bmr(user_info)
 
         assert e_info.errisinstance(HTTPException) == True
         code, detail = str(e_info.value).split(": ")

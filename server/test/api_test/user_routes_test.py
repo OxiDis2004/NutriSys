@@ -39,18 +39,6 @@ class TestUserEndpoints(BaseTestEndpoint):
 
         return resp
 
-    async def test_get_users(self, initialize_user, initialize_user_2):
-        async with (
-            AsyncClient(
-                transport=ASGITransport(app=self.app),
-                base_url="http://test"
-            ) as client
-        ):
-            resp = await client.get("/api/user/all_users")
-
-        print(resp.json())
-
-
     async def test_login_not_found(self, setup_app):
         resp = await self.login()
         assert resp.status_code == 404
@@ -75,10 +63,6 @@ class TestUserEndpoints(BaseTestEndpoint):
         resp = await self.register(USER.id)
         assert resp.status_code == 400
         assert resp.json()["detail"]["message"] == "User already exists"
-        received_user = resp.json()["detail"]["user"]
-        assert received_user["id"] == USER.user_id
-        assert received_user["telegram_id"] == USER.telegram_id
-        assert received_user["language"] == USER.language
 
     async def test_change_user_language(self, initialize_user):
         user = USER
@@ -96,7 +80,7 @@ class TestUserEndpoints(BaseTestEndpoint):
 
         assert resp.status_code == 202
 
-    async def test_calculate_calorie(self, initialize_user, update_user_info):
+    async def test_calculate_bmr(self, initialize_user, update_user_info):
         async with (
             AsyncClient(
                 transport=ASGITransport(app=self.app),
@@ -104,12 +88,42 @@ class TestUserEndpoints(BaseTestEndpoint):
             ) as client
         ):
             resp = await client.post(
-                "/api/user/calculate_calorie",
-                json=USER_INFO.model_dump(mode="json")
+                "/api/user/calculate_bmr",
+                json=USER.model_dump(mode="json")
             )
 
             assert resp.status_code == 200
             assert resp.json()["bmr"] == 2751
+
+    async def test_calculate_bmr_failed(self, initialize_user):
+        async with (
+            AsyncClient(
+                transport=ASGITransport(app=self.app),
+                base_url="http://test"
+            ) as client
+        ):
+            resp = await client.post(
+                "/api/user/calculate_bmr",
+                json=USER.model_dump(mode="json")
+            )
+
+            assert resp.status_code == 422
+            assert resp.json()["detail"] == "Not all the necessary data has been entered."
+
+    async def test_get_information(self, initialize_user, update_user_info):
+        async with (
+            AsyncClient(
+                transport=ASGITransport(app=self.app),
+                base_url="http://test"
+            ) as client
+        ):
+            resp = await client.post(
+                "/api/user/get_info",
+                json=USER.model_dump(mode="json")
+            )
+
+            assert resp.status_code == 200
+            assert resp.json() == USER_INFO.model_dump(mode="json")
 
     async def test_update_user(self, initialize_user):
         async with (
@@ -125,3 +139,17 @@ class TestUserEndpoints(BaseTestEndpoint):
 
         assert resp.status_code == 202
 
+    async def test_update_user_failed(self, setup_app):
+        async with (
+            AsyncClient(
+                transport=ASGITransport(app=self.app),
+                base_url="http://test"
+            ) as client
+        ):
+            resp = await client.put(
+                "/api/user/update_info",
+                json=USER_INFO.model_dump(mode="json")
+            )
+
+        assert resp.status_code == 500
+        assert resp.json()["detail"] == "Caught: User couldn't update"
