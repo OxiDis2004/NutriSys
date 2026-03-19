@@ -1,3 +1,5 @@
+from typing import Union
+
 from aiogram.fsm.context import FSMContext
 
 from src.models.language import Language
@@ -8,17 +10,18 @@ from src.models.unit import Unit
 from src.services.users import get_current_language
 from src.static import ua, en, de
 
+TypeToTranslate = Union[MenuButton, MenuTitle, StatisticType, PeriodType, Unit]
+
+Vocabulary = {
+    Language.UKRAINE.value: ua.vocabulary(),
+    Language.ENGLISH.value: en.vocabulary(),
+    Language.GERMAN.value: de.vocabulary()
+}
 
 async def translate(
         state: FSMContext,
-        text: MenuButton | MenuTitle | StatisticType | PeriodType | Unit
+        text: TypeToTranslate
 ):
     language = await get_current_language(state)
-    vocabulary = {}
-
-    match language:
-        case Language.UKRAINE.value: vocabulary = ua.vocabulary()
-        case Language.ENGLISH.value: vocabulary = en.vocabulary()
-        case Language.GERMAN.value: vocabulary = de.vocabulary()
-
+    vocabulary = Vocabulary.get(language, {})
     return vocabulary[text] if text in vocabulary else text

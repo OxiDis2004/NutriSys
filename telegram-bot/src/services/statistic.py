@@ -4,7 +4,7 @@ from datetime import date
 
 from src.models.statistic_type import StatisticType, PeriodType
 from src.models.unit import Unit
-from src.services.language import translate
+from src.utils import translate
 from src.services.users import get_user_calorie, get_user_id
 from src.services.water import water_statistic, water_data
 

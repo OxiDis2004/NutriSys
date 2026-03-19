@@ -7,7 +7,7 @@ from src.models.menu_parts.menu_title import MenuTitle
 from src.models.menu_parts.menu_type import MenuType
 from src.models.menu_parts.menu_button_titles import MenuButtonTitle
 from src.models.unit import Unit
-from src.services.language import translate
+from src.utils import translate
 from src.services.water import water_add_request
 
 router = Router()

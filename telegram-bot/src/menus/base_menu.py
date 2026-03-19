@@ -5,7 +5,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from src.models.menu_parts.menu_buttons import MenuButton
 from src.models.menu_parts.menu_title import MenuTitle
-from src.services.language import translate
+from src.utils import translate
 
 
 class BaseMenu(ABC):

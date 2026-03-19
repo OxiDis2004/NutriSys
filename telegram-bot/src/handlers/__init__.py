@@ -3,7 +3,7 @@ from typing import Union
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from src.builders.menu_builder import MenuFactory
+from src.utils.menu_builder import MenuFactory
 from src.models.menu_parts.menu_type import MenuType
 
 Event = Union[Message, CallbackQuery]

@@ -3,7 +3,7 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from src.builders.menu_builder import MenuFactory
+from src.utils.menu_builder import MenuFactory
 from src.handlers import history_append
 from src.models.menu_parts.menu_type import MenuType
 
