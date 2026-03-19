@@ -28,3 +28,16 @@ async def water_statistic(user_id: str, period_type: PeriodType, stat_day: date)
             drunk_water=item.get('drunk_water', 0)
         ) for item in data
     ]
+
+def water_data(period_type: PeriodType, result: list[WaterResponseDTO]) -> dict:
+    date_format = "%a"
+
+    match period_type:
+        case PeriodType.DAY: date_format = "%a"
+        case PeriodType.WEEK: date_format = "%a"
+        case PeriodType.MONTH: date_format = "%d"
+        case PeriodType.YEAR: date_format = "%b"
+
+    return {
+        date.fromisoformat(item.day).strftime(date_format) : item.drunk_water for item in result
+    }

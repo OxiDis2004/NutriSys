@@ -2,13 +2,11 @@ from aiogram.fsm.context import FSMContext
 import matplotlib.pyplot as plt
 from datetime import date
 
-from src.models.dto.water_response import WaterResponseDTO
 from src.models.statistic_type import StatisticType, PeriodType
 from src.models.unit import Unit
 from src.services.language import translate
 from src.services.users import get_user_calorie, get_user_id
-from src.services.water import water_statistic
-
+from src.services.water import water_statistic, water_data
 
 STATISTIC_KEY = 'statistic_type'
 
@@ -36,26 +34,6 @@ async def get_statistic(state: FSMContext, period_type: PeriodType) -> dict:
 
 def food_data(result, curr_day) -> dict:
     return { curr_day : result }
-
-def water_data(period_type: PeriodType, result: list[WaterResponseDTO]) -> dict:
-    match period_type:
-        case PeriodType.WEEK:
-            return {
-                date.fromisoformat(item.day).strftime("%a") : item.drunk_water for item in result
-            }
-
-        case PeriodType.MONTH:
-            return {
-                item.day : item.drunk_water for item in result
-            }
-
-        case PeriodType.YEAR:
-            return {
-                date.fromisoformat(item.day).strftime("%b") : item.drunk_water for item in result
-            }
-
-        case _:
-            return { item.day : item.drunk_water for item in result }
 
 async def generate_chart(
         state: FSMContext,
