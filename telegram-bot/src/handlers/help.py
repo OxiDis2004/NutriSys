@@ -11,7 +11,6 @@ router = Router()
 
 async def open_help(message: Message, state: FSMContext):
     menu = await MenuFactory.build_menu(MenuType.HELP, state)
-
     await message.answer(
         text=menu.title,
         reply_markup=menu.keyboard

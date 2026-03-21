@@ -9,6 +9,7 @@ class MenuTitle(Enum):
     WATER = "water_title"
     DRUNK = "drunk_title"
     FOOD = "food_title"
+    FOOD_RESPONSE = "food_response"
     SETTINGS = "settings_title"
     USER_INFO = "user_info_title"
     WEIGHT = "weight_title"

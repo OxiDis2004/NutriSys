@@ -46,3 +46,6 @@ async def request_put(url, body, throw_error: bool = True) -> Response:
     if throw_error:
         resp.raise_for_status()
     return resp
+
+async def request_put_image(url, data, files) -> Response:
+    return await CLIENT.put(url=url, data=data, files=files)

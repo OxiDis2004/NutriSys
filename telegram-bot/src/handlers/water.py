@@ -12,6 +12,12 @@ from src.services.water import water_add_request
 
 router = Router()
 
+WATER_ADD_MAP = {
+    MenuButtonTitle.ADD_250_ML.value: 250,
+    MenuButtonTitle.ADD_500_ML.value: 500,
+    MenuButtonTitle.ADD_1_L.value: 1000,
+    MenuButtonTitle.ADD_1_5_L.value: 1500
+}
 
 @router.callback_query(F.data == MenuButtonTitle.WATER.value)
 async def water_callback(callback: CallbackQuery, state: FSMContext):
@@ -28,24 +34,9 @@ async def format_answer(state: FSMContext, water: int) -> str:
     translated_text = await translate(state, MenuTitle.DRUNK)
     return translated_text.format(water=water, unit=translated_unit)
 
-async def add_n_ml(callback: CallbackQuery, state: FSMContext, water: int):
+@router.callback_query(F.data.in_(WATER_ADD_MAP.keys()))
+async def add_n_ml(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
-    total_water = await water_add_request(state, water)
+    total_water = await water_add_request(state, WATER_ADD_MAP[callback.data])
     text = await format_answer(state, total_water.drunk_water)
     await open_menu_edit_callback(callback, state, MenuType.WATER, text)
-
-@router.callback_query(F.data == MenuButtonTitle.ADD_250_ML.value)
-async def add_250ml(callback: CallbackQuery, state: FSMContext):
-    await add_n_ml(callback, state, 250)
-
-@router.callback_query(F.data == MenuButtonTitle.ADD_500_ML.value)
-async def add_500ml(callback: CallbackQuery, state: FSMContext):
-    await add_n_ml(callback, state, 500)
-
-@router.callback_query(F.data == MenuButtonTitle.ADD_1_L.value)
-async def add_1l(callback: CallbackQuery, state: FSMContext):
-    await add_n_ml(callback, state, 1000)
-
-@router.callback_query(F.data == MenuButtonTitle.ADD_1_5_L.value)
-async def add_1_5l(callback: CallbackQuery, state: FSMContext):
-    await add_n_ml(callback, state, 1500)
