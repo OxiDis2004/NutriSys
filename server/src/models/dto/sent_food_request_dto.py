@@ -1,7 +1,7 @@
 from uuid import UUID
 
+from fastapi import File, UploadFile
 from pydantic import BaseModel, Field
-from starlette.datastructures import UploadFile
 
 
 class SentFoodRequestDTO(BaseModel):

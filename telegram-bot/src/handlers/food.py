@@ -19,11 +19,12 @@ async def food_callback(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await open_menu_edit_callback(callback, state, MenuType.FOOD)
 
-@router.callback_query(F.photo)
+@router.message(F.photo)
 async def sent_photo(message: Message, state: FSMContext):
     food_response = await food_add_request(state, message.photo[-1])
     translated_text = await translate(state, MenuTitle.FOOD_RESPONSE)
     translated_kcal = await translate(state, Unit.KCAL)
     translated_g = await translate(state, Unit.GRAM)
     text = translated_text.format(**food_response.get("statistic", None), u_kcal=translated_kcal,u_g=translated_g)
-    await go_back(message, state, text=text, new_message=True)
+    await message.reply(text=text)
+    await go_back(message, state, new_message=True)
