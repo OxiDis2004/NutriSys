@@ -12,20 +12,10 @@ router = APIRouter(prefix="/api/water")
 async def add_water(water_dto: WaterRequestDTO, services: ServiceContainer = Depends(get_services)):
     return services.water_service.add_drunk_water(water_dto)
 
-@router.post("/statistic/day", response_model=list[WaterResponseDTO])
-async def statistic_week(water_statistic_dto: StatisticRequestDTO, services: ServiceContainer = Depends(get_services)):
-    return services.water_service.statistic(water_statistic_dto, PeriodType.DAY)
-
-@router.post("/statistic/week", response_model=list[WaterResponseDTO])
-async def statistic_week(water_statistic_dto: StatisticRequestDTO, services: ServiceContainer = Depends(get_services)):
-    return services.water_service.statistic(water_statistic_dto, PeriodType.WEEK)
-
-@router.post("/statistic/month", response_model=list[WaterResponseDTO])
-async def statistic_week(water_statistic_dto: StatisticRequestDTO, services: ServiceContainer = Depends(get_services)):
-    return services.water_service.statistic(water_statistic_dto, PeriodType.MONTH)
-
-@router.post("/statistic/year", response_model=list[WaterResponseDTO])
-async def statistic_week(water_statistic_dto: StatisticRequestDTO, services: ServiceContainer = Depends(get_services)):
-    return services.water_service.statistic(water_statistic_dto, PeriodType.YEAR)
-
-
+@router.post("/statistic/{period}", response_model=list[WaterResponseDTO])
+async def statistic_water(
+        period: PeriodType,
+        statistic_dto: StatisticRequestDTO,
+        services: ServiceContainer = Depends(get_services)
+):
+    return services.water_service.statistic(statistic_dto, period)

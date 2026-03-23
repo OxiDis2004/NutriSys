@@ -37,12 +37,15 @@ jobs:
           - name: server
             context: ./server
             dockerfile: ./server/Dockerfile
+            dockerfileContext: ./
           - name: bot-frontend
             context: ./telegram-bot
             dockerfile: ./telegram-bot/Dockerfile
+            dockerfileContext: ./telegram-bot
           - name: web-frontend
             context: ./web
             dockerfile: ./web/Dockerfile
+            dockerfileContext: ./web
 
     steps:
       - uses: actions/checkout@v4
@@ -135,7 +138,7 @@ jobs:
       - name: Build and push ${{ matrix.name }} image
         uses: docker/build-push-action@v5
         with:
-          context: ${{ matrix.context }}
+          context: ${{ matrix.dockerfileContext }}
           file: ${{ matrix.dockerfile }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}

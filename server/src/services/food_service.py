@@ -1,12 +1,9 @@
-import io
 import uuid
 from typing import override, Any
 from uuid import UUID
-from PIL import Image
 
 from fastapi import HTTPException
 from sqlalchemy import Sequence, Row
-from starlette.datastructures import UploadFile
 
 from src.models.dto.sent_food_response_dto import SentFoodResponseDTO
 from src.models.dto.sent_food_request_dto import SentFoodRequestDTO
@@ -27,17 +24,13 @@ class FoodService(StatisticService):
         if sent_food.image is None:
             raise HTTPException(status_code=422, detail="Image is null")
 
-        image = await self.get_image(sent_food.image)
-        if image is None:
-            raise HTTPException(status_code=400, detail="Image couldn't be find")
-
-        detected_foods = await self._ai_service.scan_image(image)
+        detected_foods = await self._ai_service.scan_image(sent_food.image)
         nutrients = self.get_nutrient_by_name([food.label for food in detected_foods])
         nutrients_by_mass = self.get_food_nutrient_by_mass(detected_foods, nutrients)
         return nutrients_by_mass
 
     def get_nutrient_by_name(self, food_names: list[str]):
-        nutrients = dict[str, FoodStatistic]
+        nutrients: dict[str, FoodStatistic] = {}
 
         for food_name in food_names:
             row = self._db_service.get_food_by_name(food_name)
@@ -73,11 +66,6 @@ class FoodService(StatisticService):
         return [
             SentFoodResponseDTO(day=key, statistic=value) for key, value in result
         ]
-
-    @staticmethod
-    async def get_image(image: UploadFile):
-        content = await image.read()
-        return Image.open(io.BytesIO(content))
 
     @staticmethod
     def get_food_nutrient_by_mass(detected_foods: list[DetectedFood], nutrients: dict[str, FoodStatistic]):
