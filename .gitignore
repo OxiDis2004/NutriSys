@@ -208,3 +208,4 @@ __marimo__/
 /.idea/
 /local-helm.sh
 /dynamic-det/dataset
+/dynamic-det/converter.py
