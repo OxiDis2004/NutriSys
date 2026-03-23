@@ -66,8 +66,16 @@ EN_VOCABULARY = {
     MenuTitle.ACTIVITY: "🏃‍♂️ Select activity level:",
     MenuTitle.GOAL: "🎯 Select your goal:",
 
+    MenuTitle.FOOD_RESPONSE: "Product name: {name}\n\n"
+                             "Calories: {calorie} {u_kcal}\n"
+                             "Protein: {protein} {u_g}\n"
+                             "Carbohydrate: {carbon} {u_g}\n"
+                             "Fat: {fat} {u_g}\n",
+
     Unit.L: "l",
     Unit.ML: "ml",
+    Unit.KCAL: "kcal",
+    Unit.GRAM: "g",
 
     StatisticType.WATER: "Water statistic",
     StatisticType.CALORIE: "Calorie statistic",

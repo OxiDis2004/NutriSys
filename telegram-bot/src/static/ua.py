@@ -65,9 +65,17 @@ UA_VOCABULARY = {
     MenuTitle.SEX: "Виберіть вашу стать:",
     MenuTitle.ACTIVITY: "Виберіть ваш рівень активності:",
     MenuTitle.GOAL: "Виберіть вашу ціль:",
-    
+
+    MenuTitle.FOOD_RESPONSE: "Назва продукту: {name}\n\n"
+                             "Калорійність: {calorie} {u_kcal}\n"
+                             "К-сть білку: {protein} {u_g}\n"
+                             "К-сть вуглеводів: {carbon} {u_g}\n"
+                             "К-сть жиру: {fat} {u_g}\n",
+
     Unit.L: "л",
     Unit.ML: "мл",
+    Unit.KCAL: "ккал",
+    Unit.GRAM: "г",
 
     StatisticType.WATER: "Статистика випитої води",
     StatisticType.CALORIE: "Статистика калорії",

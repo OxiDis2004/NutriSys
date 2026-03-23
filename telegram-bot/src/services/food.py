@@ -10,11 +10,21 @@ from src.services.users import get_user_id
 
 
 async def food_add_request(state: FSMContext, image: PhotoSize):
-    user_id = await get_user_id(state)
-    data = { "user_id": user_id }
-    files = { "file": ("image.jpg", image, "image/jpeg") }
-    resp = await request_put_image(ServerEndpoint.ADD_FOOD, data, files)
-    return resp.json()
+    # user_id = await get_user_id(state)
+    # data = { "user_id": user_id }
+    # files = { "file": ("image.jpg", image, "image/jpeg") }
+    # resp = await request_put_image(ServerEndpoint.ADD_FOOD, data, files)
+    # return resp.json()
+    return {
+        "day": date.today(),
+        "statistic": {
+            "name": "Млинці з ягодами",
+            "calorie": 340,
+            "protein": 8,
+            "carbon": 50,
+            "fat": 12,
+        }
+    }
 
 async def food_statistic(user_id: str, period_type: PeriodType, stat_day: date) \
         -> list[FoodResponseDTO]:
