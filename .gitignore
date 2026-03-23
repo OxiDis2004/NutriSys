@@ -207,3 +207,4 @@ marimo/_lsp/
 __marimo__/
 /.idea/
 /local-helm.sh
+/dynamic-det/dataset
