@@ -20,18 +20,18 @@ from torch.cuda import amp
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.tensorboard import SummaryWriter
 
-import test  # import test.py to get mAP after each epoch
-from models.yolo import Model
-from utils.autoanchor import check_anchors
-from utils.datasets import create_dataloader
-from utils.general import labels_to_class_weights, increment_path, labels_to_image_weights, init_seeds, \
+from dynamic_det import test  # import test.py to get mAP after each epoch
+from dynamic_det.models.yolo import Model
+from dynamic_det.utils.autoanchor import check_anchors
+from dynamic_det.utils.datasets import create_dataloader
+from dynamic_det.utils.general import labels_to_class_weights, increment_path, labels_to_image_weights, init_seeds, \
     fitness, strip_optimizer, get_latest_run, check_dataset, check_file, check_img_size, \
     set_logging, colorstr
-from utils.loss import ComputeLoss, ComputeLossOTADy
-from utils.plots import plot_images, plot_results, plot_lr_scheduler
-from utils.torch_utils import ModelEMA, select_device, intersect_dicts, torch_distributed_zero_first, is_parallel
-from utils.wandb_logging.wandb_utils import WandbLogger, check_wandb_resume
-from utils.checkpoint import get_state_dict
+from dynamic_det.utils.loss import ComputeLoss, ComputeLossOTADy
+from dynamic_det.utils.plots import plot_images, plot_results, plot_lr_scheduler
+from dynamic_det.utils.torch_utils import ModelEMA, select_device, intersect_dicts, torch_distributed_zero_first, is_parallel
+from dynamic_det.utils.wandb_logging.wandb_utils import WandbLogger, check_wandb_resume
+from dynamic_det.utils.checkpoint import get_state_dict
 
 
 logger = logging.getLogger(__name__)

@@ -9,13 +9,14 @@ from tqdm import tqdm
 import numpy as np
 import torch
 
-from models.yolo import Model
-from utils.datasets import create_dataloader
-from utils.general import coco80_to_coco91_class, check_dataset, check_file, check_img_size, \
+from dynamic_det import fix_code
+from dynamic_det.models.yolo import Model
+from dynamic_det.utils.datasets import create_dataloader
+from dynamic_det.utils.general import coco80_to_coco91_class, check_dataset, check_file, check_img_size, \
     box_iou, non_max_suppression, scale_coords, xyxy2xywh, xywh2xyxy, set_logging, increment_path, colorstr
-from utils.metrics import ap_per_class, ConfusionMatrix
-from utils.plots import plot_images, output_to_target
-from utils.torch_utils import select_device, time_synchronized, intersect_dicts
+from dynamic_det.utils.metrics import ap_per_class, ConfusionMatrix
+from dynamic_det.utils.plots import plot_images, output_to_target
+from dynamic_det.utils.torch_utils import select_device, time_synchronized, intersect_dicts
 
 
 logger = logging.getLogger(__name__)
