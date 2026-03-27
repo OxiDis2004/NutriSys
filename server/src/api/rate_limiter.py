@@ -7,8 +7,6 @@ WINDOW_SEC = 30
 
 async def rate_limiter(request: Request):
     ip = request.client.host
-    api_path = request.url.path
-    print(api_path)
     now = time.time()
 
     if ip not in REQUEST_LIMIT:
