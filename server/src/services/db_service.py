@@ -156,16 +156,25 @@ class DBService:
         )
         self.db.commit(stmt)
 
+    def get_sent_food_images(self, user_id: UUID, period: Period):
+        stmt = (
+            select(SentFood.image_id.label("image"))
+            .where(SentFood.user_id == str(user_id))
+            .where(SentFood.date >= period.start_date)
+            .where(SentFood.date <= period.end_date)
+            .distinct()
+        )
+        return self.db.fetch(stmt)
+
     def get_sent_food(self, user_id: UUID, period: Period):
         stmt = (
             select(
                 SentFood.date.label("date"),
-                func.sum(SentFood.food.calorie * SentFood.weight / 100).label("calorie"),
-                func.sum(SentFood.food.protein * SentFood.weight / 100).label("protein"),
-                func.sum(SentFood.food.carbon * SentFood.weight / 100).label("carbon"),
-                func.sum(SentFood.food.fat * SentFood.weight / 100).label("fat"),
-                SentFood.food_id.label("food"),
-                SentFood.image_id.label("image"),
+                Food.name.label("name"),
+                func.sum(Food.calorie * SentFood.weight / 100).label("calorie"),
+                func.sum(Food.protein * SentFood.weight / 100).label("protein"),
+                func.sum(Food.carbon * SentFood.weight / 100).label("carbon"),
+                func.sum(Food.fat * SentFood.weight / 100).label("fat"),
             )
             .join(SentFood.food)
             .where(SentFood.user_id == str(user_id))
@@ -175,6 +184,16 @@ class DBService:
         )
 
         return self.db.fetch(stmt)
+
+    def update_sent_food(self, user_id: UUID, ):
+        curr_day = date.today()
+        stmt = (
+            update(SentFood)
+            .where(SentFood.user_id == str(user_id))
+            .where(SentFood.date == curr_day)
+            .values(weight=0)
+        )
+        self.db.commit(stmt)
 
     @staticmethod
     def calculate_for_weight(food_nutrient: int | Decimal, weight: int):

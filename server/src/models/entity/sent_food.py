@@ -23,6 +23,7 @@ class SentFood(Base):
             f"id={self.id!r}, "
             f"user_id={self.user_id!r}, "
             f"food_id={self.food_id!r}, "
+            f"image_id={self.image_id!r}, "
             f"date={self.date!r}, "
             f"weight={self.weight!r}"
             f")"
