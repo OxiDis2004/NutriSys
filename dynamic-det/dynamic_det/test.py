@@ -71,7 +71,7 @@ def test(data,
 
         # Load model
         model = Model(cfg, ch=3, nc=nc)  # create
-        state_dict = torch.load(weight, map_location='cpu')['model']
+        state_dict = torch.load(weight, map_location='cpu', weights_only=False)['model']
         state_dict = intersect_dicts(state_dict, model.state_dict())  # intersect
         model.load_state_dict(state_dict, strict=False)  # load
         model.to(device)
@@ -123,7 +123,7 @@ def test(data,
         with torch.no_grad():
             # Run model
             t = time_synchronized()
-            out, train_out = model(img, augment=augment)  # inference and training outputs
+            out, train_out = model(img, augment=augment) # inference and training outputs
             t0 += time_synchronized() - t
 
             # Compute loss

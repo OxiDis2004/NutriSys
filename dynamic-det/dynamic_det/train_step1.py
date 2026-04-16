@@ -71,7 +71,8 @@ def train(hyp, opt, device, tb_writer=None):
     loggers = {'wandb': None}  # loggers dict
     if rank in [-1, 0]:
         opt.hyp = hyp  # add hyperparameters
-        run_id = torch.load(weight, map_location='cpu')['wandb_id'] if weight.endswith('.pt') and os.path.isfile(weight) else None
+        run_id = torch.load(weight, map_location='cpu', weights_only=False)['wandb_id'] \
+            if (weight.endswith('.pt') and os.path.isfile(weight)) else None
         wandb_logger = WandbLogger(opt, Path(opt.save_dir).stem, run_id, data_dict)
         loggers['wandb'] = wandb_logger.wandb
         data_dict = wandb_logger.data_dict
@@ -85,7 +86,7 @@ def train(hyp, opt, device, tb_writer=None):
     # Model
     pretrained = weight.endswith('.pt')
     if pretrained:
-        ckpt = torch.load(weight, map_location='cpu')  # load checkpoint
+        ckpt = torch.load(weight, map_location='cpu', weights_only=False)  # load checkpoint
         state_dict = ckpt['model']
         model = Model(opt.cfg, ch=3, nc=nc)  # create
         exclude = ['anchor'] if (opt.cfg or hyp.get('anchors')) and not opt.resume else []  # exclude keys

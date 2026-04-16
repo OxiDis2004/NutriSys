@@ -36,7 +36,7 @@ def detect(save_img=False):
 
     # Load model
     model = Model(cfg, ch=3, nc=nc)  # create
-    state_dict = torch.load(weight, map_location='cpu')['model']
+    state_dict = torch.load(weight, map_location='cpu', weights_only=False)['model']
     state_dict = intersect_dicts(state_dict, model.state_dict())  # intersect
     model.load_state_dict(state_dict, strict=False)  # load
     model.to(device)

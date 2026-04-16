@@ -1,18 +1,16 @@
 import argparse
-import os
 import logging
-from pathlib import Path
-from threading import Thread
 import yaml
 from tqdm import tqdm
 
 import numpy as np
 import torch
 
-from models.yolo import Model
-from utils.datasets import create_dataloader
-from utils.general import check_dataset, check_file, check_img_size, set_logging, colorstr
-from utils.torch_utils import select_device
+from dynamic_det import fix_code
+from dynamic_det.models.yolo import Model
+from dynamic_det.utils.datasets import create_dataloader
+from dynamic_det.utils.general import check_dataset, check_file, check_img_size, set_logging, colorstr
+from dynamic_det.utils.torch_utils import select_device
 
 
 logger = logging.getLogger(__name__)
@@ -37,7 +35,7 @@ def get_thres(data,
 
     # Load model
     model = Model(cfg, ch=3, nc=nc)  # create
-    state_dict = torch.load(weight, map_location='cpu')['model']
+    state_dict = torch.load(weight, map_location='cpu', weights_only=False)['model']
     model.load_state_dict(state_dict, strict=True)  # load
     model.to(device)
     logger.info('Transferred %g/%g items from %s' % (len(state_dict), len(model.state_dict()), weight))  # report
@@ -47,9 +45,9 @@ def get_thres(data,
     model.get_score = True
 
     # Half
-    half = device.type != 'cpu' and half_precision  # half precision only supported on CUDA
-    if half:
-        model.half()
+    # half = device.type != 'cpu' and half_precision  # half precision only supported on CUDA
+    # if half:
+    #     model.half()
     model.eval()
 
     # Dataloader
@@ -62,7 +60,7 @@ def get_thres(data,
     score_list = []
     for batch_i, (img, _, _, _) in enumerate(tqdm(dataloader)):
         img = img.to(device, non_blocking=True)
-        img = img.half() if half else img.float()  # uint8 to fp16/32
+        img = img.float()  # uint8 to fp16/32
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
         with torch.no_grad():
             # Run model

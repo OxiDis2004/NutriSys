@@ -1,3 +1,5 @@
+import os
+
 import math
 import logging
 from pathlib import Path
@@ -261,6 +263,9 @@ class Model(nn.Module):
         super(Model, self).__init__()
         assert isinstance(cfg, str)
         self.yaml_file = Path(cfg).name
+        print(self.yaml_file)
+        print(cfg)
+        print(os.getcwd())
         with open(cfg) as f:
             self.yaml = yaml.load(f, Loader=yaml.SafeLoader)  # model dict
         self.dynamic = self.yaml.get('dynamic', False)
@@ -375,8 +380,16 @@ class Model(nn.Module):
             if self.get_score:
                 return score
 
+        print("training", self.training)
+        print("dynamic", self.dynamic)
+        print("score", score)
+        print("dy_thres", self.dy_thres)
+
         need_second = self.training or (not self.dynamic) or score[:, 0] < self.dy_thres
         need_first_head = self.training or (self.dynamic and score[:, 0] >= self.dy_thres)
+
+
+        print(need_second, need_first_head)
 
         if need_second:
             for m in self.model_b2:
@@ -420,7 +433,12 @@ class Model(nn.Module):
 
                 y.append(x if m.i in self.save_h else None)  # save output
 
+            print("First HEAD")
+            print("x type:", type(x))
+            print("x len:" if isinstance(x, (list, tuple)) else "x shape:", len(x) if isinstance(x, (list, tuple)) else getattr(x, "shape", None))
+            print("x:", x if not isinstance(x, (list, tuple)) else f"list/tuple with len={len(x)}")
             outs.extend(x)
+            print("outs after first:", len(outs))
 
         if need_second:
             for m in self.model_h2:
@@ -446,7 +464,12 @@ class Model(nn.Module):
 
                 y.append(x if m.i in self.save_h2 else None)  # save output
 
+            print("Second HEAD")
+            print("x type:", type(x))
+            print("x len:" if isinstance(x, (list, tuple)) else "x shape:", len(x) if isinstance(x, (list, tuple)) else getattr(x, "shape", None))
+            print("x:", x if not isinstance(x, (list, tuple)) else f"list/tuple with len={len(x)}")
             outs.extend(x)
+            print("outs after first:", len(outs))
 
         if profile:
             print('%.1fms total' % sum(dt))
