@@ -9,8 +9,8 @@ images:
 apps:
   mysqlEnabled: true
   serverEnabled: true
-  botEnabled: false
-  webEnabled: false
+  botEnabled: true
+  webEnabled: true
 
 secrets:
   mysql:

@@ -1,16 +1,15 @@
 from fastapi import FastAPI
 from fastapi.params import Depends
 
+from src.api import main_router, user_router, water_router, food_router
 from src.api.limit_request import LimitRequestSizeMiddleware
 from src.api.rate_limiter import rate_limiter
-from src.dependencies import initialize_services, get_services
-from src.api import main_router, user_router, water_router, food_router
+from src.dependencies import initialize_services
 
 
 def create_app() -> FastAPI:
     app = FastAPI()
     initialize_services()
-    # print(get_services().ai_service.detector.device)
     app.add_middleware(LimitRequestSizeMiddleware, max_upload_size=65536)
     app_dependency = [Depends(rate_limiter)]
 

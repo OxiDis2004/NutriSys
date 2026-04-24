@@ -21,7 +21,7 @@ spec:
           image: {{ .Values.botDeployment.image }}
           imagePullPolicy: {{ .Values.botDeployment.imagePullPolicy }}
           securityContext:
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: false
             runAsNonRoot: false
             allowPrivilegeEscalation: false
           env:

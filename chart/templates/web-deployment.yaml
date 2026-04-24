@@ -21,7 +21,7 @@ spec:
           image: {{ .Values.webDeployment.image }}
           imagePullPolicy: {{ .Values.webDeployment.imagePullPolicy }}
           securityContext:
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: false
             runAsNonRoot: false
             allowPrivilegeEscalation: false
           ports:

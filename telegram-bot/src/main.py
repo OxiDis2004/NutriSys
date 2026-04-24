@@ -1,15 +1,14 @@
-from aiogram import Bot, Dispatcher
 import asyncio
 import logging
 import os
 
-from src import my_setenv
+from aiogram import Bot, Dispatcher
+
 from src.handlers.authmiddleware import AuthMiddleware
 from src.routers import setup_routers
 from src.services import get_hostname, initialize_client
 
 logging.basicConfig(level=logging.INFO)
-my_setenv.get_key()
 
 async def main():
     get_hostname()
