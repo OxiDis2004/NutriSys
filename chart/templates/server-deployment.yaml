@@ -22,7 +22,7 @@ spec:
           imagePullPolicy: {{ .Values.serverDeployment.imagePullPolicy }}
           securityContext:
             readOnlyRootFilesystem: true
-            runAsNonRoot: true
+            runAsNonRoot: false
             allowPrivilegeEscalation: false
           ports:
             - containerPort: {{ .Values.serverDeployment.port }}

@@ -238,7 +238,6 @@ __marimo__/
 /.idea/
 
 # local ignore
-/local-helm.sh
 /docker-compose.yml
 
 /dynamic-det/dataset

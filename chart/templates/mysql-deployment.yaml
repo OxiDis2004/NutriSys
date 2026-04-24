@@ -21,8 +21,8 @@ spec:
         - name: {{ .Values.mysql.name }}
           image: {{ .Values.mysql.image }}
           securityContext:
-            readOnlyRootFilesystem: true
-            runAsNonRoot: true
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
             allowPrivilegeEscalation: false
           ports:
             - containerPort: {{ .Values.mysql.port }}
@@ -37,8 +37,9 @@ spec:
           volumeMounts:
             - name: {{ .Values.mysql.volume.storageName }}
               mountPath: {{ .Values.mysql.volume.mountPath }}
+              subPath: mysql
       volumes:
         - name: {{ .Values.mysql.volume.storageName }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistentVolumeClaim.name }}
-{{ end }}
+{{- end }}

@@ -11,8 +11,8 @@ pydantic
 pymysql
 cryptography
 pillow
+opencv-python-headless
 
-#opencv-python
 #torchvision
 #torchaudio
 #timm
