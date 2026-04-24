@@ -9,13 +9,8 @@ images:
 apps:
   mysqlEnabled: true
   serverEnabled: true
-  botEnabled: true
+  botEnabled: false
   webEnabled: false
-
-persistentVolumeClaim:
-  name: mysql-pvc
-  storageClassName: standard
-  size: 2Gi
 
 secrets:
   mysql:
@@ -25,13 +20,18 @@ secrets:
     name: telegram-secret
     key: token
 
+persistentVolumeClaim:
+  name: mysql-pvc
+  storageClassName: standard
+  size: 2Gi
+
 mysql:
   image: mysql:9.0.1-oraclelinux9
   name: mysql
   replicaCount: 1
   port: 3306
   user: "root"
-  database: "nutri-system"
+  database: nutri-system
   volume:
     storageName: mysql-storage
     mountPath: /var/lib/mysql
