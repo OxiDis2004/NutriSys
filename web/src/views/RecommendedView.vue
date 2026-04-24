@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { type InfoData, Units } from '@/types/InfoData.ts'
+import { type InfoData, Units } from '@/types/InfoData'
 import CardDataInfo from '@/components/CardDataInfo.vue'
 
-const recommendedData: InfoData[] = ref([
+const recommendedData: InfoData[] = [
   {
     className: 'bmr',
     text: 'Your BMR',
@@ -16,7 +15,7 @@ const recommendedData: InfoData[] = ref([
     url: '/user/calculate/bmi',
     unit: null,
   },
-])
+]
 </script>
 
 <template>

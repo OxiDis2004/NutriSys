@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { type InfoData, Units } from '@/types/InfoData.ts'
-import { ref } from 'vue'
+import { type InfoData, Units } from '@/types/InfoData'
 import CardDataInfo from '@/components/CardDataInfo.vue'
 
-const dailyStatisticData: InfoData[] = ref([
+const dailyStatisticData: InfoData[] = [
   {
     className: 'calorie',
     text: 'You ate today',
@@ -16,7 +15,7 @@ const dailyStatisticData: InfoData[] = ref([
     url: '/water/statistic/day',
     unit: Units.Liter,
   },
-])
+]
 </script>
 
 <template>

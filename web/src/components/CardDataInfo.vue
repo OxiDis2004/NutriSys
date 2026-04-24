@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import DataShow from '@/components/DataShow.vue'
-import type { InfoData } from '@/types/InfoData.ts'
+import type { InfoData } from '@/types/InfoData'
 
 const props = defineProps<{
   className: string
