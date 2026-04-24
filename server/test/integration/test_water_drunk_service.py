@@ -1,31 +1,21 @@
-import datetime
-import uuid
-
-import pytest
+import datetime, pytest
 from fastapi import HTTPException
-from sqlalchemy.engine.create import create_engine
 
 from src.models.dto.water_request_dto import WaterRequestDTO
-from src.models.dto.water_statistic_request_dto import WaterStatisticRequestDTO
-from src.services.db_service import DBService
+from src.models.dto.statistic_request_dto import StatisticRequestDTO
+from src.models.property.period import PeriodType
 from src.services.water_service import WaterService
+from test import USER
+from test.integration import BaseTestService
 
 
-class TestWaterDrunkService:
+class TestWaterDrunkService(BaseTestService):
+
     @pytest.fixture(scope="function", autouse=True)
-    def setup_service(self):
-        self.engine_mock = create_engine(
-            f"sqlite:///:memory:",
-            connect_args={"check_same_thread": False},
-        )
-        self.db_service = DBService(self.engine_mock)
+    def setup_service(self, setup_database):
         self.water_service = WaterService(self.db_service)
-        self.user_id = str(uuid.uuid4())
-
+        self.user_id = USER.id
         yield
-
-        self.engine_mock = None
-        self.db_service = None
         self.water_service = None
 
     def test_failed_add_water(self):
@@ -38,20 +28,20 @@ class TestWaterDrunkService:
 
     def test_add_water(self):
         drunk = self.water_service.add_drunk_water(WaterRequestDTO(user_id=self.user_id, drunk_water=250))
-        assert drunk.drunk_water_day == 250
+        assert drunk.drunk_water == 250
 
     def test_add_water_3_times(self):
         request_1 = WaterRequestDTO(user_id=self.user_id, drunk_water=500)
         drunk = self.water_service.add_drunk_water(request_1)
-        assert drunk.drunk_water_day == request_1.drunk_water
+        assert drunk.drunk_water == request_1.drunk_water
 
         request_2 = WaterRequestDTO(user_id=self.user_id, drunk_water=250)
         drunk = self.water_service.add_drunk_water(request_2)
-        assert drunk.drunk_water_day == request_1.drunk_water + request_2.drunk_water
+        assert drunk.drunk_water == request_1.drunk_water + request_2.drunk_water
 
         request_3 = WaterRequestDTO(user_id=self.user_id, drunk_water=1000)
         drunk = self.water_service.add_drunk_water(request_3)
-        assert (drunk.drunk_water_day == request_1.drunk_water + request_2.drunk_water +
+        assert (drunk.drunk_water == request_1.drunk_water + request_2.drunk_water +
                 request_3.drunk_water)
 
     @pytest.fixture
@@ -62,11 +52,13 @@ class TestWaterDrunkService:
 
     def test_get_drunk_water(self, initialize_2000):
         water = self.water_service.statistic(
-            WaterStatisticRequestDTO(
+            StatisticRequestDTO(
                 user_id=self.user_id,
-                day=datetime.date.today()
-            )
+                statistic_date=datetime.date.today()
+            ),
+            PeriodType.DAY
         )
 
         assert len(water) == 1
-        assert water[datetime.date.today().isoformat()] == 2000
+        assert water[0].day == datetime.date.today().isoformat()
+        assert water[0].drunk_water == 2000

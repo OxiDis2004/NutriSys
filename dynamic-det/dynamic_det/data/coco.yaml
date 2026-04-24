@@ -1,0 +1,14 @@
+# train and val data as 1) directory: path/images/, 2) file: path/images.txt, or 3) list: [path1/images/, path2/images/]
+train: C:\sources\NutriSys\dynamic-det\dynamic_det\data\coco\train\images
+val: C:\sources\NutriSys\dynamic-det\dynamic_det\data\coco\valid\images
+test: C:\sources\NutriSys\dynamic-det\dynamic_det\data\coco\test\images
+
+nc: 6
+names: ['Egg custard', 'Fried Chicken', 'Kimchi Fried Rice', 'Multigrain rice', 'Pizza', 'mixed dish of boiled bean threads']
+
+roboflow:
+  workspace: food-cud7y
+  project: food-yklgo
+  version: 2
+  license: Private
+  url: https://universe.roboflow.com/food-cud7y/food-yklgo/dataset/2

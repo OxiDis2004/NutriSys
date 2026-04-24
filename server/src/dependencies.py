@@ -8,56 +8,55 @@ from src.services.water_service import WaterService
 
 
 class ServiceContainer:
-    db_service: DBService | None = None
-    user_service: UserService | None = None
-    water_service: WaterService | None = None
-    ai_service: AIService | None = None
-    food_service: FoodService | None = None
+    _db_service: DBService | None = None
+    _user_service: UserService | None = None
+    _water_service: WaterService | None = None
+    _ai_service: AIService | None = None
+    _food_service: FoodService | None = None
 
-services = ServiceContainer()
+    def __init__(self, engine):
+        self._engine = engine
 
-def set_services(
-        db_service: DBService,
-        user_service: UserService,
-        water_service: WaterService,
-        ai_service: AIService,
-        food_service: FoodService
-):
-    services.db_service = db_service
-    services.user_service = user_service
-    services.water_service = water_service
-    services.ai_service = ai_service
-    services.food_service = food_service
+    @property
+    def db_service(self) -> DBService:
+        if self._db_service is None:
+            self._db_service = DBService(self._engine)
+            self._db_service.initialize_languages()
+        return self._db_service
 
-def get_db_service() -> DBService:
-    return services.db_service
+    @property
+    def user_service(self) -> UserService:
+        if self._user_service is None:
+            self._user_service = UserService(self.db_service)
+        return self._user_service
 
-def get_user_service() -> UserService:
-    return services.user_service
+    @property
+    def ai_service(self) -> AIService:
+        if self._ai_service is None:
+            self._ai_service = AIService(self.db_service)
+        return self._ai_service
 
-def get_water_service() -> WaterService:
-    return services.water_service
+    @property
+    def water_service(self) -> WaterService:
+        if self._water_service is None:
+            self._water_service = WaterService(self.db_service)
+        return self._water_service
 
-def get_ai_service() -> AIService:
-    return services.ai_service
+    @property
+    def food_service(self) -> FoodService:
+        if self._food_service is None:
+            self._food_service = FoodService(self.db_service, self.ai_service)
+        return self._food_service
 
-def get_food_service() -> FoodService:
-    return services.food_service
+service_container: ServiceContainer | None = None
 
-def initialize_db_service(engine):
-    return DBService(engine)
+def initialize_services():
+    global service_container
+    engine = create_db_engine()
+    service_container = ServiceContainer(engine)
 
-def initialize_user_service(db_service: DBService):
-    return UserService(db_service)
-
-def initialize_water_service(db_service: DBService):
-    return WaterService(db_service)
-
-def initialize_ai_service():
-    return AIService()
-
-def initialize_food_service(db_service: DBService, ai_service: AIService):
-    return FoodService(db_service, ai_service)
+def get_services():
+    return service_container
 
 def create_db_engine():
     db_host = DBService.get_db_host()

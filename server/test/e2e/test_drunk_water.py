@@ -6,9 +6,9 @@ import random
 from pytest_bdd import given, when, then, parsers, scenarios
 
 from src.models.dto.water_request_dto import WaterRequestDTO
-from src.dependencies import get_db_service
+from src.dependencies import get_services
 from src.models.dto.water_response_dto import WaterResponseDTO
-from src.models.dto.water_statistic_request_dto import WaterStatisticRequestDTO
+from src.models.dto.statistic_request_dto import StatisticRequestDTO
 from src.services.water_service import WaterService
 
 scenarios("features/drunk_water.feature")
@@ -17,7 +17,7 @@ scenarios("features/drunk_water.feature")
 @given('remove data in table')
 def remove_water_data(states):
     if "user_id" in states:
-        get_db_service()._delete_drunk_water(states["user_id"])
+        get_services().db_service.delete_drunk_water(states["user_id"])
         states["data_exists"] = "false"
 
 
@@ -29,7 +29,6 @@ def add_water_data(states):
     if states.get("data_exists") == "true":
         return
 
-    print("add data in table")
     current_date = datetime.date(2025, 1, 1)
     end_date = datetime.date(2025, 12, 31)
 
@@ -38,15 +37,15 @@ def add_water_data(states):
 
     while current_date <= end_date:
         water = random.choice(water_values)
-        get_db_service().add_drunk_water(
+        get_services().db_service.add_drunk_water(
             user_id=states["user_id"],
             drunk_water=water,
-            now=current_date
+            _date=current_date
         )
         states["water_data"].append(
             WaterResponseDTO(
-                day=current_date,
-                drunk_water_day=water
+                day=current_date.isoformat(),
+                drunk_water=water
             )
         )
 
@@ -58,11 +57,11 @@ def add_water_data(states):
 @given(parsers.cfparse("today user already drank {water_drunk:d} ml"))
 def add_water_today(states, water_drunk):
     day = datetime.date.today()
-    states["day_water"] = [WaterResponseDTO(day=day,drunk_water_day=water_drunk)]
-    get_db_service().add_drunk_water(
+    states["day_water"] = [WaterResponseDTO(day=day.isoformat(), drunk_water=water_drunk)]
+    get_services().db_service.add_drunk_water(
         user_id=states["user_id"],
         drunk_water=water_drunk,
-        now=day
+        _date=day
     )
 
 
@@ -118,7 +117,8 @@ def get_daily_stats(client, states):
     async def inner():
         response = await client.post(
             "/water/statistic/day",
-            json=WaterStatisticRequestDTO(user_id=user_id, day=datetime.date.today())
+            json=StatisticRequestDTO(user_id=user_id,
+                                     statistic_date_str=datetime.date.today().strftime("%d_%m_%Y"))
             .model_dump(mode="json")
         )
         states["response"] = response
@@ -134,7 +134,7 @@ def get_weekly_stats(client, states):
     async def inner():
         response = await client.post(
             "/water/statistic/week",
-            json=WaterStatisticRequestDTO(user_id=user_id, week=states["week"])
+            json=StatisticRequestDTO(user_id=user_id, statistic_date_str=states["week"].strftime("%d_%m_%Y"))
             .model_dump(mode="json")
         )
         states["response"] = response
@@ -150,7 +150,7 @@ def get_monthly_stats(client, states):
     async def inner():
         response = await client.post(
             "/water/statistic/month",
-            json=WaterStatisticRequestDTO(user_id=user_id, month=states["month"])
+            json=StatisticRequestDTO(user_id=user_id, statistic_date_str=states["month"].strftime("%d_%m_%Y"))
             .model_dump(mode="json")
         )
         states["response"] = response
@@ -166,7 +166,7 @@ def get_yearly_stats(client, states):
     async def inner():
         response = await client.post(
             "/water/statistic/year",
-            json=WaterStatisticRequestDTO(user_id=user_id, year=states["year"])
+            json=StatisticRequestDTO(user_id=user_id, statistic_date=states["year"])
             .model_dump(mode="json")
         )
         states["response"] = response
@@ -207,4 +207,4 @@ def stats(states, type_statistic):
     state_water = states.get(key)
     for idx in range(len(body)):
         assert body[idx].get("day") == state_water[idx].day.isoformat()
-        assert body[idx].get("drunk_water_day") == state_water[idx].drunk_water_day
+        assert body[idx].get("drunk_water_day") == state_water[idx].drunk_water

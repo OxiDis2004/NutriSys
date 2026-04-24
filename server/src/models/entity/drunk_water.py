@@ -1,6 +1,5 @@
 import datetime
-from decimal import Decimal
-from sqlalchemy import DECIMAL, ForeignKey, DATE
+from sqlalchemy import ForeignKey, DATE, INTEGER
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.entity.base import Base
@@ -10,7 +9,7 @@ class DrunkWater(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
     user_id: Mapped[str] = mapped_column(ForeignKey("user.id"), nullable=False)
-    water: Mapped[Decimal] = mapped_column(DECIMAL(5, 2), nullable=False)
+    water: Mapped[int] = mapped_column(INTEGER, nullable=False)
     date: Mapped[datetime.date] = mapped_column(DATE, nullable=False)
 
     user: Mapped["User"] = relationship(

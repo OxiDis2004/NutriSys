@@ -1,41 +1,78 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { RouterLink } from 'vue-router'
+
+import { ref } from 'vue'
+import StartView from '@/views/StartView.vue'
+import RecommendedView from '@/views/RecommendedView.vue'
+
+const isOpen = ref(false)
+
+const toggleMenu = () => {
+  isOpen.value = !isOpen.value
+}
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+    <nav>
+      <!-- Mobile toggle button -->
+      <button class="menu-toggle" @click="toggleMenu">☰ Menu</button>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
+      <!-- Links -->
+      <div :class="['nav-links', { open: isOpen }]">
+        <RouterLink to="/#start">Start</RouterLink>
+        <RouterLink to="/#recommendation">Recommendation</RouterLink>
+        <RouterLink to="/#food-statistic">Food statistic</RouterLink>
+        <RouterLink to="/#water-statistic">Water statistic</RouterLink>
+        <RouterLink to="/#food-history">Food history</RouterLink>
+        <RouterLink to="/#settings">Settings</RouterLink>
+      </div>
+    </nav>
   </header>
 
-  <RouterView />
+  <main>
+    <StartView />
+    <RecommendedView />
+  </main>
 </template>
 
 <style scoped>
 header {
-  line-height: 1.5;
-  max-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+main {
+  width: 1120px;
+  top: 0;
+  left: 0;
 }
 
 nav {
+  display: flex;
   width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Toggle button (hidden on desktop) */
+.menu-toggle {
+  display: none;
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Links container */
+.nav-links {
+  display: flex;
 }
 
 nav a.router-link-exact-active {
@@ -56,21 +93,11 @@ nav a:first-of-type {
   border: 0;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
+/* Desktop */
+@media (min-width: 777px) {
+  .nav-links {
+    flex-direction: row;
+    justify-content: center;
   }
 
   nav {
@@ -80,6 +107,38 @@ nav a:first-of-type {
 
     padding: 1rem 0;
     margin-top: 1rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 776px) {
+  .menu-toggle {
+    display: block;
+    color: var(--color-text);
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+    background: var(--color-background);
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-links a {
+    margin: 0;
+    padding: 1.2rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  main {
+    width: 100%;
+    position: fixed;
+    padding-top: 60px;
   }
 }
 </style>

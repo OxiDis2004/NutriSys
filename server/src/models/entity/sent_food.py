@@ -12,10 +12,19 @@ class SentFood(Base):
     food_id: Mapped[str] = mapped_column(ForeignKey("food.id"), nullable=False)
     image_id: Mapped[str] = mapped_column(String(40), nullable=True)
     date: Mapped[datetime.datetime] = mapped_column(DATETIME, nullable=False)
+    weight: Mapped[int] = mapped_column(nullable=True)
 
-    user: Mapped["User"] = relationship("User", back_populates="sent_food")
-    food: Mapped["Food"] = relationship("Food", back_populates="sent_foods")
+    user: Mapped['User'] = relationship("User", back_populates="sent_food")
+    food: Mapped['Food'] = relationship("Food", back_populates="sent_foods")
 
     def __repr__(self) -> str:
-        return (f"Sent_food_from_user(id={self.id!r}, user_id={self.user_id!r}, "
-                f"food_id={self.food_id!r}, date={self.date!r})")
+        return (
+            f"Sent_food_from_user("
+            f"id={self.id!r}, "
+            f"user_id={self.user_id!r}, "
+            f"food_id={self.food_id!r}, "
+            f"image_id={self.image_id!r}, "
+            f"date={self.date!r}, "
+            f"weight={self.weight!r}"
+            f")"
+        )

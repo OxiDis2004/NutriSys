@@ -1,15 +1,21 @@
-FROM python:3.13.9-alpine3.22
+FROM python:3.12-slim
 LABEL authors="Denys Ponomarenko"
 
 WORKDIR /server
 
-COPY requirements.txt .
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
+COPY ./server/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./src ./src
+COPY ./dynamic-det/pyproject.toml ./dynamic-det/
+COPY ./dynamic-det/dynamic_det ./dynamic-det/dynamic_det
+RUN pip install --no-cache-dir -v ./dynamic-det
 
-COPY ./test ./test
+COPY ./server/src ./src
+
+COPY ./server/test ./test
 
 EXPOSE 8000
 
