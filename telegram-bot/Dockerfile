@@ -1,7 +1,7 @@
 FROM python:3.13.9-alpine3.22
 LABEL authors="Denys Ponomarenko"
 
-WORKDIR telegram-bot
+WORKDIR /telegram-bot
 
 COPY requirements.txt .
 
@@ -11,4 +11,4 @@ COPY ./src ./src
 
 COPY ./test ./test
 
-CMD ["python", "./src/main.py"]
+CMD ["python", "-m", "src.main"]
