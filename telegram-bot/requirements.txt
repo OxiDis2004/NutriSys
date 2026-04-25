@@ -2,3 +2,6 @@ aiogram
 requests
 matplotlib
 httpx
+ruff
+mypy
+pre-commit

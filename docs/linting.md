@@ -25,19 +25,59 @@
 
 - Активувати віртуальне середовище Python:
 
-        .\server\.venv\Scripts\activate
+    ```bash
+    .\server\.venv\Scripts\activate
 
 - Виконати перевірку:
 
-       ruff check server
+    ```bash
+    ruff check server
 
 Для телеграм боту:
 
 - Активувати віртуальне середовище Python:
 
-        .\telegram-bot\.venv\Scripts\activate
+    ```bash
+    .\telegram-bot\.venv\Scripts\activate
 
 - Виконати перевірку:
 
-       ruff check telegram-bot
+    ```bash
+    ruff check telegram-bot
 
+## CI/CD, Git Hooks, Static Typing та Build Process
+
+### Git Hooks (pre-commit)
+
+У проєкті використовується `pre-commit` для автоматичної перевірки якості коду перед створенням коміту.
+
+#### Встановлення
+
+    pip install pre-commit
+    pre-commit install
+
+#### Запуск вручну
+
+    pre-commit run --all-files
+
+### Інтеграція з процесом збірки
+
+Усі перевірки об’єднані в `Makefile`, щоб локальна і CI логіка була однаковою.
+
+#### Локальна перевірка
+
+    make check
+
+### CI/CD (GitHub Actions)
+
+CI використовує `Makefile` як єдине джерело правди.
+
+### Статична типізація
+
+#### Python (mypy)
+
+Використовується строгий режим перевірки типів.
+
+#### Запуск
+
+    mypy .

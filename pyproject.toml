@@ -1,7 +1,7 @@
 [tool.ruff]
 line-length = 88
 indent-width = 4
-target-version = "py313"
+target-version = "py312"
 extend-exclude = [
     ".git",
     ".idea",
