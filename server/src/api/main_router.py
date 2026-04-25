@@ -9,7 +9,9 @@ async def index():
     return Response(content="Hello world")
 
 @router.get("/db_health")
-async def db_health_check(services: ServiceContainer = Depends(get_services)):
+async def db_health_check(
+        services: ServiceContainer = Depends(get_services)  # noqa: B008
+):
     try:
         services.db_service.check_health()
         return Response(content="Healthy")

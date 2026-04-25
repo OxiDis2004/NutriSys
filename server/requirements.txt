@@ -12,6 +12,9 @@ pymysql
 cryptography
 pillow
 opencv-python-headless
+ruff
+mypy
+pre-commit
 
 #torchvision
 #torchaudio

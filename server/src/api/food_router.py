@@ -11,7 +11,7 @@ router = APIRouter(prefix="/api/food")
 @router.put("/add", response_model=SentFoodResponseDTO)
 async def add_food(
         send_food_dto: SentFoodRequestDTO,
-        services: ServiceContainer = Depends(get_services)
+        services: ServiceContainer = Depends(get_services)  # noqa: B008
 ):
     return services.food_service.sent_food(send_food_dto)
 
@@ -19,6 +19,6 @@ async def add_food(
 async def statistic_food(
         period: PeriodType,
         statistic_dto: StatisticRequestDTO,
-        services: ServiceContainer = Depends(get_services)
+        services: ServiceContainer = Depends(get_services)  # noqa: B008
 ):
     return services.food_service.statistic(statistic_dto, period)
