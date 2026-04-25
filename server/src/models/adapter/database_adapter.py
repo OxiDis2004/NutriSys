@@ -1,5 +1,5 @@
 from sqlalchemy import Engine, inspect
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 
 class DBAdapter:
@@ -22,9 +22,9 @@ class DBAdapter:
             try:
                 curr_session.execute(stmt)
                 curr_session.commit()
-            except:
+            except Exception as err:
                 curr_session.rollback()
-                raise Exception("Error committing statement")
+                raise Exception("Error committing statement") from err
 
     def get_pk_constraint_of_table(self, tablename):
         _inspect = inspect(self.engine)
@@ -32,14 +32,7 @@ class DBAdapter:
 
     def init_db(self):
         from src.models.entity.base import Base
-        from src.models.entity import (
-            language,
-            user,
-            user_info,
-            food,
-            drunk_water,
-            sent_food,
-        )
+
         Base.metadata.create_all(self.engine)
 
     def close_session(self):

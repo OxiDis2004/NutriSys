@@ -1,7 +1,7 @@
 import asyncio
 from datetime import date
 
-from pytest_bdd import when, parsers, then, scenarios, given
+from pytest_bdd import given, parsers, scenarios, then, when
 
 from src.dependencies import get_services
 from src.models.dto.user_dto import UserDTO
@@ -10,6 +10,7 @@ from src.models.property.activity import Activity
 from src.models.property.goal import Goal
 
 scenarios("features/user_profile_personalization.feature")
+
 
 @given(parsers.cfparse('system has language "{language}"'))
 def step_impl(language):
@@ -20,21 +21,26 @@ def step_impl(language):
 
     get_services().db_service.add_language(language)
 
-@when(parsers.cfparse(
-    'user with telegram id "{telegram_id}" updates profile language to "{language}"'
-))
+
+@when(
+    parsers.cfparse(
+        'user with telegram id "{telegram_id}" updates profile language to "{language}"'
+    )
+)
 def update_language(client, states, telegram_id, language):
-    user_id = states["user_id"] if "user_id" in states else None
-    states["user_data"] = UserDTO(id=user_id, telegram_id=telegram_id, language=language)
+    user_id = states.get("user_id", None)
+    states["user_data"] = UserDTO(
+        id=user_id, telegram_id=telegram_id, language=language
+    )
 
     async def inner():
         response = await client.put(
-            "/user/change_language",
-            json=states["user_data"].model_dump(mode="json")
+            "/user/change_language", json=states["user_data"].model_dump(mode="json")
         )
         states["response"] = response
 
     asyncio.run(inner())
+
 
 @then(parsers.cfparse('user profile language should be "{language}"'))
 def check_update(states):
@@ -48,16 +54,22 @@ def check_update(states):
 
 @when("user update profile information")
 def update_information(client, states):
-    user_id = states["user_id"] if "user_id" in states else None
-    user_info: UserInfoDTO = UserInfoDTO(id=user_id, name="Denys", lastname="Ponomarenko",
-                                         birthday=date(2005, 1, 6), weight=100, height=182, sex='m',
-                                         activity=Activity.HighActivity, goal=Goal.LoseWeight
-                                         )
+    user_id = states.get("user_id", None)
+    user_info: UserInfoDTO = UserInfoDTO(
+        id=user_id,
+        name="Denys",
+        lastname="Ponomarenko",
+        birthday=date(2005, 1, 6),
+        weight=100,
+        height=182,
+        sex="m",
+        activity=Activity.HighActivity,
+        goal=Goal.LoseWeight,
+    )
 
     async def inner():
         response = await client.put(
-            "/user/update_info",
-            json=user_info.model_dump(mode="json")
+            "/user/update_info", json=user_info.model_dump(mode="json")
         )
         states["response"] = response
 

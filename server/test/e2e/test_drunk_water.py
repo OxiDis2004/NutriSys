@@ -1,27 +1,26 @@
-import datetime
-
 import asyncio
+import datetime
 import random
 
-from pytest_bdd import given, when, then, parsers, scenarios
+from pytest_bdd import given, parsers, scenarios, then, when
 
-from src.models.dto.water_request_dto import WaterRequestDTO
 from src.dependencies import get_services
-from src.models.dto.water_response_dto import WaterResponseDTO
 from src.models.dto.statistic_request_dto import StatisticRequestDTO
+from src.models.dto.water_request_dto import WaterRequestDTO
+from src.models.dto.water_response_dto import WaterResponseDTO
 from src.services.water_service import WaterService
 
 scenarios("features/drunk_water.feature")
 
 
-@given('remove data in table')
+@given("remove data in table")
 def remove_water_data(states):
     if "user_id" in states:
         get_services().db_service.delete_drunk_water(states["user_id"])
         states["data_exists"] = "false"
 
 
-@given('add data in table')
+@given("add data in table")
 def add_water_data(states):
     if "user_id" not in states:
         return
@@ -38,15 +37,10 @@ def add_water_data(states):
     while current_date <= end_date:
         water = random.choice(water_values)
         get_services().db_service.add_drunk_water(
-            user_id=states["user_id"],
-            drunk_water=water,
-            _date=current_date
+            user_id=states["user_id"], drunk_water=water, _date=current_date
         )
         states["water_data"].append(
-            WaterResponseDTO(
-                day=current_date.isoformat(),
-                drunk_water=water
-            )
+            WaterResponseDTO(day=current_date.isoformat(), drunk_water=water)
         )
 
         current_date += datetime.timedelta(days=1)
@@ -57,11 +51,11 @@ def add_water_data(states):
 @given(parsers.cfparse("today user already drank {water_drunk:d} ml"))
 def add_water_today(states, water_drunk):
     day = datetime.date.today()
-    states["day_water"] = [WaterResponseDTO(day=day.isoformat(), drunk_water=water_drunk)]
+    states["day_water"] = [
+        WaterResponseDTO(day=day.isoformat(), drunk_water=water_drunk)
+    ]
     get_services().db_service.add_drunk_water(
-        user_id=states["user_id"],
-        drunk_water=water_drunk,
-        _date=day
+        user_id=states["user_id"], drunk_water=water_drunk, _date=day
     )
 
 
@@ -72,8 +66,7 @@ def add_water_in_week(states):
     water_data: list[WaterResponseDTO] = states["water_data"]
     period = WaterService.get_week(current_day)
     states["week_water"] = [
-        d for d in water_data
-        if period.start_date <= d.day <= period.end_date
+        d for d in water_data if period.start_date <= d.day <= period.end_date
     ]
 
 
@@ -84,8 +77,7 @@ def add_water_in_month(states):
     water_data: list[WaterResponseDTO] = states["water_data"]
     period = WaterService.get_month(current_day)
     states["month_water"] = [
-        d for d in water_data
-        if period.start_date <= d.day <= period.end_date
+        d for d in water_data if period.start_date <= d.day <= period.end_date
     ]
 
 
@@ -97,13 +89,14 @@ def add_water_in_year(states):
 
 @when(parsers.cfparse("I add {water_drunk:d} ml of water"))
 def add_water_api(client, states, water_drunk):
-    user_id = states["user_id"] if "user_id" in states else None
+    user_id = states.get("user_id", None)
 
     async def inner():
         response = await client.put(
             "/water/add",
-            json=WaterRequestDTO(user_id=user_id, drunk_water=water_drunk)
-            .model_dump(mode="json")
+            json=WaterRequestDTO(user_id=user_id, drunk_water=water_drunk).model_dump(
+                mode="json"
+            ),
         )
         states["response"] = response
 
@@ -112,65 +105,68 @@ def add_water_api(client, states, water_drunk):
 
 @when("get daily statistic")
 def get_daily_stats(client, states):
-    user_id = states["user_id"] if "user_id" in states else None
+    user_id = states.get("user_id", None)
 
     async def inner():
         response = await client.post(
             "/water/statistic/day",
-            json=StatisticRequestDTO(user_id=user_id,
-                                     statistic_date_str=datetime.date.today().strftime("%d_%m_%Y"))
-            .model_dump(mode="json")
+            json=StatisticRequestDTO(
+                user_id=user_id,
+                statistic_date=datetime.date.today(),
+            ).model_dump(mode="json"),
         )
         states["response"] = response
-        print(response)
 
     asyncio.run(inner())
 
 
 @when("get weekly statistic")
 def get_weekly_stats(client, states):
-    user_id = states["user_id"] if "user_id" in states else None
+    user_id = states.get("user_id", None)
 
     async def inner():
         response = await client.post(
             "/water/statistic/week",
-            json=StatisticRequestDTO(user_id=user_id, statistic_date_str=states["week"].strftime("%d_%m_%Y"))
-            .model_dump(mode="json")
+            json=StatisticRequestDTO(
+                user_id=user_id,
+                statistic_date=states["week"].strftime("%d_%m_%Y")
+            ).model_dump(mode="json"),
         )
         states["response"] = response
-        print(response)
 
     asyncio.run(inner())
 
 
 @when("get monthly statistic")
 def get_monthly_stats(client, states):
-    user_id = states["user_id"] if "user_id" in states else None
+    user_id = states.get("user_id", None)
 
     async def inner():
         response = await client.post(
             "/water/statistic/month",
-            json=StatisticRequestDTO(user_id=user_id, statistic_date_str=states["month"].strftime("%d_%m_%Y"))
-            .model_dump(mode="json")
+            json=StatisticRequestDTO(
+                user_id=user_id,
+                statistic_date=states["month"].strftime("%d_%m_%Y")
+            ).model_dump(mode="json"),
         )
         states["response"] = response
-        print(response)
 
     asyncio.run(inner())
 
 
 @when("get yearly statistic")
 def get_yearly_stats(client, states):
-    user_id = states["user_id"] if "user_id" in states else None
+    user_id = states.get("user_id", None)
 
     async def inner():
         response = await client.post(
             "/water/statistic/year",
-            json=StatisticRequestDTO(user_id=user_id, statistic_date=states["year"])
-            .model_dump(mode="json")
+            json=StatisticRequestDTO(
+                user_id=user_id,
+                statistic_date=states["year"]
+            ).model_dump(mode="json"),
         )
         states["response"] = response
-        print(response)
 
     asyncio.run(inner())
 
@@ -186,19 +182,19 @@ def stats(states, type_statistic):
     body = states.get("response").json()
 
     match type_statistic:
-        case 'daily':
+        case "daily":
             min_count = 1
             max_count = 1
             key = "day_water"
-        case 'weekly':
+        case "weekly":
             min_count = 1
             max_count = 7
             key = "week_water"
-        case 'monthly':
+        case "monthly":
             min_count = 1
             max_count = 31
             key = "month_water"
-        case 'yearly':
+        case "yearly":
             min_count = 1
             max_count = 365
             key = "year_water"

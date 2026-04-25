@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.params import Depends
 
-from src.api import main_router, user_router, water_router, food_router
+from src.api import food_router, main_router, user_router, water_router
 from src.api.limit_request import LimitRequestSizeMiddleware
 from src.api.rate_limiter import rate_limiter
 from src.dependencies import initialize_services

@@ -1,7 +1,6 @@
 from collections import defaultdict
 from datetime import date, timedelta
 from enum import Enum
-from typing import Type
 
 
 class Period:
@@ -18,7 +17,7 @@ class Period:
         return self._end_date.isoformat()
 
     def period_dict(self, default_value, step_month: bool = False) -> dict:
-        result = defaultdict(Type[default_value])
+        result = defaultdict(type[default_value])
         current = self._start_date
 
         while current <= self._end_date:
@@ -33,6 +32,7 @@ class Period:
                 current += timedelta(days=1)
 
         return result
+
 
 class PeriodType(Enum):
     DAY = "day"

@@ -1,5 +1,5 @@
-from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi import Request, Response
+from starlette.middleware.base import BaseHTTPMiddleware
 
 
 class LimitRequestSizeMiddleware(BaseHTTPMiddleware):
@@ -11,7 +11,6 @@ class LimitRequestSizeMiddleware(BaseHTTPMiddleware):
         body = await request.body()
         if len(body) > self.max_upload_size:
             return Response(
-                status_code=413,
-                content={"detail": "Request body too large"}
+                status_code=413, content={ "detail": "Request body too large" }
             )
         return await call_next(request)

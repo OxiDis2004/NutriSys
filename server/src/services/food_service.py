@@ -1,12 +1,12 @@
 import uuid
-from typing import override, Any
+from typing import Any, override
 from uuid import UUID
 
 from fastapi import HTTPException
-from sqlalchemy import Sequence, Row
+from sqlalchemy import Row, Sequence
 
-from src.models.dto.sent_food_response_dto import SentFoodResponseDTO
 from src.models.dto.sent_food_request_dto import SentFoodRequestDTO
+from src.models.dto.sent_food_response_dto import SentFoodResponseDTO
 from src.models.property.detected_food import DetectedFood
 from src.models.property.food_statistic import FoodStatistic
 from src.models.property.period import Period
@@ -54,7 +54,9 @@ class FoodService(StatisticService):
         return FoodStatistic()
 
     @override
-    def _update_dict_value(self, dict_value: FoodStatistic, new_value: FoodStatistic) -> Any:
+    def _update_dict_value(
+            self, dict_value: FoodStatistic, new_value: FoodStatistic
+    ) -> Any:
         return dict_value.update(new_value)
 
     @override
@@ -63,13 +65,13 @@ class FoodService(StatisticService):
 
     @override
     def _wrap_func(self, result: dict) -> list[SentFoodResponseDTO]:
-        return [
-            SentFoodResponseDTO(day=key, statistic=value) for key, value in result
-        ]
+        return [SentFoodResponseDTO(day=key, statistic=value) for key, value in result]
 
     @staticmethod
-    def get_food_nutrient_by_mass(detected_foods: list[DetectedFood], nutrients: dict[str, FoodStatistic]):
-        for food_name in nutrients.keys():
+    def get_food_nutrient_by_mass(
+            detected_foods: list[DetectedFood], nutrients: dict[str, FoodStatistic]
+    ):
+        for food_name in nutrients:
             mass = 0
             for detected_food in detected_foods:
                 if food_name == detected_food.label:

@@ -8,17 +8,9 @@ from src.models.property.goal import Goal
 
 LANGUAGES = ("ua", "en", "de")
 
-USER: UserDTO = UserDTO(
-    id=uuid.uuid4(),
-    telegram_id=123456789,
-    language=LANGUAGES[0]
-)
+USER: UserDTO = UserDTO(id=uuid.uuid4(), telegram_id=123456789, language=LANGUAGES[0])
 
-USER2: UserDTO = UserDTO(
-    id=uuid.uuid4(),
-    telegram_id=123454321,
-    language=LANGUAGES[1]
-)
+USER2: UserDTO = UserDTO(id=uuid.uuid4(), telegram_id=123454321, language=LANGUAGES[1])
 
 USER_INFO: UserInfoDTO = UserInfoDTO(
     id=USER.id,
@@ -27,7 +19,7 @@ USER_INFO: UserInfoDTO = UserInfoDTO(
     birthday=date(2005, 1, 6),
     weight=100,
     height=182,
-    sex='m',
+    sex="m",
     activity=Activity.HighActivity,
-    goal=Goal.LoseWeight
+    goal=Goal.LoseWeight,
 )

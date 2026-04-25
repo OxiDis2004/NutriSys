@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, String, DATETIME, Integer
-from sqlalchemy.orm import Mapped, relationship, mapped_column
+from sqlalchemy import DATETIME, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.entity.base import Base
 
@@ -9,7 +9,9 @@ from src.models.entity.base import Base
 class UserInfo(Base):
     __tablename__ = "user_info"
 
-    user_id: Mapped[str] = mapped_column(ForeignKey("user.id"), primary_key=True, unique=True, nullable=False)
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("user.id"), primary_key=True, unique=True, nullable=False
+    )
     name: Mapped[str] = mapped_column(String(55), nullable=True)
     lastname: Mapped[str] = mapped_column(String(55), nullable=True)
     birthday: Mapped[datetime] = mapped_column(DATETIME, nullable=True)

@@ -8,11 +8,10 @@ from test import LANGUAGES, USER
 
 
 class BaseTestService:
-
     @pytest.fixture(scope="function", autouse=True)
     def setup_database(self):
         engine_mock = create_engine(
-            f"sqlite:///:memory:",
+            "sqlite:///:memory:",
             connect_args={"check_same_thread": False},
         )
         self.db_service = DBService(engine_mock)

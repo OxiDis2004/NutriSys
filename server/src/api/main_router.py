@@ -1,16 +1,18 @@
 from fastapi import APIRouter, Depends, Response
 
-from src.dependencies import get_services, ServiceContainer
+from src.dependencies import ServiceContainer, get_services
 
 router = APIRouter(prefix="/api")
+
 
 @router.get("/")
 async def index():
     return Response(content="Hello world")
 
+
 @router.get("/db_health")
 async def db_health_check(
-        services: ServiceContainer = Depends(get_services)  # noqa: B008
+        services: ServiceContainer = Depends(get_services),  # noqa: B008
 ):
     try:
         services.db_service.check_health()

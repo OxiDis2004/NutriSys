@@ -1,6 +1,7 @@
 from datetime import datetime
-from sqlalchemy import String, ForeignKey, DATETIME
-from sqlalchemy.orm import mapped_column, Mapped, relationship
+
+from sqlalchemy import DATETIME, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.entity.base import Base
 from src.models.entity.drunk_water import DrunkWater
@@ -14,9 +15,7 @@ class User(Base):
     language_id: Mapped[int] = mapped_column(ForeignKey("language.id"), nullable=False)
     last_activity: Mapped[datetime] = mapped_column(DATETIME, nullable=False)
 
-    language: Mapped["Language"] = relationship(
-        "Language", back_populates="users"
-    )
+    language: Mapped["Language"] = relationship("Language", back_populates="users")
 
     info: Mapped["UserInfo"] = relationship(
         "UserInfo", back_populates="user", cascade="all, delete-orphan"
@@ -31,7 +30,7 @@ class User(Base):
     )
 
     def __repr__(self) -> str:
-        lang = self.language.iso if self.language else 'uk'
+        lang = self.language.iso if self.language else "uk"
         return (
             f"User(id={self.id!r}, telegram_id={self.telegram_id!r}, "
             f"language={lang!r}, last_activity={self.last_activity!r})"

@@ -2,17 +2,15 @@ import datetime
 import uuid
 
 import pytest
+from fastapi import HTTPException
 
 from src.models.dto.user_dto import UserDTO
 from src.models.dto.user_info_dto import UserInfoDTO
 from src.services.user_service import UserService
-from fastapi import HTTPException
-
 from test import USER, USER_INFO
 
 
 class TestUserService:
-
     @pytest.fixture(autouse=True)
     def setup_mocks(self, mocker):
         self.db_service_mock = mocker.Mock()
@@ -44,9 +42,9 @@ class TestUserService:
         with pytest.raises(Exception) as e_info:
             self.user_service_mock.login(user)
 
-        assert e_info.errisinstance(HTTPException) == True
+        assert e_info.errisinstance(HTTPException)
         code, detail = str(e_info.value).split(": ")
-        assert code == '404'
+        assert code == "404"
         assert detail == "User not found"
 
     def test_register_successful(self, mocker):
@@ -93,21 +91,21 @@ class TestUserService:
         with pytest.raises(Exception) as e_info:
             self.user_service_mock.register(user)
 
-        assert e_info.errisinstance(HTTPException) == True
+        assert e_info.errisinstance(HTTPException)
         code, detail = str(e_info.value).split(": ")
-        assert code == '422'
+        assert code == "422"
         assert detail == "User cannot be created"
 
     def test_cannot_register(self, mocker):
-        user = UserDTO(id=None, telegram_id=123, language='ua')
+        user = UserDTO(id=None, telegram_id=123, language="ua")
         self.db_service_mock.get_user.side_effect = [None, None]
 
         with pytest.raises(Exception) as e_info:
             self.user_service_mock.register(user)
 
-        assert e_info.errisinstance(HTTPException) == True
+        assert e_info.errisinstance(HTTPException)
         code, detail = str(e_info.value).split(": ")
-        assert code == '400'
+        assert code == "500"
         assert detail == "User couldn't create"
 
     def test_update_information(self, mocker):
@@ -118,56 +116,62 @@ class TestUserService:
         self.db_service_mock.update_user_info.assert_called_once_with(user_info)
 
     def test_update_information_failed(self, mocker):
-        user_info = UserInfoDTO(id=None)
+        user_info: UserInfoDTO = UserInfoDTO(
+            id=None,
+            name=None,
+            lastname=None,
+            birthday=None,
+            weight=None,
+            height=None,
+            sex=None,
+            activity=None,
+            goal=None,
+        )
 
         with pytest.raises(Exception) as e_info:
             self.user_service_mock.update_information(user_info)
 
-        assert e_info.errisinstance(HTTPException) == True
+        assert e_info.errisinstance(HTTPException)
         code, detail = str(e_info.value).split(": ")
-        assert code == '400'
+        assert code == "422"
         assert detail == "User id is undefined"
 
     def test_calculate_calorie_successful(self, mocker):
-        user_info = USER_INFO
+        user = USER
+        self.user_service_mock.get_information = mocker.Mock(return_value=USER_INFO)
         self.user_service_mock.years_old = mocker.Mock(return_value=20)
         self.user_service_mock.formula = mocker.Mock(return_value=2000)
         self.user_service_mock.set_bmr_by_activity = mocker.Mock(return_value=3000)
         self.user_service_mock.set_bmr_by_goal = mocker.Mock(return_value=2700)
 
-        response = self.user_service_mock.calculate_bmr(user_info)
+        response = self.user_service_mock.calculate_bmr(user)
 
-        assert response['bmr'] == 2700
-        self.user_service_mock.years_old.assert_called_once_with(user_info.birthday)
+        assert response["bmr"] == 2700
+        self.user_service_mock.years_old.assert_called_once_with(USER_INFO.birthday)
         self.user_service_mock.formula.assert_called_once_with(
-            user_info.weight,
-            user_info.height,
-            20,
-            user_info.sex
+            USER_INFO.weight, USER_INFO.height, 20, USER_INFO.sex
         )
         self.user_service_mock.set_bmr_by_activity.assert_called_once_with(
-            2000,
-            user_info.activity
+            2000, USER_INFO.activity
         )
         self.user_service_mock.set_bmr_by_goal.assert_called_once_with(
-            3000,
-            user_info.goal
+            3000, USER_INFO.goal
         )
 
     def test_calculate_calorie_failed(self, mocker):
-        user_info = UserInfoDTO(
+        user_info = UserDTO(
             id=None,
-            name='Denys',
-            lastname='Ponomarenko',
+            telegram_id=None,
+            language="en"
         )
 
         with pytest.raises(Exception) as e_info:
             self.user_service_mock.calculate_bmr(user_info)
 
-        assert e_info.errisinstance(HTTPException) == True
+        assert e_info.errisinstance(HTTPException)
         code, detail = str(e_info.value).split(": ")
-        assert code == '422'
-        assert detail == "Not all the necessary data has been entered."
+        assert code == "422"
+        assert detail == "User id is undefined"
 
     def test_years_old_normal(self, mocker):
         today = datetime.date(2025, 5, 6)

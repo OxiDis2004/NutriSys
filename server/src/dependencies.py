@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine
+
 from src.models.adapter.database_adapter import DBAdapter
 from src.services.ai_service import AIService
 from src.services.db_service import DBService
@@ -8,11 +9,11 @@ from src.services.water_service import WaterService
 
 
 class ServiceContainer:
-    _db_service: DBService | None = None
-    _user_service: UserService | None = None
-    _water_service: WaterService | None = None
-    _ai_service: AIService | None = None
-    _food_service: FoodService | None = None
+    _db_service: DBService = None
+    _user_service: UserService = None
+    _water_service: WaterService = None
+    _ai_service: AIService = None
+    _food_service: FoodService = None
 
     def __init__(self, engine):
         self._engine = engine
@@ -48,15 +49,19 @@ class ServiceContainer:
             self._food_service = FoodService(self.db_service, self.ai_service)
         return self._food_service
 
+
 service_container: ServiceContainer | None = None
+
 
 def initialize_services():
     global service_container
     engine = create_db_engine()
     service_container = ServiceContainer(engine)
 
+
 def get_services():
     return service_container
+
 
 def create_db_engine():
     db_host = DBService.get_db_host()

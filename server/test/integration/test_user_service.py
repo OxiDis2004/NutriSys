@@ -9,7 +9,6 @@ from test.integration import BaseTestService
 
 
 class TestUserService(BaseTestService):
-
     @pytest.fixture(scope="function", autouse=True)
     def setup_service(self, setup_database):
         self.user_service = UserService(self.db_service)
@@ -18,11 +17,7 @@ class TestUserService(BaseTestService):
 
     def test_login(self, initialize_language, initialize_user):
         received_user = self.user_service.login(
-            UserDTO(
-                id=None,
-                telegram_id=USER.telegram_id,
-                language=USER.language
-            )
+            UserDTO(id=None, telegram_id=USER.telegram_id, language=USER.language)
         )
         assert received_user.id == USER.user_id
         assert received_user.telegram_id == USER.telegram_id
@@ -30,11 +25,7 @@ class TestUserService(BaseTestService):
 
     def test_register(self, initialize_language):
         registered_user = self.user_service.register(
-            UserDTO(
-                id=None,
-                telegram_id=USER.telegram_id,
-                language=USER.language
-            )
+            UserDTO(id=None, telegram_id=USER.telegram_id, language=USER.language)
         )
         assert USER.id is not None
         assert registered_user.telegram_id == USER.telegram_id
@@ -46,7 +37,11 @@ class TestUserService(BaseTestService):
 
     def test_login_failed(self):
         with pytest.raises(Exception) as e_info:
-            self.user_service.login(UserDTO(id=None, telegram_id=(USER.telegram_id - 1), language=USER.language))
+            self.user_service.login(
+                UserDTO(
+                    id=None, telegram_id=(USER.telegram_id - 1), language=USER.language
+                )
+            )
 
         assert e_info.errisinstance(HTTPException)
         assert e_info.value.status_code == 404
@@ -55,11 +50,7 @@ class TestUserService(BaseTestService):
     def test_register_failed(self, initialize_language, initialize_user):
         with pytest.raises(Exception) as e_info:
             self.user_service.register(
-                UserDTO(
-                    id=None,
-                    telegram_id=USER.telegram_id,
-                    language=USER.language
-                )
+                UserDTO(id=None, telegram_id=USER.telegram_id, language=USER.language)
             )
 
         assert e_info.errisinstance(HTTPException)
@@ -68,8 +59,20 @@ class TestUserService(BaseTestService):
         assert e_info.value.detail["user"] == USER.model_dump(mode="json")
 
     def test_update_information_failed(self, initialize_language):
+        user_info = UserInfoDTO(
+            id=None,
+            name=None,
+            lastname=None,
+            birthday=None,
+            weight=None,
+            height=None,
+            sex=None,
+            activity=None,
+            goal=None
+        )
+
         with pytest.raises(Exception) as e_info:
-            self.user_service.update_information(UserInfoDTO(id=None))
+            self.user_service.update_information(user_info)
 
         assert e_info.errisinstance(HTTPException)
         assert e_info.value.status_code == 400
