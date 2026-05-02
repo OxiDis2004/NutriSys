@@ -237,9 +237,6 @@ marimo/_lsp/
 __marimo__/
 /.idea/
 
-# local ignore
-/docker-compose.yml
-
 /dynamic-det/dataset
 /dynamic-det/converter.py
 /dynamic-det/runs/train/

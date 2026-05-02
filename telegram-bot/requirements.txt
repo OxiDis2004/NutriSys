@@ -1,6 +1,7 @@
 aiogram
 requests
 matplotlib
+numpy
 httpx
 ruff
 mypy

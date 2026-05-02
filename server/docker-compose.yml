@@ -21,7 +21,9 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-    build: .
+    build:
+      context: ..
+      dockerfile: ./server/Dockerfile
     container_name: server-cont
     ports:
       - "8000:8000"
@@ -31,6 +33,11 @@ services:
       DB_USER: root
       DB_PASSWORD: my_pass
       DB_DATABASE: nutri_system
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/db_health')" ]
+      interval: 60s
+      timeout: 3s
+      retries: 2
 
 volumes:
   mysql_data:

@@ -1,0 +1,92 @@
+version: "3.1"
+
+services:
+  mysql:
+    image: mysql:9.0.1-oraclelinux9
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysql", "-u${DB_USER}", "-p${DB_PASSWORD}", "-e", "USE ${DB_DATABASE};" ]
+      interval: 7s
+      timeout: 5s
+      retries: 10
+    networks:
+      default:
+        aliases:
+          - ${DB_HOST}
+
+  server:
+    depends_on:
+      mysql:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    container_name: server-cont
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./server/logs:/server/logs
+    environment:
+      - DB_HOST
+      - DB_PORT
+      - DB_USER
+      - DB_PASSWORD
+      - DB_DATABASE
+      - LOG_LEVEL
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/db_health')" ]
+    networks:
+      default:
+        aliases:
+          - ${SERVER_HOST}
+
+  telegram-bot:
+    depends_on:
+      server:
+        condition: service_healthy
+    build: ./telegram-bot/
+    container_name: telegram-bot
+    volumes:
+      - ./telegram-bot/logs:/telegram-bot/logs
+    environment:
+      - TELEGRAM_BOT_TOKEN
+      - SERVER_HOST
+
+  loki:
+    image: grafana/loki:3.2.0
+    container_name: loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    image: grafana/promtail:3.2.0
+    container_name: promtail
+    volumes:
+      - ./grafana/promtail-config.yml:/etc/promtail/config.yml
+      - ./server/logs:/logs/server:ro
+      - ./telegram-bot/logs:/logs/bot:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    depends_on:
+      - loki
+
+volumes:
+  mysql_data:
