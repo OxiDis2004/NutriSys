@@ -47,3 +47,84 @@ It combines computer vision, backend processing, and scalable infrastructure to 
     - Check services:
 
           kubectl get services
+
+### Running project as dev engineer
+
+#### 1. Requirements
+
+- git
+- python 3.12 <
+- docker
+- kubectl
+- helm
+
+#### 2. Project clone
+
+```bash
+git clone https://github.com/OxiDis2004/NutriSys.git
+cd NutriSys
+```
+
+#### 3. Project configuration
+
+##### 3.1 Main System Configuration File
+
+Create the following file in the user’s home directory:
+
+```bash
+touch ~/.nutri-system.properties
+```
+
+This file stores the primary confidential configuration values required for project startup
+
+Example structure:
+
+    TELEGRAM_BOT_TOKEN=your_telegram_token
+    GHCR_USERNAME=your_registry_username
+    GHCR_PASSWORD=your_registry_password
+
+##### 3.2 Separate Dependency Environments for Each Subproject
+
+Create a dedicated Python virtual environment for the backend server:
+
+```bash
+cd server
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Create a separate Python virtual environment for the Telegram bot:
+
+```bash
+cd telegram-bot
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Install Node.js dependencies for the web frontend:
+
+```bash
+cd web
+npm install
+```
+
+##### 3.3 Local `.env` File for Docker Compose
+
+For convenient local development and testing, create a file named:
+
+```bash
+touch .env
+```
+
+Basic config file:
+
+    DB_HOST=localhost
+    DB_PORT=3306
+    DB_NAME=nutrisys
+    DB_USER=nutrisys_user
+    DB_PASSWORD=strong_password
+
+    TELEGRAM_BOT_TOKEN=your_telegram_token
+    SERVER_HOST=server
