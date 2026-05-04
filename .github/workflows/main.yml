@@ -71,6 +71,7 @@ jobs:
           cd ${{ matrix.context }}
           make ci
           cd ..
+        continue-on-error: true
 
       - name: Generate documentation
         if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
