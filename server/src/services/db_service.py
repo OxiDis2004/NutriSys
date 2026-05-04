@@ -1,6 +1,5 @@
 import os
 from datetime import date, datetime
-from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy import Engine, Row, delete, func, select, text, update
@@ -20,11 +19,32 @@ from src.models.property.period import Period
 
 
 class DBService:
+    """Service for database access operations.
+
+    Provides methods for user, profile, language, water, food and statistic
+    persistence. SQLAlchemy statements are created here and executed through
+    DBAdapter.
+    """
+
     def __init__(self, engine: Engine):
+        """Initialize database service and database schema.
+
+        Args:
+            engine (Engine): SQLAlchemy engine connected to the application database.
+        """
         self.db = DBAdapter(engine)
         self.db.init_db()
 
     def get_user(self, telegram_id: int) -> Row:
+        """Return a user by Telegram identifier.
+
+        Args:
+            telegram_id (int): Telegram user identifier.
+
+        Returns:
+            Row: Row containing user id and language ISO code.
+        """
+
         stmt = (
             select(User.id.label("id"), Language.iso.label("iso"))
             .join(User.language)
@@ -41,6 +61,13 @@ class DBService:
         return self.db.fetch_one(stmt)
 
     def add_user(self, user: UserDTO, activity: datetime):
+        """Create a user and related empty profile record.
+
+        Args:
+            user (UserDTO): User data to insert.
+            activity (datetime): Initial last activity timestamp.
+        """
+
         stmt = insert(User).values(
             [
                 {
@@ -60,6 +87,8 @@ class DBService:
         self.db.commit(stmt)
 
     def initialize_languages(self):
+        """Ensure that all supported language ISO codes exist in the database."""
+
         isos = [row.iso for row in self.get_languages()]
 
         for iso in LANGUAGE_ISO:
@@ -67,6 +96,12 @@ class DBService:
                 self.add_language(iso)
 
     def update_user_language(self, user: UserDTO):
+        """Update the selected language of a user.
+
+        Args:
+            user (UserDTO): User data containing user id and language code.
+        """
+
         stmt = (
             update(User)
             .where(User.id == user.user_id)
@@ -92,6 +127,15 @@ class DBService:
         self.db.commit(stmt)
 
     def get_user_infos(self, user_ids: list[UUID]):
+        """Return profile information for multiple users.
+
+        Args:
+            user_ids (list[UUID]): List of internal user identifiers.
+
+        Returns:
+            Sequence[Row]: User profile rows.
+        """
+
         stmt = select(
             UserInfo.name.label("name"),
             UserInfo.lastname.label("lastname"),
@@ -104,6 +148,15 @@ class DBService:
         return self.db.fetch(stmt)
 
     def get_user_info(self, user_id: UUID):
+        """Return detailed profile information for one user.
+
+        Args:
+            user_id (UUID): Internal user identifier.
+
+        Returns:
+            Row: User profile row.
+        """
+
         stmt = select(
             UserInfo.user_id.label("id"),
             UserInfo.name.label("name"),
@@ -135,6 +188,16 @@ class DBService:
         self.db.commit(stmt)
 
     def get_drunk_water_interval(self, user_id: UUID, period: Period):
+        """Return water consumption grouped by date for a period.
+
+        Args:
+            user_id (UUID): Internal user identifier.
+            period (Period): Requested date interval.
+
+        Returns:
+            Sequence[Row]: Rows containing date and total water amount.
+        """
+
         stmt = (
             select(
                 DrunkWater.date.label("date"), func.sum(DrunkWater.water).label("water")
@@ -148,12 +211,28 @@ class DBService:
         return self.db.fetch(stmt)
 
     def add_drunk_water(self, user_id: UUID, drunk_water: int, _date: date):
+        """Insert water consumption for a date.
+
+        Args:
+            user_id (UUID): Internal user identifier.
+            drunk_water (int): Consumed water amount.
+            _date (date): Consumption date.
+        """
+
         stmt = insert(DrunkWater).values(
             user_id=str(user_id), water=drunk_water, date=_date
         )
         self.db.commit(stmt)
 
     def update_drunk_water(self, user_id: UUID, drunk_water: int, _date: date):
+        """Update water consumption for a date.
+
+        Args:
+            user_id (UUID): Internal user identifier.
+            drunk_water (int): Updated consumed water amount.
+            _date (date): Consumption date.
+        """
+
         stmt = (
             update(DrunkWater)
             .where(DrunkWater.user_id == str(user_id))
@@ -163,6 +242,16 @@ class DBService:
         self.db.commit(stmt)
 
     def get_sent_food_images(self, user_id: UUID, period: Period):
+        """Return distinct food image identifiers sent by a user.
+
+        Args:
+            user_id (UUID): Internal user identifier.
+            period (Period): Requested date interval.
+
+        Returns:
+            Sequence[Row]: Rows containing image identifiers.
+        """
+
         stmt = (
             select(SentFood.image_id.label("image"))
             .where(SentFood.user_id == str(user_id))
@@ -173,6 +262,16 @@ class DBService:
         return self.db.fetch(stmt)
 
     def get_sent_food(self, user_id: UUID, period: Period):
+        """Return aggregated food nutrient statistics for a period.
+
+        Args:
+            user_id (UUID): Internal user identifier.
+            period (Period): Requested date interval.
+
+        Returns:
+            Sequence[Row]: Rows containing date, food name and nutrient sums.
+        """
+
         stmt = (
             select(
                 SentFood.date.label("date"),
@@ -191,10 +290,13 @@ class DBService:
 
         return self.db.fetch(stmt)
 
-    def update_sent_food(
-            self,
-            user_id: UUID,
-    ):
+    def update_sent_food(self, user_id: UUID):
+        """Reset today's sent food weight for a user.
+
+        Args:
+            user_id (UUID): Internal user identifier.
+        """
+
         curr_day = date.today()
         stmt = (
             update(SentFood)
@@ -204,11 +306,16 @@ class DBService:
         )
         self.db.commit(stmt)
 
-    @staticmethod
-    def calculate_for_weight(food_nutrient: int | Decimal, weight: int):
-        return food_nutrient * weight / 100
-
     def add_sent_food(self, user_id: UUID, food_id: str, image_id: str, weight: int):
+        """Insert a recognized food entry sent by a user.
+
+        Args:
+            user_id (UUID): Internal user identifier.
+            food_id (str): Food identifier.
+            image_id (str): Uploaded image identifier.
+            weight (int): Estimated food weight.
+        """
+
         date_now = date.today()
 
         stmt = insert(SentFood).values(
@@ -226,12 +333,39 @@ class DBService:
         self.db.commit(stmt)
 
     def get_food_by_id(self, food_id: str):
+        """Return food data by identifier.
+
+        Args:
+            food_id (str): Food identifier.
+
+        Returns:
+            Sequence[Row]: Matching food rows.
+        """
+
         return self.get_food(Food.id == food_id)
 
     def get_food_by_name(self, food_name: str):
+        """Return food data by name.
+
+        Args:
+            food_name (str): Food name.
+
+        Returns:
+            Sequence[Row]: Matching food rows.
+        """
+
         return self.get_food(Food.name == food_name)
 
     def get_food(self, condition):
+        """Return food records matching a SQLAlchemy condition.
+
+        Args:
+            condition: SQLAlchemy filter condition.
+
+        Returns:
+            Sequence[Row]: Matching food rows.
+        """
+
         stmt = select(
             Food.id.label("_id"),
             Food.name.label("_name"),
@@ -244,6 +378,13 @@ class DBService:
         return self.db.fetch(stmt)
 
     def add_food(self, food_id: str, food: FoodStatistic):
+        """Insert a new food record with nutrient values.
+
+        Args:
+            food_id (str): Food identifier.
+            food (FoodStatistic): Food nutrient information.
+        """
+
         stmt = insert(Food).values(
             [
                 {
@@ -261,26 +402,57 @@ class DBService:
 
     # -------- FOR TESTS --------
     def check_health(self):
+        """Check whether the database connection is available.
+
+        Returns:
+            bool: True if the database responds successfully.
+        """
+
         stmt = select(text("1"))
         return len(self.db.fetch(stmt)) > 0
 
     def delete_user(self, telegram_id: int):
+        """Delete a user by Telegram identifier.
+
+        Args:
+            telegram_id (int): Telegram user identifier.
+        """
+
         stmt = delete(User).where(User.telegram_id == telegram_id)
         self.db.commit(stmt)
 
     def delete_drunk_water(self, user_id: UUID):
+        """Delete all water records for a user.
+
+        Args:
+            user_id (UUID): Internal user identifier.
+        """
+
         stmt = delete(DrunkWater).where(DrunkWater.user_id == str(user_id))
         self.db.commit(stmt)
 
     def get_languages(self):
+        """Return all supported language ISO codes.
+
+        Returns:
+            Sequence[Row]: Rows containing language ISO codes.
+        """
+
         stmt = select(Language.iso.label("iso"))
         return self.db.fetch(stmt)
 
     def add_language(self, iso: str):
+        """Insert a supported language ISO code.
+
+        Args:
+            iso (str): Language ISO code.
+        """
+
         insert_stmt = insert(Language).values(iso=iso)
         self.db.commit(insert_stmt)
 
     def close_session(self):
+        """Close the underlying database session."""
         self.db.close_session()
 
     @staticmethod

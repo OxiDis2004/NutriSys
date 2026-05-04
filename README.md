@@ -128,3 +128,52 @@ Basic config file:
 
     TELEGRAM_BOT_TOKEN=your_telegram_token
     SERVER_HOST=server
+
+### Code Documentation
+
+The project uses Python docstrings according to PEP 257 and Google-style
+docstring conventions.
+
+All public modules, classes, functions and methods must contain docstrings.
+Docstrings should explain not only what the code does, but also why it is
+needed and how it should be used.
+
+#### Required docstring structure
+
+For functions and methods:
+
+```python
+def example_function(value: int) -> str:
+    """Short description of the function.
+
+    More detailed explanation of the logic if needed.
+
+    Args:
+        value (int): Input value.
+
+    Returns:
+        str: Result of processing.
+
+    Raises:
+        ValueError: If the input value is invalid.
+    """
+```
+
+For classes:
+
+```python
+class ExampleClass:
+    """Short description of the class.
+
+    Describes the responsibility of the class and its role in the system.
+    """
+```
+
+Documentation rules
+
+- Public functions, classes and methods must have docstrings.
+- Private helper methods may use short comments if their logic is not obvious.
+- Docstrings must use triple double quotes: `"""`.
+- Each docstring must start with a short summary sentence.
+- Arguments, return values and exceptions must be documented.
+- Documentation must be updated when the public interface changes.

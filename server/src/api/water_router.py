@@ -14,6 +14,16 @@ async def add_water(
         water_dto: WaterRequestDTO,
         services: ServiceContainer = Depends(get_services),  # noqa: B008
 ):
+    """Add consumed water for the current day.
+
+    Args:
+        water_dto (WaterRequestDTO): Water consumption request.
+        services (ServiceContainer): Application service container.
+
+    Returns:
+        WaterResponseDTO: Updated daily water consumption.
+    """
+
     return services.water_service.add_drunk_water(water_dto)
 
 
@@ -23,4 +33,15 @@ async def statistic_water(
         statistic_dto: StatisticRequestDTO,
         services: ServiceContainer = Depends(get_services),  # noqa: B008
 ):
+    """Return water consumption statistics for a selected period.
+
+    Args:
+        period (PeriodType): Statistic aggregation period.
+        statistic_dto (StatisticRequestDTO): Statistic request data.
+        services (ServiceContainer): Application service container.
+
+    Returns:
+        list[WaterResponseDTO]: Water statistics grouped by date.
+    """
+
     return services.water_service.statistic(statistic_dto, period)

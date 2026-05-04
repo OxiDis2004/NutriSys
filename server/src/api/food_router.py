@@ -14,6 +14,16 @@ async def add_food(
         send_food_dto: SentFoodRequestDTO,
         services: ServiceContainer = Depends(get_services),  # noqa: B008
 ):
+    """Process a sent food image and return nutrition information.
+
+    Args:
+        send_food_dto (SentFoodRequestDTO): Request containing the food image.
+        services (ServiceContainer): Application service container.
+
+    Returns:
+        SentFoodResponseDTO: Recognized food and nutrition data.
+    """
+
     return services.food_service.sent_food(send_food_dto)
 
 
@@ -23,4 +33,15 @@ async def statistic_food(
         statistic_dto: StatisticRequestDTO,
         services: ServiceContainer = Depends(get_services),  # noqa: B008
 ):
+    """Return food consumption statistics for a selected period.
+
+    Args:
+        period (PeriodType): Statistic aggregation period.
+        statistic_dto (StatisticRequestDTO): Statistic request data.
+        services (ServiceContainer): Application service container.
+
+    Returns:
+        list[SentFoodResponseDTO]: Food statistics grouped by date.
+    """
+
     return services.food_service.statistic(statistic_dto, period)

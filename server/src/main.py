@@ -11,6 +11,14 @@ from src.logger import setup_logger
 
 
 def create_app() -> FastAPI:
+    """Create and configure the FastAPI application instance.
+
+    Initializes logging, application services, middleware components and API
+    routers. The function is used as an application factory by Uvicorn.
+
+    Returns:
+        FastAPI: Configured FastAPI application instance.
+    """
     setup_logger()
 
     app = FastAPI()

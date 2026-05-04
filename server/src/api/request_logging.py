@@ -10,10 +10,31 @@ logger = logging.getLogger("Server")
 
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
+    """Middleware for logging incoming requests and responses.
+
+    Adds or propagates a request identifier and writes request lifecycle
+    information to the application logger.
+    """
+
     def __init__(self, app):
+        """Initialize request logging middleware.
+
+        Args:
+            app: ASGI application instance.
+        """
         super().__init__(app)
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+        """Log request metadata and response status.
+
+        Args:
+            request (Request): Incoming HTTP request.
+            call_next (RequestResponseEndpoint): Next request handler.
+
+        Returns:
+            Response: Response from the next handler or a JSON error response.
+        """
+
         request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
         user_id = request.headers.get("User-ID", None)
         start_time = time.time()

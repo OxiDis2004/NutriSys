@@ -16,6 +16,14 @@ LOG_FORMAT = "[%(asctime)s][%(levelname)s][%(module)s] - %(message)s"
 
 
 def setup_logger():
+    """Configure application-wide logging.
+
+    Creates the log directory if it does not exist, configures the root logger
+    level from the LOG_LEVEL environment variable and attaches both file and
+    console handlers.
+
+    The file handler uses log rotation to prevent unlimited log growth.
+    """
     log_dir = os.path.join(os.getcwd(), "logs")
     os.makedirs(log_dir, exist_ok=True)
 

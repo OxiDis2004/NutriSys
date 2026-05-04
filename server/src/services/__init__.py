@@ -12,7 +12,19 @@ from src.models.property.period import Period, PeriodType
 
 
 class StatisticService(ABC):
+    """Abstract base class for statistic aggregation services.
+
+    Provides common logic for grouping statistic data by day, week, month or
+    year. Subclasses define how raw database rows are loaded, accumulated and
+    converted into response DTOs.
+    """
+
     def __init__(self, db_service):
+        """Initialize statistic service.
+
+        Args:
+            db_service: Database service used to load statistic data.
+        """
         self._db_service = db_service
 
     @abstractmethod
@@ -34,6 +46,19 @@ class StatisticService(ABC):
     def statistic[T](
             self, request: StatisticRequestDTO, period_type: PeriodType
     ) -> list[T]:
+        """Calculate statistics for the selected period type.
+
+        Args:
+            request (StatisticRequestDTO): Statistic request data.
+            period_type (PeriodType): Period type used for aggregation.
+
+        Returns:
+            list[T]: Statistic response objects.
+
+        Raises:
+            HTTPException: If the request is invalid or statistic calculation fails.
+        """
+
         if request.user_id is None:
             raise HTTPException(status_code=400, detail="User id is null")
 
@@ -58,20 +83,66 @@ class StatisticService(ABC):
             raise HTTPException(status_code=500, detail="Caught " + str(err)) from err
 
     def get_statistic_day(self, request: StatisticRequestDTO) -> dict:
+        """Calculate statistics for one day.
+
+        Args:
+            request (StatisticRequestDTO): Statistic request data.
+
+        Returns:
+            dict: Aggregated daily statistic data.
+        """
+
         return self.get_statistic_data(self.get_day, request)
 
     def get_statistic_week(self, request: StatisticRequestDTO) -> dict:
+        """Calculate statistics for one week.
+
+        Args:
+           request (StatisticRequestDTO): Statistic request data.
+
+        Returns:
+           dict: Aggregated weekly statistic data.
+        """
+
         return self.get_statistic_data(self.get_week, request)
 
     def get_statistic_month(self, request: StatisticRequestDTO) -> dict:
+        """Calculate statistics for one month.
+
+        Args:
+            request (StatisticRequestDTO): Statistic request data.
+
+        Returns:
+            dict: Aggregated monthly statistic data.
+        """
+
         return self.get_statistic_data(self.get_month, request)
 
     def get_statistic_year(self, request: StatisticRequestDTO) -> dict:
+        """Calculate statistics for one year.
+
+        Args:
+            request (StatisticRequestDTO): Statistic request data.
+
+        Returns:
+            dict: Aggregated yearly statistic data grouped by month.
+        """
         return self.get_statistic_data(self.get_year, request, True)
 
     def get_statistic_data(
             self, period_func, request: StatisticRequestDTO, step_month: bool = False
     ) -> dict:
+        """Load and aggregate statistic data for a calculated period.
+
+        Args:
+            period_func: Function that converts a date into a Period object.
+            request (StatisticRequestDTO): Statistic request data.
+            step_month (bool): Whether to group result keys by month.
+
+        Returns:
+            dict: Aggregated statistic values indexed by date string.
+        """
+
         period: Period = period_func(request.statistic_date)
         rows = self._get_data_from_db(request.user_id, period)
         result = period.period_dict(self._default_dict_value(), step_month)

@@ -12,6 +12,15 @@ async def login(
         user: UserDTO,
         services: ServiceContainer = Depends(get_services),  # noqa: B008
 ):
+    """Authenticate an existing user.
+
+    Args:
+        user (UserDTO): User login data.
+        services (ServiceContainer): Application service container.
+
+    Returns:
+        UserDTO: User data with resolved identifier and language.
+    """
     return services.user_service.login(user)
 
 
@@ -20,6 +29,15 @@ async def register(
         user: UserDTO,
         services: ServiceContainer = Depends(get_services),  # noqa: B008
 ):
+    """Register a new user.
+
+    Args:
+        user (UserDTO): User registration data.
+        services (ServiceContainer): Application service container.
+
+    Returns:
+        UserDTO: Created user data.
+    """
     return services.user_service.register(user)
 
 
@@ -28,6 +46,15 @@ async def change_language(
         user: UserDTO,
         services: ServiceContainer = Depends(get_services),  # noqa: B008
 ):
+    """Update the user's interface language.
+
+    Args:
+        user (UserDTO): User data containing the selected language.
+        services (ServiceContainer): Application service container.
+
+    Returns:
+        Response: HTTP response with accepted status.
+    """
     return services.user_service.update_language(user)
 
 
@@ -36,6 +63,15 @@ async def get_info(
         user: UserDTO,
         services: ServiceContainer = Depends(get_services),  # noqa: B008
 ):
+    """Return detailed user profile information.
+
+    Args:
+        user (UserDTO): User identifier data.
+        services (ServiceContainer): Application service container.
+
+    Returns:
+        UserInfoDTO: User profile information.
+    """
     return services.user_service.get_information(user)
 
 
@@ -44,6 +80,15 @@ async def update_info(
         user: UserInfoDTO,
         services: ServiceContainer = Depends(get_services),  # noqa: B008
 ):
+    """Update user profile information.
+
+    Args:
+        user (UserInfoDTO): New user profile data.
+        services (ServiceContainer): Application service container.
+
+    Returns:
+        Response: HTTP response with accepted status.
+    """
     return services.user_service.update_information(user)
 
 
@@ -52,4 +97,13 @@ async def calculate_bmr(
         user: UserDTO,
         services: ServiceContainer = Depends(get_services),  # noqa: B008
 ):
+    """Calculate the user's daily calorie norm.
+
+    Args:
+       user (UserDTO): User identifier data.
+       services (ServiceContainer): Application service container.
+
+    Returns:
+       dict[str, int]: Dictionary containing the calculated BMR value.
+    """
     return services.user_service.calculate_bmr(user)

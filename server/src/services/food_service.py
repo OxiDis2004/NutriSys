@@ -16,11 +16,38 @@ from src.services.db_service import DBService
 
 
 class FoodService(StatisticService):
+    """Service responsible for food-related business logic.
+
+    Provides methods for managing food entries, calculating nutritional
+    statistics, processing calorie information and aggregating user food data.
+
+    Inherits:
+        StatisticService: Base service for statistical calculations.
+
+    Responsibilities:
+        - Create and manage food records
+        - Calculate calorie and nutrient statistics
+        - Aggregate food consumption history
+        - Provide food-related analytics for users
+    """
+
     def __init__(self, db_service: DBService, ai_service: AIService):
         super().__init__(db_service)
         self._ai_service = ai_service
 
     async def sent_food(self, sent_food: SentFoodRequestDTO) -> SentFoodResponseDTO:
+        """Process a sent food image and calculate nutrition values.
+
+        Args:
+            sent_food (SentFoodRequestDTO): Request containing the food image.
+
+        Returns:
+            SentFoodResponseDTO: Calculated food nutrition response.
+
+        Raises:
+            HTTPException: If the image is missing.
+        """
+
         if sent_food.image is None:
             raise HTTPException(status_code=422, detail="Image is null")
 
@@ -30,6 +57,18 @@ class FoodService(StatisticService):
         return nutrients_by_mass
 
     def get_nutrient_by_name(self, food_names: list[str]):
+        """Return nutrient information for food names.
+
+        Loads nutrient data from the database when available. If food data is not
+        found, it is requested from an external API and saved to the database.
+
+        Args:
+            food_names (list[str]): Recognized food names.
+
+        Returns:
+            dict[str, FoodStatistic]: Nutrient values indexed by food name.
+        """
+
         nutrients: dict[str, FoodStatistic] = {}
 
         for food_name in food_names:
@@ -47,6 +86,14 @@ class FoodService(StatisticService):
         return nutrients
 
     def get_nutrient_from_api(self, food_name: str) -> FoodStatistic:
+        """Load nutrient information from an external API.
+
+        Args:
+            food_name (str): Food name.
+
+        Returns:
+            FoodStatistic: Nutrient information for the requested food.
+        """
         pass
 
     @override
@@ -69,8 +116,18 @@ class FoodService(StatisticService):
 
     @staticmethod
     def get_food_nutrient_by_mass(
-            detected_foods: list[DetectedFood], nutrients: dict[str, FoodStatistic]
+            detected_foods: list[DetectedFood],
+            nutrients: dict[str, FoodStatistic]
     ):
+        """Calculate nutrient values according to detected food mass.
+
+        Args:
+            detected_foods (list[DetectedFood]): Foods detected by the AI model.
+            nutrients (dict[str, FoodStatistic]): Nutrient data by food name.
+
+        Returns:
+            dict[str, FoodStatistic]: Nutrient data recalculated by mass.
+        """
         for food_name in nutrients:
             mass = 0
             for detected_food in detected_foods:

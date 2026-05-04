@@ -14,10 +14,27 @@ from src.services.db_service import DBService
 
 
 class WaterService(StatisticService):
+    """Service responsible for water tracking and water statistics."""
+
     def __init__(self, db_service: DBService):
         super().__init__(db_service)
 
     def add_drunk_water(self, water_request: WaterRequestDTO) -> WaterResponseDTO:
+        """Add consumed water for the current day.
+
+        If a record for the current day already exists, the new value is added to
+        the previous amount.
+
+        Args:
+            water_request (WaterRequestDTO): Water consumption request.
+
+        Returns:
+            WaterResponseDTO: Updated water consumption for the current day.
+
+        Raises:
+            HTTPException: If user id is missing or database update fails.
+        """
+
         if water_request is None or water_request.user_id is None:
             raise HTTPException(status_code=400, detail="User id is null")
 
@@ -46,6 +63,11 @@ class WaterService(StatisticService):
 
     @override
     def _default_dict_value(self):
+        """Return the default water statistic value.
+
+        Returns:
+            int: Zero water amount.
+        """
         return 0
 
     @override

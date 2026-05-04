@@ -14,10 +14,29 @@ from src.services.db_service import DBService
 logger = logging.getLogger(__name__)
 
 class UserService:
+    """Service responsible for user management operations.
+
+    Handles user-related business logic including retrieval, creation,
+    updating and authentication-related data access.
+    """
+
     def __init__(self, db_service: DBService):
         self._db_service: DBService = db_service
 
     def login(self, user: UserDTO) -> UserDTO:
+        """Authenticate an existing user by Telegram identifier.
+
+        Args:
+            user (UserDTO): Login request data.
+
+        Returns:
+            UserDTO: User data with internal id and language.
+
+        Raises:
+            HTTPException: If the request is invalid, the user is not found or
+            activity update fails.
+        """
+
         logger.debug("Login request started for telegram_id=%s", user.telegram_id)
 
         if user.telegram_id is None:
@@ -42,6 +61,18 @@ class UserService:
             raise HTTPException(status_code=400, detail="Caught: " + str(err)) from err
 
     def register(self, user: UserDTO) -> UserDTO:
+        """Register a new user.
+
+        Args:
+            user (UserDTO): User registration data.
+
+        Returns:
+            UserDTO: Created user data with internal id.
+
+        Raises:
+            HTTPException: If the user already exists or cannot be created.
+        """
+
         user.id = uuid.uuid4()
         logger.debug("Register request started for telegram_id=%s", user.telegram_id)
 
@@ -77,6 +108,18 @@ class UserService:
         return user
 
     def get_information(self, user: UserDTO) -> UserInfoDTO:
+        """Return profile information for a user.
+
+        Args:
+            user (UserDTO): User identifier data.
+
+        Returns:
+            UserInfoDTO: User profile information.
+
+        Raises:
+            HTTPException: If user id is missing or profile information is not found.
+        """
+
         logger.debug("Get user information request started, user_id=%s", user.id)
 
         if user.id is None:
@@ -94,6 +137,18 @@ class UserService:
         return UserInfoDTO(**data._mapping)
 
     def update_information(self, user_info: UserInfoDTO):
+        """Update profile information for a user.
+
+        Args:
+            user_info (UserInfoDTO): New profile information.
+
+        Returns:
+            Response: HTTP 202 response if the update is successful.
+
+        Raises:
+            HTTPException: If user id is missing or update fails.
+        """
+
         logger.debug("Update user information request started, user_id=%s", user_info.id)
 
         if user_info.id is None:
@@ -116,6 +171,18 @@ class UserService:
             raise HTTPException(status_code=500, detail="Caught: " + str(err)) from err
 
     def update_language(self, user: UserDTO):
+        """Update the selected language for a user.
+
+        Args:
+            user (UserDTO): User data containing id and language.
+
+        Returns:
+            Response: HTTP 202 response if the update is successful.
+
+        Raises:
+            HTTPException: If user data is invalid or update fails.
+        """
+
         logger.debug("Update language request started, user_id=%s", user.id)
 
         if user.user_id is None:
@@ -133,8 +200,22 @@ class UserService:
             logger.exception("Update language failed, user_id=%s", user.id)
             raise HTTPException(status_code=400, detail="Caught: " + str(err)) from err
 
-
     def calculate_bmr(self, user: UserDTO) -> dict[str, int]:
+        """Calculate the user's recommended calorie norm.
+
+        Uses stored profile information, age, sex, weight, height, activity level
+        and goal to calculate the final BMR-based recommendation.
+
+        Args:
+            user (UserDTO): User identifier data.
+
+        Returns:
+            dict[str, int]: Dictionary with calculated BMR value.
+
+        Raises:
+            HTTPException: If required profile data is missing or invalid.
+        """
+
         logger.debug("Calculate BMR request started, user_id=%s", user.id)
 
         user_info = self.get_information(user)
@@ -190,6 +271,15 @@ class UserService:
         return { "bmr": result }
 
     def years_old(self, birthday: date) -> int:
+        """Calculate age from birthday.
+
+        Args:
+            birthday (date): User birthday.
+
+        Returns:
+            int: User age in years, or -1 if birthday is in the future.
+        """
+
         today = self.get_today()
         if birthday > today:
             return -1
@@ -202,10 +292,27 @@ class UserService:
 
     @staticmethod
     def get_today():
+        """Return the current date.
+
+        Returns:
+            date: Current local date.
+        """
         return date.today()
 
     @staticmethod
     def formula(weight: int, height: int, years: int, sex: str) -> float:
+        """Calculate base BMR using weight, height, age and sex.
+
+        Args:
+            weight (int): User weight in kilograms.
+            height (int): User height in centimeters.
+            years (int): User age in years.
+            sex (str): User sex code.
+
+        Returns:
+            float: Calculated base BMR value.
+        """
+
         return (
                 (10 * weight)
                 + (6.25 * height)
@@ -215,6 +322,16 @@ class UserService:
 
     @staticmethod
     def set_bmr_by_activity(normal_bmr: float, activity: Activity) -> float:
+        """Adjust BMR according to activity level.
+
+        Args:
+            normal_bmr (float): Base BMR value.
+            activity (Activity): User activity level.
+
+        Returns:
+            float: Activity-adjusted BMR value.
+        """
+
         match activity:
             case Activity.NoActivity:
                 return normal_bmr
@@ -229,6 +346,16 @@ class UserService:
 
     @staticmethod
     def set_bmr_by_goal(normal_bmr: float, goal: Goal) -> float:
+        """Adjust BMR according to the user's nutrition goal.
+
+        Args:
+            normal_bmr (float): Current BMR value.
+            goal (Goal): User nutrition goal.
+
+        Returns:
+            float: Goal-adjusted BMR value.
+        """
+
         match goal:
             case Goal.LoseWeight:
                 return normal_bmr * 0.9
