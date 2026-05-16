@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from typing import Any, override
 from uuid import UUID
@@ -5,9 +6,9 @@ from uuid import UUID
 from fastapi import HTTPException
 from sqlalchemy import Row, Sequence
 
-from src.models.dto.sent_food_request_dto import SentFoodRequestDTO
-from src.models.dto.sent_food_response_dto import SentFoodResponseDTO
-from src.models.property.detected_food import DetectedFood
+from src.models.dto.food_record_request_dto import FoodRecordRequestDTO
+from src.models.dto.food_record_response_dto import FoodRecordResponseDTO
+from src.models.entity.food import Food
 from src.models.property.food_statistic import FoodStatistic
 from src.models.property.period import Period
 from src.services import StatisticService
@@ -35,14 +36,14 @@ class FoodService(StatisticService):
         super().__init__(db_service)
         self._ai_service = ai_service
 
-    async def sent_food(self, sent_food: SentFoodRequestDTO) -> SentFoodResponseDTO:
+    async def add_food_record(self, sent_food: FoodRecordRequestDTO) -> list[FoodRecordResponseDTO]:
         """Process a sent food image and calculate nutrition values.
 
         Args:
-            sent_food (SentFoodRequestDTO): Request containing the food image.
+            sent_food (FoodRecordRequestDTO): Request containing the food image.
 
         Returns:
-            SentFoodResponseDTO: Calculated food nutrition response.
+            FoodRecordResponseDTO: Calculated food nutrition response.
 
         Raises:
             HTTPException: If the image is missing.
@@ -51,12 +52,12 @@ class FoodService(StatisticService):
         if sent_food.image is None:
             raise HTTPException(status_code=422, detail="Image is null")
 
-        detected_foods = await self._ai_service.scan_image(sent_food.image)
-        nutrients = self.get_nutrient_by_name([food.label for food in detected_foods])
-        nutrients_by_mass = self.get_food_nutrient_by_mass(detected_foods, nutrients)
-        return nutrients_by_mass
+        detected_food_names = await self._ai_service.scan_image(sent_food.image)
+        foods_information = self.get_food_information(detected_food_names)
+        foods_response = self.get_foods_response(foods_information)
+        return foods_response
 
-    def get_nutrient_by_name(self, food_names: list[str]):
+    def get_food_information(self, food_names: list[str]) -> list[Food]:
         """Return nutrient information for food names.
 
         Loads nutrient data from the database when available. If food data is not
@@ -69,23 +70,25 @@ class FoodService(StatisticService):
             dict[str, FoodStatistic]: Nutrient values indexed by food name.
         """
 
-        nutrients: dict[str, FoodStatistic] = {}
+        result: list[Food] = []
+
+        found_foods = {
+            found_food.name: found_food
+            for found_food in self._db_service.get_foods_by_names(food_names)
+        }
 
         for food_name in food_names:
-            row = self._db_service.get_food_by_name(food_name)
-
-            if row is None or row.id is None:
+            if food_name not in found_foods:
                 food_id = str(uuid.uuid4())
-                nutrient = self.get_nutrient_from_api(food_name)
-                self._db_service.add_food(food_id, nutrient)
-            else:
-                nutrient = FoodStatistic(**row._mapping)
+                food = self.get_nutrient_from_api(food_name)
+                self._db_service.add_food(food_id, food)
+                found_foods[food_name] = food
 
-            nutrients.update({food_name: nutrient})
+            result.append(Food(**found_foods[food_name]))
 
-        return nutrients
+        return result
 
-    def get_nutrient_from_api(self, food_name: str) -> FoodStatistic:
+    def get_nutrient_from_api(self, food_name: str) -> Food:
         """Load nutrient information from an external API.
 
         Args:
@@ -111,30 +114,31 @@ class FoodService(StatisticService):
         return self._db_service.get_sent_food(user_id, period)
 
     @override
-    def _wrap_func(self, result: dict) -> list[SentFoodResponseDTO]:
-        return [SentFoodResponseDTO(day=key, statistic=value) for key, value in result]
+    def _wrap_func(self, result: dict) -> list[FoodRecordResponseDTO]:
+        return [FoodRecordResponseDTO(day=key, statistic=value) for key, value in result]
 
     @staticmethod
-    def get_food_nutrient_by_mass(
-            detected_foods: list[DetectedFood],
-            nutrients: dict[str, FoodStatistic]
-    ):
+    def get_foods_response(
+            detected_foods: list[Food]
+    ) -> list[FoodRecordResponseDTO]:
         """Calculate nutrient values according to detected food mass.
 
         Args:
-            detected_foods (list[DetectedFood]): Foods detected by the AI model.
-            nutrients (dict[str, FoodStatistic]): Nutrient data by food name.
+            detected_foods (list[Food]): Foods detected by the AI model and with own information.
 
         Returns:
-            dict[str, FoodStatistic]: Nutrient data recalculated by mass.
+            list[FoodRecordResponseDTO]: Nutrient data recalculated by mass.
         """
-        for food_name in nutrients:
-            mass = 0
-            for detected_food in detected_foods:
-                if food_name == detected_food.label:
-                    mass = detected_food.mass
-                    break
+        result: list[FoodRecordResponseDTO] = []
 
-            nutrients.get(food_name).calculate(mass)
+        for food in detected_foods:
+            calculated_by_mass_food: FoodStatistic = FoodStatistic(**food.__dict__).calculate(
+                food.mass
+            )
+            result.append(
+                FoodRecordResponseDTO(
+                    day=datetime.datetime.now(), statistic=calculated_by_mass_food
+                )
+            )
 
-        return nutrients
+        return result

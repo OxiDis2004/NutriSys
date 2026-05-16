@@ -1,40 +1,33 @@
 from __future__ import annotations
 
-import io
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
-
 import cv2
+import io
 import numpy as np
 import torch
 import torch.nn as nn
 from PIL import Image
+from typing import Optional
 
+from dynamic_det.models.detection_result import DetectionResult
 from dynamic_det.models.yolo import Model
 from dynamic_det.utils.general import check_img_size, non_max_suppression, scale_coords
 from dynamic_det.utils.torch_utils import intersect_dicts
 
-@dataclass
-class DetectionResult:
-    name: str
-    confidence: float
-    bbox: List[float]  # [x1, y1, x2, y2]
-    class_id: int
 
 class DetectorModul:
     def __init__(
             self,
             cfg_path: str,
             weights_path: str,
-            num_classes: int = '',
+            num_classes: int = 0,
             device: str = "cuda:0",
             img_size: int = 640,
-            conf_thres: float = 0.25,
-            iou_thres: float = 0.65,
-            dy_thres: float = 0.5,
-            class_names: Optional[List[str]] = None,
+            conf_threes: float = 0.25,
+            iou_threes: float = 0.65,
+            dy_threes: float = 0.5,
+            class_names: Optional[list[str]] = None,
             agnostic_nms: bool = False,
-            classes: Optional[List[int]] = None,
+            classes: Optional[list[int]] = None,
     ) -> None:
         self.cfg_path = cfg_path
         self.weights_path = weights_path
@@ -43,9 +36,9 @@ class DetectorModul:
             device if torch.cuda.is_available() or device == "cpu" else "cpu"
         )
         self.img_size = img_size
-        self.conf_thres = conf_thres
-        self.iou_thres = iou_thres
-        self.dy_thres = dy_thres
+        self.conf_threes = conf_threes
+        self.iou_threes = iou_threes
+        self.dy_threes = dy_threes
         self.agnostic_nms = agnostic_nms
         self.classes = classes
 
@@ -88,8 +81,8 @@ class DetectorModul:
             elif type(m) is nn.Upsample:
                 m.recompute_scale_factor = None
 
-        if hasattr(model, "dy_thres"):
-            model.dy_thres = self.dy_thres
+        if hasattr(model, "dy_threes"):
+            model.dy_threes = self.dy_threes
 
         if self.half:
             model.half()
@@ -173,16 +166,16 @@ class DetectorModul:
             raw_output: torch.Tensor,
             tensor_shape: torch.Size,
             original_image: np.ndarray,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[DetectionResult]:
         pred = non_max_suppression(
             raw_output,
-            self.conf_thres,
-            self.iou_thres,
+            self.conf_threes,
+            self.iou_threes,
             classes=self.classes,
             agnostic=self.agnostic_nms,
         )
 
-        results: List[Dict[str, Any]] = []
+        results: list[DetectionResult] = []
 
         for det in pred:
             if len(det):
@@ -193,17 +186,17 @@ class DetectorModul:
                 for *xyxy, conf, cls in reversed(det):
                     class_id = int(cls)
                     results.append(
-                        {
-                            "name": self.names[class_id],
-                            "confidence": float(conf),
-                            "bbox": [float(x) for x in xyxy],
-                            "class_id": class_id,
-                        }
+                        DetectionResult(
+                            name=self.names[class_id],
+                            confidence=float(conf),
+                            bbox=[float(x) for x in xyxy],
+                            class_id=class_id,
+                        )
                     )
 
         return results
 
-    def predict(self, image_bytes: bytes) -> List[Dict[str, Any]]:
+    def predict(self, image_bytes: bytes) -> list[DetectionResult]:
         tensor, original_image = self.preprocess_image(image_bytes)
 
         with torch.no_grad():

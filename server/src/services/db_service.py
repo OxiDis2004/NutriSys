@@ -356,6 +356,18 @@ class DBService:
 
         return self.get_food(Food.name == food_name)
 
+    def get_foods_by_names(self, food_names: list[str]):
+        """Return food data by names.
+
+        Args:
+            food_names (list[str]): Food names.
+
+        Returns:
+            Sequence[Row]: Matching food rows.
+        """
+
+        return self.get_food(Food.name.in_(food_names))
+
     def get_food(self, condition):
         """Return food records matching a SQLAlchemy condition.
 
@@ -373,11 +385,12 @@ class DBService:
             Food.protein.label("_protein"),
             Food.carbon.label("_carbon"),
             Food.fat.label("_fat"),
+            Food.mass.label("_mass"),
         ).where(condition)
 
         return self.db.fetch(stmt)
 
-    def add_food(self, food_id: str, food: FoodStatistic):
+    def add_food(self, food_id: str, food: Food):
         """Insert a new food record with nutrient values.
 
         Args:

@@ -26,6 +26,7 @@ dependencies = [
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["dynamic_det*"]
+exclude = ["dynamic_det/data"]
 
 [tool.setuptools.package-data]
 dynamic_det = ["cfg/*.yaml", "weights/*.pt"]

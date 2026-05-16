@@ -1,9 +1,9 @@
-import argparse
-import time
-import logging
 from pathlib import Path
 
+import argparse
 import cv2
+import logging
+import time
 import torch
 import torch.backends.cudnn as cudnn
 from numpy import random
@@ -11,10 +11,9 @@ from numpy import random
 from models.yolo import Model
 from utils.datasets import LoadStreams, LoadImages
 from utils.general import check_img_size, check_imshow, non_max_suppression, \
-    scale_coords, xyxy2xywh, strip_optimizer, set_logging, increment_path
+    scale_coords, xyxy2xywh, set_logging, increment_path
 from utils.plots import plot_one_box
 from utils.torch_utils import select_device, time_synchronized, intersect_dicts
-
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +44,7 @@ def detect(save_img=False):
     stride = int(model.stride.max())  # model stride
     imgsz = check_img_size(imgsz, s=stride)  # check img_size
 
-    if hasattr(model, 'dy_thres'):
+    if hasattr(model, 'dy_threes'):
         model.dy_thres = opt.dy_thres
         logger.info('Set dynamic threshold to %f' % opt.dy_thres)
 

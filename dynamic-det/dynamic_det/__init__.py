@@ -1,6 +1,8 @@
 from pathlib import Path
 
 from dynamic_det.detector_modul import DetectorModul
+from dynamic_det.models.detection_result import DetectionResult
+
 
 def detector():
     base_dir = Path(__file__).resolve().parent

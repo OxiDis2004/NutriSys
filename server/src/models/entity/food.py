@@ -15,6 +15,7 @@ class Food(Base):
     protein: Mapped[Decimal] = mapped_column(DECIMAL(6, 2), nullable=False)
     carbon: Mapped[Decimal] = mapped_column(DECIMAL(6, 2), nullable=False)
     fat: Mapped[Decimal] = mapped_column(DECIMAL(6, 2), nullable=False)
+    mass: Mapped[int] = mapped_column(Integer, nullable=False)
 
     sent_foods: Mapped[list["SentFood"]] = relationship(
         "SentFood", back_populates="food", cascade="all, delete-orphan"

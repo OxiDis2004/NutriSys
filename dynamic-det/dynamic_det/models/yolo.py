@@ -1,21 +1,20 @@
-import os
-
-import math
-import logging
 from pathlib import Path
-import yaml
+
+import logging
+import math
+import os
 import sys
+import yaml
 from copy import deepcopy
 
 sys.path.append('/')  # to run '$ python *.py' files in subdirectories
 logger = logging.getLogger(__name__)
-import torch
 from torch.nn.modules.batchnorm import _BatchNorm
 from dynamic_det.models.common import *
 from dynamic_det.utils.autoanchor import check_anchor_order
-from dynamic_det.utils.general import make_divisible, check_file, set_logging
+from dynamic_det.utils.general import make_divisible
 from dynamic_det.utils.torch_utils import time_synchronized, fuse_conv_and_bn, model_info, scale_img, initialize_weights, \
-    select_device, copy_attr
+    copy_attr
 
 try:
     import thop  # for FLOPS computation
@@ -383,7 +382,7 @@ class Model(nn.Module):
         print("training", self.training)
         print("dynamic", self.dynamic)
         print("score", score)
-        print("dy_thres", self.dy_thres)
+        print("dy_threes", self.dy_thres)
 
         need_second = self.training or (not self.dynamic) or score[:, 0] < self.dy_thres
         need_first_head = self.training or (self.dynamic and score[:, 0] >= self.dy_thres)

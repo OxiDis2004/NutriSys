@@ -15,9 +15,9 @@ RUN apt-get update && apt-get install -y \
 COPY ./server/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-#COPY ./dynamic-det/pyproject.toml ./dynamic-det/
-#COPY ./dynamic-det/dynamic_det ./dynamic-det/dynamic_det
-#RUN pip install --no-cache-dir -v ./dynamic-det
+COPY ./dynamic-det/pyproject.toml ./dynamic-det/
+COPY ./dynamic-det/dynamic_det ./dynamic-det/dynamic_det
+RUN pip install --no-cache-dir -v ./dynamic-det
 
 COPY ./server/src ./src
 

@@ -4,6 +4,6 @@ from fastapi import File, UploadFile
 from pydantic import BaseModel, Field
 
 
-class SentFoodRequestDTO(BaseModel):
-    user_id: UUID | None = Field(..., max_length=36)
+class FoodRecordRequestDTO(BaseModel):
+    user_id: UUID = Field(...)
     image: UploadFile = File(...)

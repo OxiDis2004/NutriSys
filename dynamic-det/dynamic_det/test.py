@@ -1,23 +1,23 @@
+from pathlib import Path
+
 import argparse
 import json
 import logging
-from pathlib import Path
-from threading import Thread
-import yaml
-from tqdm import tqdm
-
 import numpy as np
 import torch
+import yaml
+from threading import Thread
+from tqdm import tqdm
 
-from dynamic_det import fix_code
 from dynamic_det.models.yolo import Model
 from dynamic_det.utils.datasets import create_dataloader
-from dynamic_det.utils.general import coco80_to_coco91_class, check_dataset, check_file, check_img_size, \
-    box_iou, non_max_suppression, scale_coords, xyxy2xywh, xywh2xyxy, set_logging, increment_path, colorstr
+from dynamic_det.utils.general import coco80_to_coco91_class, check_dataset, check_file, \
+    check_img_size, \
+    box_iou, non_max_suppression, scale_coords, xyxy2xywh, xywh2xyxy, set_logging, increment_path, \
+    colorstr
 from dynamic_det.utils.metrics import ap_per_class, ConfusionMatrix
 from dynamic_det.utils.plots import plot_images, output_to_target
 from dynamic_det.utils.torch_utils import select_device, time_synchronized, intersect_dicts
-
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ def test(data,
          half_precision=True,
          is_coco=False,
          v5_metric=False,
-         dy_thres=0.5,
+        dy_threes=0.5,
          save_results=False):
     # Initialize/load model and set device
     training = model is not None
@@ -78,7 +78,7 @@ def test(data,
         logger.info('Transferred %g/%g items from %s' % (len(state_dict), len(model.state_dict()), weight))  # report
         gs = max(int(model.stride.max()), 32)  # grid size (max stride)
         imgsz = check_img_size(imgsz, s=gs)  # check img_size
-        if hasattr(model, 'dy_thres'):
+        if hasattr(model, 'dy_threes'):
             model.dy_thres = dy_thres
             logger.info('Set dynamic threshold to %f' % dy_thres)
 
@@ -216,7 +216,7 @@ def test(data,
                             if d.item() not in detected_set:
                                 detected_set.add(d.item())
                                 detected.append(d)
-                                correct[pi[j]] = ious[j] > iouv  # iou_thres is 1xn
+                                correct[pi[j]] = ious[j] > iouv  # iou_threes is 1xn
                                 if len(detected) == nl:  # all targets already located in image
                                     break
 
@@ -288,7 +288,9 @@ def test(data,
             if save_results:
                 results_txt = str(save_dir / f"{w}_results.txt")
                 with open(results_txt, 'a') as f:
-                    f.write(f'map: {round(map, 3)}, map50: {round(map50, 3)}, dy_thres: {dy_thres}\n')
+                    f.write(
+                        f'map: {round(map, 3)}, map50: {round(map50, 3)}, dy_threes: {dy_thres}\n'
+                    )
                     f.write('Speed: %.1f/%.1f/%.1f ms inference/NMS/total per %gx%g image at batch-size %g\n' % t)
                     f.write('***********************************************************************************\n')
         except Exception as e:

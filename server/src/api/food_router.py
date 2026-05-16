@@ -1,33 +1,33 @@
 from fastapi import APIRouter, Depends
 
 from src.dependencies import ServiceContainer, get_services
-from src.models.dto.sent_food_request_dto import SentFoodRequestDTO
-from src.models.dto.sent_food_response_dto import SentFoodResponseDTO
+from src.models.dto.food_record_request_dto import FoodRecordRequestDTO
+from src.models.dto.food_record_response_dto import FoodRecordResponseDTO
 from src.models.dto.statistic_request_dto import StatisticRequestDTO
 from src.models.property.period import PeriodType
 
 router = APIRouter(prefix="/api/food")
 
 
-@router.put("/add", response_model=SentFoodResponseDTO)
+@router.put("/add", response_model=list[FoodRecordResponseDTO])
 async def add_food(
-        send_food_dto: SentFoodRequestDTO,
+        send_food_dto: FoodRecordRequestDTO,
         services: ServiceContainer = Depends(get_services),  # noqa: B008
 ):
     """Process a sent food image and return nutrition information.
 
     Args:
-        send_food_dto (SentFoodRequestDTO): Request containing the food image.
+        send_food_dto (FoodRecordRequestDTO): Request containing the food image.
         services (ServiceContainer): Application service container.
 
     Returns:
-        SentFoodResponseDTO: Recognized food and nutrition data.
+        FoodRecordResponseDTO: Recognized food and nutrition data.
     """
 
-    return services.food_service.sent_food(send_food_dto)
+    return services.food_service.add_food_record(send_food_dto)
 
 
-@router.post("/statistic/{period}", response_model=list[SentFoodResponseDTO])
+@router.post("/statistic/{period}", response_model=list[FoodRecordResponseDTO])
 async def statistic_food(
         period: PeriodType,
         statistic_dto: StatisticRequestDTO,
@@ -41,7 +41,7 @@ async def statistic_food(
         services (ServiceContainer): Application service container.
 
     Returns:
-        list[SentFoodResponseDTO]: Food statistics grouped by date.
+        list[FoodRecordResponseDTO]: Food statistics grouped by date.
     """
 
     return services.food_service.statistic(statistic_dto, period)
