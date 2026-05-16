@@ -1,5 +1,5 @@
 import http from 'k6/http';
-import { check, sleep } from 'k6';
+import {check, sleep} from 'k6';
 
 export const options = {
     stages: [
@@ -14,7 +14,7 @@ export const options = {
     },
 };
 
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'http://localhost:8000/api';
 
 export default function () {
 
@@ -32,7 +32,9 @@ export default function () {
 
     // POST /user/login
     const payload_login = JSON.stringify({
-        telegram_id: 'telegram_123',
+        uuid: null,
+        telegram_id: 123914312,
+        language: 'en'
     });
 
     const params_login = {
