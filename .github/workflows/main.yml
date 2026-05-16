@@ -62,6 +62,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install sphinx sphinx-rtd-theme
           cd ${{ matrix.context }}
+          ls -la
           make install
           cd ..
 
