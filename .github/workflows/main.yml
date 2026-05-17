@@ -187,6 +187,9 @@ jobs:
     if: ${{ github.event.inputs.deploy_to_server == 'true' }}
     #    needs: build-and-push
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
 
@@ -209,10 +212,6 @@ jobs:
             --docker-username=${{ github.actor }} \
             --docker-password=${{ env.GHCR_PASS }} \
             -n ${{ env.KUBE_NAMESPACE }}
-
-      - name: Directory
-        run: |
-          ll
 
       - name: Deploy with Helm
         run: |
