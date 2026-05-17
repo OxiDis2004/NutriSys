@@ -21,6 +21,8 @@ env:
   SERVER_IMAGE_NAME: server
   TELEGRAM_BOT_IMAGE_NAME: bot-frontend
   WEB_IMAGE_NAME: web-frontend
+  KUBE_RELEASE: nutri-sys-ns
+  KUBE_NAMESPACE: stack
 
 
 jobs:
@@ -181,40 +183,35 @@ jobs:
 
   deploy-to-server:
     name: Deploy to server
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     if: ${{ github.event.inputs.deploy_to_server == 'true' }}
     needs: build-and-push
     steps:
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
 
-      - name: Configure kubectl
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
-
       - name: Ensure namespace exists
         run: |
-          kubectl get ns ${{ secrets.KUBE_NAMESPACE }} >/dev/null 2>&1 || kubectl create ns ${{ secrets.KUBE_NAMESPACE }}
+          kubectl get ns ${{ env.KUBE_NAMESPACE }} >/dev/null 2>&1 || kubectl create ns ${{ env.KUBE_NAMESPACE }}
 
       - name: Create telegram secret in Kubernetes
         run: |
-          kubectl delete secret telegram-secret -n ${{ secrets.KUBE_NAMESPACE }} --ignore-not-found
+          kubectl delete secret telegram-secret -n ${{ env.KUBE_NAMESPACE }} --ignore-not-found
           kubectl create secret generic telegram-secret \
             --from-literal=token=${{ secrets.TELEGRAM_TOKEN }} \
-            -n ${{ secrets.KUBE_NAMESPACE }}
+            -n ${{ env.KUBE_NAMESPACE }}
 
       - name: Create GHCR secret in Kubernetes
         run: |
-          kubectl delete secret ghcr-secret -n ${{ secrets.KUBE_NAMESPACE }} --ignore-not-found
+          kubectl delete secret ghcr-secret -n ${{ env.KUBE_NAMESPACE }} --ignore-not-found
           kubectl create secret docker-registry ghcr-secret \
             --docker-server=${{ env.REGISTRY }} \
             --docker-username=${{ github.actor }} \
             --docker-password=${{ env.GHCR_PASS }} \
-            -n ${{ secrets.KUBE_NAMESPACE }}
+            -n ${{ env.KUBE_NAMESPACE }}
 
       - name: Deploy with Helm
         run: |
-          helm upgrade -i ${{ secrets.RELEASE }} ./chart \
-            --namespace ${{ secrets.KUBE_NAMESPACE }} \
+          helm upgrade -i ${{ env.KUBE_RELEASE }} ./chart \
+            --namespace ${{ env.KUBE_NAMESPACE }} \
             --create-namespace
