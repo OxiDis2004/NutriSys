@@ -9,7 +9,7 @@ on:
       deploy_to_server:
         description: "Deploy to server"
         required: true
-        default: "false"
+        default: "true"
         type: choice
         options:
           - "true"
@@ -189,7 +189,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
 
