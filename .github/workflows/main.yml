@@ -26,166 +26,166 @@ env:
 
 
 jobs:
-  #  build-and-push:
-  #    name: Build and Push Docker Images
-  #    runs-on: ubuntu-latest
-  #    permissions:
-  #      contents: read
-  #      packages: write
-  #
-  #    strategy:
-  #      matrix:
-  #        include:
-  #          - name: server
-  #            context: ./server
-  #            dockerfile: ./server/Dockerfile
-  #            dockerfileContext: ./
-  #          - name: bot-frontend
-  #            context: ./telegram-bot
-  #            dockerfile: ./telegram-bot/Dockerfile
-  #            dockerfileContext: ./telegram-bot
-  #          - name: web-frontend
-  #            context: ./web
-  #            dockerfile: ./web/Dockerfile
-  #            dockerfileContext: ./web
-  #
-  #    steps:
-  #      - uses: actions/checkout@v4
-  #
-  #      - name: Setup Python
-  #        if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
-  #        uses: actions/setup-python@v5
-  #        with:
-  #          python-version: '3.12'
-  #
-  #      - name: Install system dependencies
-  #        if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
-  #        run: |
-  #          python -m pip install --upgrade pip
-  #          pip install sphinx sphinx-rtd-theme
-  #          cd ${{ matrix.context }}
-  #          ls -la
-  #          make install
-  #          cd ..
-  #
-  #      - name: Run CI pipeline
-  #        if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
-  #        run: |
-  #          cd ${{ matrix.context }}
-  #          make ci
-  #          cd ..
-  #        continue-on-error: true
-  #
-  #      - name: Generate documentation
-  #        if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
-  #        run: |
-  #          cd ${{ matrix.context }}
-  #          sphinx-apidoc -o docs/source ./src
-  #          sphinx-build -b html docs/source docs/build/html
-  #          cd docs/build
-  #          zip -r nutrisys-${{ matrix.name }}-documentation.zip html
-  #          cd ../../..
-  #
-  #      - name: Upload documentation artifact
-  #        if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
-  #        uses: actions/upload-artifact@v4
-  #        with:
-  #          name: nutrisys-${{ matrix.name }}-documentation
-  #          path: ${{ matrix.context }}/docs/build/nutrísys-${{ matrix.name }}-documentation.zip
-  #
-  #      # --- Python tests ---
-  #      - name: Run Python unit tests for ${{ matrix.name }}
-  #        id: unit_tests
-  #        if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
-  #        run: |
-  #          cd ${{ matrix.context }}
-  #          pip install -r requirements.txt
-  #          pytest -v test/unit > ../test-${{ matrix.name }}-unit.log 2>&1
-  #          TEST_EXIT_CODE=$?
-  #          echo "test_exit_code_${{ matrix.name }}=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
-  #        continue-on-error: true
-  #
-  #      - name: Run Python integration tests for ${{ matrix.name }}
-  #        id: integration_tests
-  #        if: matrix.name == env.SERVER_IMAGE_NAME
-  #        run: |
-  #          cd ${{ matrix.context }}
-  #          pytest -v test/integration > ../test-${{ matrix.name }}-integration.log 2>&1
-  #          TEST_EXIT_CODE=$?
-  #          echo "test_exit_code_${{ matrix.name }}=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
-  #        continue-on-error: true
-  #
-  #      - name: Run Python e2e tests for ${{ matrix.name }}
-  #        id: e2e_tests
-  #        if: matrix.name == env.SERVER_IMAGE_NAME
-  #        run: |
-  #          cd ${{ matrix.context }}
-  #          pytest test/e2e -vv --cucumber-json=report-e2e-${{ matrix.name }}.json
-  #          TEST_EXIT_CODE=$?
-  #          echo "test_exit_code_${{ matrix.name }}=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
-  #        continue-on-error: true
-  #
-  #      # --- Web tests (Playwright) ---
-  #      - name: Setup Node.js
-  #        if: matrix.name == env.WEB_IMAGE_NAME
-  #        uses: actions/setup-node@v4
-  #        with:
-  #          node-version: 20
-  #
-  #      - name: Install dependencies (web)
-  #        if: matrix.test_type == 'web'
-  #        run: |
-  #          cd ${{ matrix.context }}
-  #          npm ci
-  #
-  #      - name: Run Playwright tests
-  #        id: web_e2e_tests
-  #        if: matrix.test_type == 'web'
-  #        run: |
-  #          cd ${{ matrix.context }}
-  #          npx playwright install --with-deps
-  #          npx playwright test > ../test-${{ matrix.name }}-playwright.log 2>&1
-  #          TEST_EXIT_CODE=$?
-  #          echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
-  #        continue-on-error: true
-  #
-  #      # --- Upload logs ---
-  #      - name: Upload test logs for ${{ matrix.name }}
-  #        if: always()
-  #        uses: actions/upload-artifact@v4
-  #        with:
-  #          name: test-logs-${{ matrix.name }}
-  #          path: test-${{ matrix.name }}-*.log
-  #
-  #      # --- Build images and push into GitHub repository ---
-  #      - name: Login into ${{ env.REGISTRY }}
-  #        uses: docker/login-action@v3
-  #        with:
-  #          registry: ${{ env.REGISTRY }}
-  #          username: ${{ github.actor }}
-  #          password: ${{ env.GHCR_PASS }}
-  #
-  #      - name: Extract Docker metadata
-  #        id: meta
-  #        # if: steps.integration_tests.outputs.test_exit_code == '0'
-  #        uses: docker/metadata-action@v3
-  #        with:
-  #          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.name }}
-  #
-  #      - name: Build and push ${{ matrix.name }} image
-  #        uses: docker/build-push-action@v5
-  #        with:
-  #          context: ${{ matrix.dockerfileContext }}
-  #          file: ${{ matrix.dockerfile }}
-  #          push: true
-  #          tags: ${{ steps.meta.outputs.tags }}
-  #          labels: ${{ steps.meta.outputs.labels }}
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        include:
+          - name: server
+            context: ./server
+            dockerfile: ./server/Dockerfile
+            dockerfileContext: ./
+          - name: bot-frontend
+            context: ./telegram-bot
+            dockerfile: ./telegram-bot/Dockerfile
+            dockerfileContext: ./telegram-bot
+          - name: web-frontend
+            context: ./web
+            dockerfile: ./web/Dockerfile
+            dockerfileContext: ./web
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install system dependencies
+        if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
+        run: |
+          python -m pip install --upgrade pip
+          pip install sphinx sphinx-rtd-theme
+          cd ${{ matrix.context }}
+          ls -la
+          make install
+          cd ..
+
+      - name: Run CI pipeline
+        if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
+        run: |
+          cd ${{ matrix.context }}
+          make ci
+          cd ..
+        continue-on-error: true
+
+      - name: Generate documentation
+        if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
+        run: |
+          cd ${{ matrix.context }}
+          sphinx-apidoc -o docs/source ./src
+          sphinx-build -b html docs/source docs/build/html
+          cd docs/build
+          zip -r nutrisys-${{ matrix.name }}-documentation.zip html
+          cd ../../..
+
+      - name: Upload documentation artifact
+        if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
+        uses: actions/upload-artifact@v4
+        with:
+          name: nutrisys-${{ matrix.name }}-documentation
+          path: ${{ matrix.context }}/docs/build/nutrísys-${{ matrix.name }}-documentation.zip
+
+      # --- Python tests ---
+      - name: Run Python unit tests for ${{ matrix.name }}
+        id: unit_tests
+        if: matrix.name == env.TELEGRAM_BOT_IMAGE_NAME || matrix.name == env.SERVER_IMAGE_NAME
+        run: |
+          cd ${{ matrix.context }}
+          pip install -r requirements.txt
+          pytest -v test/unit > ../test-${{ matrix.name }}-unit.log 2>&1
+          TEST_EXIT_CODE=$?
+          echo "test_exit_code_${{ matrix.name }}=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Run Python integration tests for ${{ matrix.name }}
+        id: integration_tests
+        if: matrix.name == env.SERVER_IMAGE_NAME
+        run: |
+          cd ${{ matrix.context }}
+          pytest -v test/integration > ../test-${{ matrix.name }}-integration.log 2>&1
+          TEST_EXIT_CODE=$?
+          echo "test_exit_code_${{ matrix.name }}=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Run Python e2e tests for ${{ matrix.name }}
+        id: e2e_tests
+        if: matrix.name == env.SERVER_IMAGE_NAME
+        run: |
+          cd ${{ matrix.context }}
+          pytest test/e2e -vv --cucumber-json=report-e2e-${{ matrix.name }}.json
+          TEST_EXIT_CODE=$?
+          echo "test_exit_code_${{ matrix.name }}=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      # --- Web tests (Playwright) ---
+      - name: Setup Node.js
+        if: matrix.name == env.WEB_IMAGE_NAME
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies (web)
+        if: matrix.test_type == 'web'
+        run: |
+          cd ${{ matrix.context }}
+          npm ci
+
+      - name: Run Playwright tests
+        id: web_e2e_tests
+        if: matrix.test_type == 'web'
+        run: |
+          cd ${{ matrix.context }}
+          npx playwright install --with-deps
+          npx playwright test > ../test-${{ matrix.name }}-playwright.log 2>&1
+          TEST_EXIT_CODE=$?
+          echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      # --- Upload logs ---
+      - name: Upload test logs for ${{ matrix.name }}
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-${{ matrix.name }}
+          path: test-${{ matrix.name }}-*.log
+
+      # --- Build images and push into GitHub repository ---
+      - name: Login into ${{ env.REGISTRY }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ env.GHCR_PASS }}
+
+      - name: Extract Docker metadata
+        id: meta
+        # if: steps.integration_tests.outputs.test_exit_code == '0'
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.name }}
+
+      - name: Build and push ${{ matrix.name }} image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.dockerfileContext }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
   deploy-to-server:
     name: Deploy to server
     runs-on: self-hosted
     if: ${{ github.event.inputs.deploy_to_server == 'true' }}
-    #    needs: build-and-push
+    needs: build-and-push
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
